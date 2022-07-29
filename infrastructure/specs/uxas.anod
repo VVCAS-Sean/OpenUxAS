@@ -20,7 +20,7 @@ class Uxas(spec('common')):
             Anod.Dependency('sqlite'),
             Anod.Dependency('boost'),
             Anod.Dependency('sqlitecpp'),
-            Anod.Dependency('wellclear')]
+            Anod.Dependency('daidalus')]
 
     @property
     def build_source_list(self):
@@ -65,7 +65,7 @@ class Uxas(spec('common')):
         self.deps['sqlitecpp'].setenv()
         self.deps['boost'].setenv()
         self.deps['czmq'].setenv()
-        self.deps['wellclear'].setenv()
+        self.deps['daidalus'].setenv()
 
     @Anod.primitive()
     def build(self):

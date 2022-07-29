@@ -21,7 +21,6 @@
 
 #include "Constants/Convert.h"
 #include "Daidalus.h"
-#include "KinematicMultiBands.h"
 #include "Position.h"
 #include "ServiceBase.h"
 #include "Velocity.h"

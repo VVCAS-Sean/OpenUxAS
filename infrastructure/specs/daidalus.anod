@@ -5,23 +5,23 @@ from e3.fs import cp, mkdir, rm, sync_tree
 import os
 
 
-class WellClear(spec('github')):
+class Daidalus(spec('github')):
 
     @property
     def build_deps(self):
         return [Anod.Dependency('compiler'),
                 Anod.Dependency('cmake')]
 
-    github_project = 'wellclear'
+    github_project = 'daidalus'
 
     @Anod.primitive()
     def build(self):
-        src_dir = os.path.join(self.build_space.src_dir, 'DAIDALUS', 'C++')
+        src_dir = os.path.join(self.build_space.src_dir, 'C++')
         make = Make(self, exec_dir=src_dir)
         make.set_var('CXX', 'g++')
         make.set_var('CXXFLAGS', '-Iinclude -std=c++11 -Wall -O')
         make('lib')
-        cp(os.path.join(src_dir, 'lib', 'DAIDALUS.a'),
+        cp(os.path.join(src_dir, 'lib', 'DAIDALUS2.a'),
            os.path.join(src_dir, 'lib', 'libdaidalus.a'))
         rm(self.build_space.install_dir, recursive=True)
         mkdir(self.build_space.install_dir)
