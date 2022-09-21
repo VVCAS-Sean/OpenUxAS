@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.cnd.makeproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/make-project/1">
+            <name>uxas</name>
+            <c-extensions>c</c-extensions>
+            <cpp-extensions>cc,cpp</cpp-extensions>
+            <header-extensions>h,hpp,inc,inc_c,ipp</header-extensions>
+            <sourceEncoding>UTF-8</sourceEncoding>
+            <make-dep-projects/>
+            <sourceRootList>
+                <sourceRootElem>..</sourceRootElem>
+                <sourceRootElem>../../src/cpp</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/cppzmq/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/boost/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/czmq/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/pugixml/src/src</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/serial/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/serial/src/src</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/sqlite/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/sqlitecpp/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/sqlitecpp/src/src</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/uxas-lmcp-cpp/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/zeromq/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/zeromq/src/src</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/zyre/install/include</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/daidalus/src/C++/src</sourceRootElem>
+                <sourceRootElem>../../infrastructure/sbx/x86_64-linux/daidalus/install/include</sourceRootElem>
+            </sourceRootList>
+            <confList>
+                <confElem>
+                    <name>Default</name>
+                    <type>0</type>
+                </confElem>
+            </confList>
+            <formatting>
+                <project-formatting-style>false</project-formatting-style>
+            </formatting>
+        </data>
+    </configuration>
+</project>

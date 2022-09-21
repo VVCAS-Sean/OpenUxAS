@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <code-assistance-data xmlns="http://www.netbeans.org/ns/make-project-private/1">
+        <code-model-enabled>true</code-model-enabled>
+    </code-assistance-data>
+    <data xmlns="http://www.netbeans.org/ns/make-project-private/1">
+        <activeConfTypeElem>0</activeConfTypeElem>
+        <activeConfIndexElem>0</activeConfIndexElem>
+    </data>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/src/C++/src/Detection3DParameterReader.cpp</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/install/include/Detection3D.h</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/src/C++/src/StateReader.cpp</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/src/C++/src/Daidalus.cpp</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/install/include/Daidalus.h</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/src/cpp/Services/RouteAggregatorService.cpp</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/src/cpp/Communications/LmcpMessage.h</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/src/C++/src/Alerter.cpp</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/src/cpp/Services/DAIDALUS_Processing.h</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/install/include/AlertThresholds.h</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/install/include/Detection3DParameterReader.h</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/src/C++/src/SeparatedInput.cpp</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/src/cpp/Services/DAIDALUS_Processing.cpp</file>
+            <file>file:/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/src/C++/src/DaidalusParameters.cpp</file>
+        </group>
+    </open-files>
+</project-private>

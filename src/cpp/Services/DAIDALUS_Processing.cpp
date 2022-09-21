@@ -112,7 +112,7 @@
 
 // anonymous namespace for helper functions
 namespace {
-    // use direction cosine matrix to convert body frame velocity components into inertial frame velocity components: [DCM]*body_ref_vel_vector
+    // use direction cosine matrix to convert body frame velocity components into inertial frame velocity components NEDown: [DCM]*body_ref_vel_vector
     void makeVelocityXYZ(double u, double v, double w, double Phi_rad, double Theta_rad, double Psi_rad, double& velocityX, double& velocityY, 
             double& velocityZ)
     {
@@ -1140,15 +1140,15 @@ bool DAIDALUS_Processing::configure(const pugi::xml_node& ndComponent)
         }
     }
     m_daa.setLookaheadTime(m_lookahead_time_s, "s");
-    m_daa.parameters.setLeftTrack(m_left_trk_deg, "deg");
-    m_daa.parameters.setRightTrack(m_right_trk_deg, "deg");
+    m_daa.setLeftHorizontalDirection(m_left_trk_deg, "deg");
+    m_daa.setRightHorizontalDirection(m_right_trk_deg, "deg");
     m_daa.setMaxHorizontalSpeed(m_max_gs_mps, "m/s");
     m_daa.setMinHorizontalSpeed(m_min_gs_mps, "m/s");
     m_daa.setMaxVerticalSpeed(m_max_vs_mps, "m/s");
     m_daa.setMinVerticalSpeed(m_min_vs_mps, "m/s");
     m_daa.setMaxAltitude(m_max_alt_m, "m");
     m_daa.setMinAltitude(m_min_alt_m, "m");
-    m_daa.parameters.setTrackStep(m_trk_step_deg, "deg");
+    m_daa.setHorizontalDirectionStep(m_trk_step_deg, "deg");
     m_daa.setHorizontalSpeedStep(m_gs_step_mps, "m/s");
     m_daa.setVerticalSpeedStep(m_vs_step_mps, "m/s");
     m_daa.setAltitudeStep(m_alt_step_m, "m");
@@ -1161,7 +1161,7 @@ bool DAIDALUS_Processing::configure(const pugi::xml_node& ndComponent)
     }
     m_daa.setVerticalRate(m_vertical_rate_mps, "m/s");
     m_daa.setRecoveryStabilityTime(m_recovery_stability_time_s, "s");
-    m_daa.parameters.setRecoveryTrackBands(m_recovery_trk_bool);
+    m_daa.setRecoveryHorizontalDirectionBands(m_recovery_trk_bool);
     m_daa.setRecoveryHorizontalSpeedBands(m_recovery_gs_bool);
     m_daa.setRecoveryVerticalSpeedBands(m_recovery_vs_bool);
     m_daa.setRecoveryAltitudeBands(m_recovery_alt_bool);
@@ -1203,7 +1203,7 @@ bool DAIDALUS_Processing::configure(const pugi::xml_node& ndComponent)
     }
     
     raw_ptr = nullptr; //clean up raw pointer after use
-    m_daa.parameters.saveToFile("testConfiguraton"); // produce a text file with the DAIDALUS configuration used
+    m_daa.saveToFile("testConfiguraton"); // produce a text file with the DAIDALUS configuration used
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
     addSubscriptionAddress(uxas::messages::uxnative::StartupComplete::Subscription);
     addSubscriptionAddress(afrl::cmasi::AutomationResponse::Subscription);
@@ -1288,15 +1288,15 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
             std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
             DetectionConfiguration->setEntityId(m_VehicleID);
             DetectionConfiguration->setLookAheadTime(m_daa.getLookaheadTime("s"));
-            DetectionConfiguration->setLeftTrack(m_daa.parameters.getLeftTrack("deg"));
-            DetectionConfiguration->setRightTrack(m_daa.parameters.getRightTrack("deg"));
+            DetectionConfiguration->setLeftTrack(m_daa.getLeftHorizontalDirection("deg"));
+            DetectionConfiguration->setRightTrack(m_daa.getRightHorizontalDirection("deg"));
             DetectionConfiguration->setMaxGroundSpeed(m_daa.getMaxHorizontalSpeed("m/s"));
             DetectionConfiguration->setMinGroundSpeed(m_daa.getMinHorizontalSpeed("m/s"));
             DetectionConfiguration->setMaxVerticalSpeed(m_daa.getMaxVerticalSpeed("m/s"));
             DetectionConfiguration->setMinVerticalSpeed(m_daa.getMinVerticalSpeed("m/s"));
             DetectionConfiguration->setMaxAltitude(m_daa.getMaxAltitude("m"));
             DetectionConfiguration->setMinAltitude(m_daa.getMinAltitude("m"));
-            DetectionConfiguration->setTrackStep(m_daa.parameters.getTrackStep("deg"));
+            DetectionConfiguration->setTrackStep(m_daa.getHorizontalDirectionStep("deg"));
             DetectionConfiguration->setGroundSpeedStep(m_daa.getHorizontalSpeedStep("m/s"));
             DetectionConfiguration->setVerticalSpeedStep(m_daa.getVerticalSpeedStep("m/s"));
             DetectionConfiguration->setAltitudeStep(m_daa.getAltitudeStep("m"));
@@ -1306,7 +1306,7 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
             DetectionConfiguration->setBankAngle(m_daa.getBankAngle("deg"));
             DetectionConfiguration->setVerticalRate(m_daa.getVerticalRate("m/s"));
             DetectionConfiguration->setRecoveryStabilityTime(m_daa.getRecoveryStabilityTime("s"));
-            DetectionConfiguration->setIsRecoveryTrackBands(m_daa.parameters.isEnabledRecoveryTrackBands());
+            DetectionConfiguration->setIsRecoveryTrackBands(m_daa.isEnabledRecoveryHorizontalDirectionBands());
             DetectionConfiguration->setIsRecoveryGroundSpeedBands(m_daa.isEnabledRecoveryHorizontalSpeedBands());
             DetectionConfiguration->setIsRecoveryVerticalSpeedBands(m_daa.isEnabledRecoveryVerticalSpeedBands());
             DetectionConfiguration->setIsRecoveryAltitudeBands(m_daa.isEnabledRecoveryAltitudeBands());
@@ -1423,7 +1423,7 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                 // Determine the time to violation of the wellclear volume of the ownship by each intruder aircaft
                 for (int intruderIndex = 1; intruderIndex<=m_daa.numberOfAircraft()-1; ++intruderIndex)
                 {
-                    double timeToViolation_s = m_daa.timeToViolation(intruderIndex);
+                    double timeToViolation_s = m_daa.timeToCorrectiveVolume(intruderIndex);
                     int alert_level = m_daa.alerting(intruderIndex);
                     violation_data temp_data;
                     temp_data.TimeToViolation = timeToViolation_s;
@@ -1435,9 +1435,7 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                 }
                 //send out response
                 //Create DAIDALUS bands object and compute conflict/peripheral bands
-                larcfm::KinematicMultiBands m_daa_bands(m_daa.parameters);
-                m_daa.kinematicMultiBands(m_daa_bands);
-                std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>  nogo_ptr = 
+               std::shared_ptr<larcfm::DAIDALUS::WellClearViolationIntervals>  nogo_ptr = 
                         std::make_shared<larcfm::DAIDALUS::WellClearViolationIntervals>();  //Compose violations message
                 larcfm::TrafficState daa_own = m_daa.getOwnshipState();
                 for (auto itViolations = detectedViolations.cbegin(); itViolations !=detectedViolations.cend(); itViolations++)
@@ -1458,13 +1456,13 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                 nogo_ptr->setCurrentLongitude(m_daidalusVehicleInfo[m_VehicleID].longitude_deg);  //Current ownship longitude
                 nogo_ptr->setCurrentTime(m_daidalusVehicleInfo[m_VehicleID].m_daidalusTime_s);
                 
-                for (int ii = 0; ii < m_daa_bands.trackLength(); ii++)  //ground track bands
+                for (int ii = 0; ii < m_daa.horizontalDirectionBandsLength(); ii++)  //ground track bands
                 {
                     std::unique_ptr<larcfm::DAIDALUS::GroundHeadingInterval> pTempPtr (new larcfm::DAIDALUS::GroundHeadingInterval);
-                    larcfm::Interval iv = m_daa_bands.track(ii,"deg");
+                    larcfm::Interval iv = m_daa.horizontalDirectionIntervalAt(ii,"deg");
                     double lower_trk_deg = iv.low; //lower bound on interval
                     double upper_trk_deg = iv.up;   //upper bound on interval
-                    larcfm::BandsRegion::Region regionType = m_daa_bands.trackRegion(ii);   //region classification for above interval
+                    larcfm::BandsRegion::Region regionType = m_daa.horizontalDirectionRegionAt(ii);   //region classification for above interval
                     //Currently only considering conflict bands classified as NEAR, MID, or FAR
                     if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
                     {
@@ -1496,13 +1494,13 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                     
                 }
                 
-                for (int ii = 0; ii < m_daa_bands.groundSpeedLength();++ii) //ground speed bands
+                for (int ii = 0; ii < m_daa.horizontalSpeedBandsLength();++ii) //ground speed bands
                 {
                     std::unique_ptr<larcfm::DAIDALUS::GroundSpeedInterval> pTempPtr (new larcfm::DAIDALUS::GroundSpeedInterval);
-                    larcfm::Interval iv = m_daa_bands.groundSpeed(ii, "mps");
+                    larcfm::Interval iv = m_daa.horizontalSpeedIntervalAt(ii, "mps");
                     double lower_gs_mps = iv.low;
                     double upper_gs_mps =iv.up;
-                    larcfm::BandsRegion::Region regionType = m_daa_bands.groundSpeedRegion(ii);
+                    larcfm::BandsRegion::Region regionType = m_daa.horizontalSpeedRegionAt(ii);
                     if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
                     {
                         larcfm::DAIDALUS::BandsRegion::BandsRegion temp_regionType;
@@ -1533,13 +1531,13 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                     
                 }
                 
-                for (int ii =0; ii < m_daa_bands.verticalSpeedLength();++ii)    //vertical speed bands
+                for (int ii =0; ii < m_daa.verticalSpeedBandsLength();++ii)    //vertical speed bands
                 {
                     std::unique_ptr<larcfm::DAIDALUS::VerticalSpeedInterval> pTempPtr (new larcfm::DAIDALUS::VerticalSpeedInterval);
-                    larcfm::Interval iv = m_daa_bands.verticalSpeed(ii, "mps");
+                    larcfm::Interval iv = m_daa.verticalSpeedIntervalAt(ii, "mps");
                     double lower_vs_mps = iv.low;
                     double upper_vs_mps = iv.up;
-                    larcfm::BandsRegion::Region regionType = m_daa_bands.verticalSpeedRegion(ii);
+                    larcfm::BandsRegion::Region regionType = m_daa.verticalSpeedRegionAt(ii);
                     if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
                     {
                         larcfm::DAIDALUS::BandsRegion::BandsRegion temp_regionType;
@@ -1570,13 +1568,13 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                     
                 }
                 
-                for (int ii = 0; ii < m_daa_bands.altitudeLength(); ++ii)   //altitude bands
+                for (int ii = 0; ii < m_daa.altitudeBandsLength(); ++ii)   //altitude bands
                 {
                     std::unique_ptr<larcfm::DAIDALUS::AltitudeInterval> pTempPtr (new larcfm::DAIDALUS::AltitudeInterval);
-                    larcfm::Interval iv = m_daa_bands.altitude(ii, "m");
+                    larcfm::Interval iv = m_daa.altitudeIntervalAt(ii, "m");
                     double lower_alt_m = iv.low;
                     double upper_alt_m = iv.up;
-                    larcfm::BandsRegion::Region regionType = m_daa_bands.altitudeRegion(ii);
+                    larcfm::BandsRegion::Region regionType = m_daa.altitudeRegionAt(ii);
                     if (regionType == larcfm::BandsRegion::FAR || regionType == larcfm::BandsRegion::MID || regionType == larcfm::BandsRegion::NEAR)
                     {
                         larcfm::DAIDALUS::BandsRegion::BandsRegion temp_regionType;
