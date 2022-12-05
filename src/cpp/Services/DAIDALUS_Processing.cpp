@@ -1180,28 +1180,29 @@ bool DAIDALUS_Processing::configure(const pugi::xml_node& ndComponent)
     std::unique_ptr<larcfm::Detection3D> cd = makeDetectionPtr(m_horizontal_detection_type,alert_level);
     larcfm::Detection3D* raw_ptr; //DAIDALUS Interface requires a raw pointer
     raw_ptr = cd.get();
-    m_daa.parameters.alertor.clear();
+    m_daa.clearAlerters();
+    larcfm::Alerter alerter;
     // Configure the alert levels and timing based on the number of alert levels desired (3 levels used for all testing...may be mis-interpretation for <3)
     if (m_RTCA_alert_levels == 1)
     {
-        m_daa.parameters.alertor.setConflictAlertLevel(1);
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::NEAR));
+       // m_daa.parameters.alertor.setConflictAlertLevel(1);
+        alerter.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::NEAR));
         
     }
     else if (m_RTCA_alert_levels == 2)
     {
-        m_daa.parameters.alertor.setConflictAlertLevel(2);
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::MID));
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_2_s, m_early_alert_time_2_s, larcfm::BandsRegion::NEAR));
+        //m_daa.parameters.alertor.setConflictAlertLevel(2);
+        alerter.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::MID));
+        alerter.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_2_s, m_early_alert_time_2_s, larcfm::BandsRegion::NEAR));
     }
     else 
     {
-        m_daa.parameters.alertor.setConflictAlertLevel(3);
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::FAR));
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_2_s, m_early_alert_time_2_s, larcfm::BandsRegion::MID));
-        m_daa.parameters.alertor.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_3_s, m_early_alert_time_3_s, larcfm::BandsRegion::NEAR));
+        //m_daa.parameters.alertor.setConflictAlertLevel(3);
+        alerter.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_1_s, m_early_alert_time_1_s, larcfm::BandsRegion::FAR));
+        alerter.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_2_s, m_early_alert_time_2_s, larcfm::BandsRegion::MID));
+        alerter.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_3_s, m_early_alert_time_3_s, larcfm::BandsRegion::NEAR));
     }
-    
+    larcfm::Daidalus::addAlerter(alerter);
     raw_ptr = nullptr; //clean up raw pointer after use
     m_daa.saveToFile("testConfiguraton"); // produce a text file with the DAIDALUS configuration used
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
