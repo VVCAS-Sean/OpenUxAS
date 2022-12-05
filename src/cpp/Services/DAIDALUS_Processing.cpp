@@ -1202,7 +1202,7 @@ bool DAIDALUS_Processing::configure(const pugi::xml_node& ndComponent)
         alerter.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_2_s, m_early_alert_time_2_s, larcfm::BandsRegion::MID));
         alerter.addLevel(larcfm::AlertThresholds(raw_ptr, m_alert_time_3_s, m_early_alert_time_3_s, larcfm::BandsRegion::NEAR));
     }
-    larcfm::Daidalus::addAlerter(alerter);
+    m_daa.larcfm::Daidalus::addAlerter(alerter);
     raw_ptr = nullptr; //clean up raw pointer after use
     m_daa.saveToFile("testConfiguraton"); // produce a text file with the DAIDALUS configuration used
     addSubscriptionAddress(afrl::cmasi::AirVehicleState::Subscription);
