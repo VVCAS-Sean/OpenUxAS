@@ -41,6 +41,7 @@
             <in>ZmqTcpSocket.cpp</in>
             <in>ZmqTcpSocket.h</in>
           </df>
+          <in>IMsgSenderReceiver.h</in>
           <in>ZmqAttributedMsgSenderReceiver.cpp</in>
           <in>ZmqAttributedMsgSenderReceiver.h</in>
           <in>ZmqPullReceiver.cpp</in>

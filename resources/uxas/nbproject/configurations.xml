@@ -3,6 +3,31 @@
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="../../src/cpp" name="0">
       <df name="Communications">
+        <df name="ZeroMq">
+          <df name="Proxy">
+            <in>ThreadRunnerBase.cpp</in>
+            <in>ZmqProxy.cpp</in>
+          </df>
+          <df name="Receivers">
+            <in>MsgReceiverSentinel.cpp</in>
+            <in>SetArrayClientList.cpp</in>
+            <in>ZmqGenericReceiver.cpp</in>
+            <in>ZmqTcpReceiver.cpp</in>
+          </df>
+          <df name="Senders">
+            <in>MsgSenderSentinel.cpp</in>
+            <in>ZmqTcpSender.cpp</in>
+          </df>
+          <df name="Sockets">
+            <in>ZmqSocketBase.cpp</in>
+            <in>ZmqSocketInitializer.cpp</in>
+            <in>ZmqTcpSocket.cpp</in>
+          </df>
+          <in>ZmqAttributedMsgSenderReceiver.cpp</in>
+          <in>ZmqPullReceiver.cpp</in>
+          <in>ZmqPushSender.cpp</in>
+          <in>ZmqTcpSenderReceiver.cpp</in>
+        </df>
         <in>AddressedAttributedMessage.cpp</in>
         <in>ImpactSubscribePushBridge.cpp</in>
         <in>LmcpObjectMessageReceiverPipe.cpp</in>
@@ -126,6 +151,7 @@
       <df name="VisilibityLib">
         <in>visilibity.cpp</in>
       </df>
+      <in>UxAS_Main.cpp</in>
     </df>
     <df root="../../infrastructure/sbx/x86_64-linux/cppzmq/install/include"
         name="1">
@@ -310,15 +336,6 @@
           <ccTool>
             <incDir>
               <pElem>../../src/cpp/Communications</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/daidalus/install/include</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/boost/install/include/boost</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/cppzmq/install/include</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/czmq/install/include</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/pugixml/install/include</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/sqlitecpp/install/include</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/uxas-lmcp-cpp/install/include</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/zeromq/install/include</pElem>
-              <pElem>/home/rqqa/vvcas-sean/OpenUxAS/infrastructure/sbx/x86_64-linux/zyre/install/include</pElem>
             </incDir>
           </ccTool>
         </makeTool>
@@ -1083,6 +1100,111 @@
         <ccTool flags="0">
         </ccTool>
       </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Proxy/ThreadRunnerBase.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Proxy/ZmqProxy.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Receivers/MsgReceiverSentinel.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Receivers/SetArrayClientList.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Receivers/ZmqGenericReceiver.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Receivers/ZmqTcpReceiver.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Senders/MsgSenderSentinel.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Senders/ZmqTcpSender.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Sockets/ZmqSocketBase.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Sockets/ZmqSocketInitializer.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/Sockets/ZmqTcpSocket.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/ZmqAttributedMsgSenderReceiver.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/ZmqPullReceiver.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/ZmqPushSender.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
+      <item path="../../src/cpp/Communications/ZeroMq/ZmqTcpSenderReceiver.cpp"
+            ex="false"
+            tool="1"
+            flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
       <item path="../../src/cpp/Communications/ZeroMqAddressStringReceiver.cpp"
             ex="false"
             tool="1"
@@ -1241,17 +1363,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/01_HelloWorld.cpp"
@@ -1259,17 +1370,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/AssignmentTreeBranchBoundBase.cpp"
@@ -1277,17 +1377,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/AssignmentTreeBranchBoundService.cpp"
@@ -1295,17 +1384,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/AutomationDiagramDataService.cpp"
@@ -1313,17 +1391,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/AutomationRequestValidatorService.cpp"
@@ -1331,17 +1398,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/BatchSummaryService.cpp"
@@ -1349,17 +1405,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/DAIDALUS_Processing.cpp"
@@ -1367,22 +1412,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Communications/ZeroMq/Proxy</pElem>
-            <pElem>../../src/cpp/Communications/ZeroMq/Receivers</pElem>
-            <pElem>../../src/cpp/Communications/ZeroMq/Senders</pElem>
-            <pElem>../../src/cpp/Communications/ZeroMq/Sockets</pElem>
-            <pElem>../../src/cpp/Communications/ZeroMq</pElem>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/LoiterLeash.cpp"
@@ -1390,17 +1419,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/MessageLoggerDataService.cpp"
@@ -1408,17 +1426,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/OperatingRegionStateService.cpp"
@@ -1426,17 +1433,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/OsmPlannerService.cpp"
@@ -1444,17 +1440,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/PlanBuilderService.cpp"
@@ -1462,17 +1447,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/RouteAggregatorService.cpp"
@@ -1480,17 +1454,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/RoutePlannerService.cpp"
@@ -1498,17 +1461,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/RoutePlannerVisibilityService.cpp"
@@ -1516,17 +1468,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/SendMessagesService.cpp"
@@ -1534,17 +1475,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/SensorManagerService.cpp"
@@ -1552,17 +1482,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/SerialAutomationRequestTestService.cpp"
@@ -1570,17 +1489,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/ServiceBase.cpp"
@@ -1588,17 +1496,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/ServiceManager.cpp"
@@ -1606,17 +1503,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/SimpleWaypointPlanManagerService.cpp"
@@ -1624,17 +1510,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/StatusReportService.cpp"
@@ -1642,17 +1517,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/SteeringService.cpp"
@@ -1660,17 +1524,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/Test_SimulationTime.cpp"
@@ -1678,17 +1531,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Services/WaypointPlanManagerService.cpp"
@@ -1696,17 +1538,6 @@
             tool="1"
             flavor2="8">
         <ccTool flags="0">
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
         </ccTool>
       </item>
       <item path="../../src/cpp/Tasks/00_TaskTemplate.cpp"
@@ -2003,6 +1834,10 @@
         <ccTool flags="0">
         </ccTool>
       </item>
+      <item path="../../src/cpp/UxAS_Main.cpp" ex="false" tool="1" flavor2="8">
+        <ccTool flags="0">
+        </ccTool>
+      </item>
       <item path="../../src/cpp/VisilibityLib/visilibity.cpp"
             ex="false"
             tool="1"
@@ -2010,84 +1845,14 @@
         <ccTool flags="0">
         </ccTool>
       </item>
-      <folder path="0/Communications">
+      <folder path="0">
         <ccTool>
           <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/DPSS">
-        <ccTool>
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/Plans">
-        <ccTool>
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/Tasks">
-        <ccTool>
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/Utilities">
-        <ccTool>
-          <incDir>
-            <pElem>../../src/cpp/Includes</pElem>
-            <pElem>../../src/cpp/Services</pElem>
-            <pElem>../../src/cpp/Tasks</pElem>
-            <pElem>../../src/cpp/DPSS</pElem>
-            <pElem>../../src/cpp/Plans</pElem>
-            <pElem>../../src/cpp/Utilities</pElem>
-            <pElem>../../src/cpp/VisilibityLib</pElem>
-            <pElem>../AutomationDiagramDataService</pElem>
-            <pElem>../..</pElem>
-          </incDir>
-        </ccTool>
-      </folder>
-      <folder path="0/VisilibityLib">
-        <ccTool>
-          <incDir>
+            <pElem>../../src/cpp/Communications/ZeroMq/Proxy</pElem>
+            <pElem>../../src/cpp/Communications/ZeroMq/Receivers</pElem>
+            <pElem>../../src/cpp/Communications/ZeroMq/Senders</pElem>
+            <pElem>../../src/cpp/Communications/ZeroMq/Sockets</pElem>
+            <pElem>../../src/cpp/Communications/ZeroMq</pElem>
             <pElem>../../src/cpp/Includes</pElem>
             <pElem>../../src/cpp/Services</pElem>
             <pElem>../../src/cpp/Tasks</pElem>
@@ -2103,6 +1868,15 @@
       <folder path="16">
         <ccTool>
           <incDir>
+            <pElem>../../infrastructure/sbx/x86_64-linux/daidalus/install/include</pElem>
+            <pElem>../../infrastructure/sbx/x86_64-linux/boost/install/include/boost</pElem>
+            <pElem>../../infrastructure/sbx/x86_64-linux/cppzmq/install/include</pElem>
+            <pElem>../../infrastructure/sbx/x86_64-linux/czmq/install/include</pElem>
+            <pElem>../../infrastructure/sbx/x86_64-linux/pugixml/install/include</pElem>
+            <pElem>../../infrastructure/sbx/x86_64-linux/sqlitecpp/install/include</pElem>
+            <pElem>../../infrastructure/sbx/x86_64-linux/uxas-lmcp-cpp/install/include</pElem>
+            <pElem>../../infrastructure/sbx/x86_64-linux/zeromq/install/include</pElem>
+            <pElem>../../infrastructure/sbx/x86_64-linux/zyre/install/include</pElem>
             <pElem>../../src/cpp/Includes</pElem>
             <pElem>../../src/cpp/Services</pElem>
             <pElem>../../src/cpp/Tasks</pElem>
