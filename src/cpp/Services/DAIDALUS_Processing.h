@@ -232,6 +232,7 @@ private: //following are member variables associated with detection
     int m_RTCA_alert_levels = {3};   //number of alert levels reported for guidance processing--max 3
     std::string m_horizontal_detection_type = {"TAUMOD"}; //string--horizontal detection type
     double m_staleness_time_s = m_lookahead_time_s;
+    bool m_bands_add_time_to_maneuver_bool = {true}; //Boolean--adds time to maneuver to band classification
     
     struct MydaidalusPackage
     {

@@ -101,6 +101,7 @@
 #define STRING_XML_HORIZONTALDETECTIONTYPE "HorizontalDetectionType"
 #define STRING_XML_DTHR "DTHR"
 #define STRING_XML_ZTHR "ZTHR"
+#define STRING_XML_BANDSADDTIME "BandsAddTimeToManeuver"
 
 //preprocessor directives associated with response
 #define STRING_XML_AUTOMATICRESPONSESTATUS "AutomaticResponseStatus"
@@ -1139,6 +1140,12 @@ bool DAIDALUS_Processing::configure(const pugi::xml_node& ndComponent)
             m_AutomaticResponseStatus = "ON";
         }
     }
+    if (!ndComponent.attribute(STRING_XML_BANDSADDTIME).empty())
+    {
+       bool local_bands_add_time_to_maneuver_bool = ndComponent.attribute(STRING_XML_BANDSADDTIME).as_bool();
+       m_bands_add_time_to_maneuver_bool = local_bands_add_time_to_maneuver_bool;
+    }
+    
     m_daa.setLookaheadTime(m_lookahead_time_s, "s");
     m_daa.setLeftHorizontalDirection(m_left_trk_deg, "deg");
     m_daa.setRightHorizontalDirection(m_right_trk_deg, "deg");
@@ -1172,6 +1179,7 @@ bool DAIDALUS_Processing::configure(const pugi::xml_node& ndComponent)
     m_daa.setVerticalNMAC(m_vertical_nmac_m, "m");
     m_daa.setMinVerticalRecovery(m_min_vertical_recovery_m, "m");
     m_daa.setHorizontalContourThreshold(m_contour_thr_deg, "deg");
+    m_daa.setBandsAddTimeToManeuver(m_bands_add_time_to_maneuver_bool);
     larcfm::WCVTable alert_level;
     alert_level.setDTHR(m_DTHR_m,"m");
     alert_level.setZTHR(m_ZTHR_m,"m");
