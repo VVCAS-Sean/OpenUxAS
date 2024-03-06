@@ -19,6 +19,16 @@ with UxAS.Messages.Route.RoutePlan;                   use UxAS.Messages.Route.Ro
 with UxAS.Messages.Route.RoutePlanRequest;            use UxAS.Messages.Route.RoutePlanRequest;
 with UxAS.Messages.Route.RoutePlanResponse;           use UxAS.Messages.Route.RoutePlanResponse;
 with UxAS.Messages.Route.RouteRequest;                use UxAS.Messages.Route.RouteRequest;
+with larcfm.DAIDALUS.DAIDALUSConfiguration;           use larcfm.DAIDALUS.DAIDALUSConfiguration;
+with larcfm.DAIDALUS.WellClearViolationIntervals;     use larcfm.DAIDALUS.WellClearViolationIntervals;
+with larcfm.DAIDALUS.GroundHeadingInterval;           use larcfm.DAIDALUS.GroundHeadingInterval;
+with larcfm.DAIDALUS.GroundSpeedInterval;             use larcfm.DAIDALUS.GroundSpeedInterval;
+with larcfm.DAIDALUS.VerticalSpeedInterval;           use larcfm.DAIDALUS.VerticalSpeedInterval;
+with larcfm.DAIDALUS.AltitudeInterval;                use larcfm.DAIDALUS.AltitudeInterval;
+with larcfm.DAIDALUS.GroundHeadingRecoveryInterval;   use larcfm.DAIDALUS.GroundHeadingRecoveryInterval;
+with larcfm.DAIDALUS.GroundSpeedRecoveryInterval;     use larcfm.DAIDALUS.GroundSpeedRecoveryInterval;
+with larcfm.DAIDALUS.VerticalSpeedRecoveryInterval;   use larcfm.DAIDALUS.VerticalSpeedRecoveryInterval;
+with larcfm.DAIDALUS.AltitudeRecoveryInterval;        use larcfm.DAIDALUS.AltitudeRecoveryInterval;
 
 package LMCP_Message_Conversions is
 
@@ -59,5 +69,45 @@ package LMCP_Message_Conversions is
    function As_MissionCommand_Message (Msg : not null MissionCommand_Acc) return LMCP_Messages.MissionCommand;
 
    function As_Object_Any (Msg : LMCP_Messages.Message_Root'Class) return AVTAS.LMCP.Object.Object_Any;
+
+   function As_DAIDALUSConfiguration_Message
+     (Msg : not null DAIDALUSConfiguration_Any) return
+     LMCP_Messages.DAIDALUSConfiguration;
+
+   function As_WellClearViolationsIntervals_Message
+     (Msg : not null WellClearViolationIntervals_Any) return
+     LMCP_Messages.WellClearViolationIntervals;
+
+   function As_GroundHeadingInterval_Message
+     (Msg : not null GroundHeadingInterval_Acc) return
+     LMCP_Messages.Real64_Array;
+
+   function As_GroundSpeedInterval_Message
+     (Msg : not null GroundSpeedInterval_Acc) return
+     LMCP_Messages.Real64_Array;
+
+   function As_VerticalSpeedInterval_Message
+     (Msg : not null VerticalSpeedInterval_Acc) return
+     LMCP_Messages.Real64_Array;
+
+   function As_AltitudeInterval_Message
+     (Msg : not null AltitudeInterval_Acc) return
+     LMCP_Messages.Real64_Array;
+
+   function As_GroundHeadingRecoveryInterval_Message
+     (Msg : not null GroundHeadingRecoveryInterval_Acc) return
+     LMCP_Messages.Real64_Array;
+
+   function As_GroundSpeedRecoveryInterval_Message
+     (Msg : not null GroundSpeedRecoveryInterval_Acc) return
+     LMCP_Messages.Real64_Array;
+
+   function As_VerticalSpeedRecoveryInterval_Message
+     (Msg : not null VerticalSpeedRecoveryInterval_Acc) return
+     LMCP_Messages.Real64_Array;
+
+   function As_AltitudeRecoveryInterval_Message
+     (Msg : not null AltitudeRecoveryInterval_Acc) return
+     LMCP_Messages.Real64_Array;
 
 end LMCP_Message_Conversions;
