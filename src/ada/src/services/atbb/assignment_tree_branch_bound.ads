@@ -1,10 +1,10 @@
 with SPARK.Containers.Formal.Unbounded_Hashed_Maps;
 with SPARK.Containers.Functional.Maps;
-with Ada.Containers;                             use Ada.Containers;
-with Ada.Strings.Unbounded;                      use Ada.Strings.Unbounded;
-with Assignment_Tree_Branch_Bound_Communication; use Assignment_Tree_Branch_Bound_Communication;
-with Common;                                     use Common;
-with LMCP_Messages;                              use LMCP_Messages;
+with Ada.Containers;                         use Ada.Containers;
+with Ada.Strings.Unbounded;                  use Ada.Strings.Unbounded;
+with Assignment_Tree_Branch_Bound_Mailboxes; use Assignment_Tree_Branch_Bound_Mailboxes;
+with Common;                                 use Common;
+with LMCP_Messages;                          use LMCP_Messages;
 
 package Assignment_Tree_Branch_Bound with SPARK_Mode is
 

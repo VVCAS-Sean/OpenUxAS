@@ -2,9 +2,9 @@ with DOM.Core;
 
 with Common;                                         use Common;
 with Route_Aggregator;                               use Route_Aggregator;
-with Route_Aggregator_Communication;                 use Route_Aggregator_Communication;
+with Route_Aggregator_Mailboxes;                 use Route_Aggregator_Mailboxes;
 
-package UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
+package UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregator_Interfacing is
 
    type Route_Aggregator_Service is new Service_Base with private;
 
@@ -47,4 +47,4 @@ private
       Received_Message : not null Any_LMCP_Message;
       Should_Terminate : out Boolean);
 
-end UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation;
+end UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregator_Interfacing;

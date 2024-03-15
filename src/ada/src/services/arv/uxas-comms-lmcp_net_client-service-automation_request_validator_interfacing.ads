@@ -2,10 +2,10 @@
 
 with DOM.Core;
 
-with Automation_Request_Validator;               use Automation_Request_Validator;
-with Automation_Request_Validator_Communication; use Automation_Request_Validator_Communication;
+with Automation_Request_Validator;           use Automation_Request_Validator;
+with Automation_Request_Validator_Mailboxes; use Automation_Request_Validator_Mailboxes;
 
-package UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validation is
+package UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validator_Interfacing is
 
    type Automation_Request_Validator_Service is new Service_Base with private;
 
@@ -73,4 +73,4 @@ private
 --  this function gets called when the tasks involved have not reported initialization in time
 --  void OnTasksReadyTimeout();
 
-end UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validation;
+end UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validator_Interfacing;

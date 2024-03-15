@@ -20,7 +20,7 @@ with UxAS.Messages.lmcptask.TaskPlanOptions;         use UxAS.Messages.lmcptask.
 with UxAS.Messages.lmcptask.UniqueAutomationRequest; use UxAS.Messages.lmcptask.UniqueAutomationRequest;
 with Ada.Containers; use Ada.Containers;
 
-package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
+package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregator_Interfacing is
 
    procedure Handle_AirVehicleConfig_Msg
      (This : in out Route_Aggregator_Service;
@@ -420,7 +420,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation is
    begin
       Result := True; --  per the C++ version
 
-      Route_Aggregator_Communication.Initialize
+      Route_Aggregator_Mailboxes.Initialize
         (This.Mailbox,
          Source_Group => Value (This.Message_Source_Group),
          Unique_Id    => Common.Int64 (UxAS.Comms.LMCP_Net_Client.Unique_Entity_Send_Message_Id),
@@ -503,4 +503,4 @@ begin
    --  All concrete service subclasses must call this procedure in their
    --  own package like this, with their own params.
    Register_Service_Creation_Function_Pointers (Registry_Service_Type_Names, Create'Access);
-end UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation;
+end UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregator_Interfacing;

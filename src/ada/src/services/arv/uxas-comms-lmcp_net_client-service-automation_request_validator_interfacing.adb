@@ -25,7 +25,7 @@ with DOM.Core.Elements;
 with Common;                   use Common;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 
-package body UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validation is
+package body UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validator_Interfacing is
 
    function UInt32_Attribute
      (XML_Node : DOM.Core.Element;
@@ -529,7 +529,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validation is
       -- since not doing the Timers
    begin
       --  the C++ version creates the timers here (but we don't, unless we implement the timers).
-      Automation_Request_Validator_Communication.Initialize
+      Automation_Request_Validator_Mailboxes.Initialize
         (This.Mailbox,
          Source_Group => Value (This.Message_Source_Group),
          Unique_Id    => Common.Int64 (UxAS.Comms.LMCP_Net_Client.Unique_Entity_Send_Message_Id),
@@ -653,4 +653,4 @@ begin
    --  located at the top of the cpp file
 
    Register_Service_Creation_Function_Pointers (Registry_Service_Type_Names, Create'Access);
-end UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validation;
+end UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validator_Interfacing;

@@ -1,9 +1,9 @@
 with DOM.Core;
 
 with Assignment_Tree_Branch_Bound;               use Assignment_Tree_Branch_Bound;
-with Assignment_Tree_Branch_Bound_Communication; use Assignment_Tree_Branch_Bound_Communication;
+with Assignment_Tree_Branch_Bound_Mailboxes; use Assignment_Tree_Branch_Bound_Mailboxes;
 
-package UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bounding is
+package UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bound_Interfacing is
 
    type Assignment_Tree_Branch_Bound_Service is new Service_Base with private;
 
@@ -46,4 +46,4 @@ private
       Received_Message : not null Any_LMCP_Message;
       Should_Terminate : out Boolean);
 
-end UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bounding;
+end UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bound_Interfacing;

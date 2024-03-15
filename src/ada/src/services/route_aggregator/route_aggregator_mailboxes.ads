@@ -7,7 +7,7 @@ private with UxAS.Comms.LMCP_Object_Message_Sender_Pipes;
 --  Package only concerned with message passing. It defines its own state,
 --  named Mailbox here, which is not mixed with the state of the service.
 
-package Route_Aggregator_Communication with SPARK_Mode is
+package Route_Aggregator_Mailboxes with SPARK_Mode is
 
    type Route_Aggregator_Mailbox is limited private;
 
@@ -46,4 +46,4 @@ private
       Unique_Entity_Send_Message_Id : Int64;
    end record;
 
-end Route_Aggregator_Communication;
+end Route_Aggregator_Mailboxes;

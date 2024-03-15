@@ -7,9 +7,9 @@ with SPARK.Containers.Functional.Infinite_Sequences;
 with SPARK.Containers.Types;               use SPARK.Containers.Types;
 with SPARK.Big_Integers; use SPARK.Big_Integers;
 
-with Common;                         use Common;
-with LMCP_Messages;                  use LMCP_Messages;
-with Route_Aggregator_Communication; use Route_Aggregator_Communication;
+with Common;                     use Common;
+with LMCP_Messages;              use LMCP_Messages;
+with Route_Aggregator_Mailboxes; use Route_Aggregator_Mailboxes;
 
 package Route_Aggregator with SPARK_Mode is
    pragma Unevaluated_Use_Of_Old (Allow);

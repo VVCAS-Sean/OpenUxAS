@@ -2,7 +2,7 @@ with AVTAS.LMCP.Types;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 with UxAS.Common.String_Constant.Message_Group;
 
-package body Route_Aggregator_Communication is
+package body Route_Aggregator_Mailboxes is
 
    ----------------------------------------
    -- Get_Next_Unique_Sending_Message_Id --
@@ -83,4 +83,4 @@ package body Route_Aggregator_Communication is
                           when AircraftPathPlanner => Message_Group.AircraftPathPlanner),
          Message      => As_Object_Any (Msg));
    end sendLimitedCastMessage;
-end Route_Aggregator_Communication;
+end Route_Aggregator_Mailboxes;

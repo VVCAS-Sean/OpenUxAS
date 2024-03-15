@@ -9,7 +9,7 @@ with Common;                   use Common;
 with LMCP_Messages;            -- use LMCP_Messages;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 
-package body UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management is
+package body UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Manager_Interfacing is
 
    ---------------------------
    -- Convenience functions --
@@ -201,7 +201,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management is
       -- Since we are not doing the Timers
    begin
       --  the C++ version creates the timers here (but we don't currently).
-      Waypoint_Plan_Manager_Communication.Initialize
+      Waypoint_Plan_Manager_Mailboxes.Initialize
         (This.Mailbox,
          Source_Group => Value (This.Message_Source_Group),
          Unique_Id    => Common.Int64 (UxAS.Comms.LMCP_Net_Client.Unique_Entity_Send_Message_Id),
@@ -411,4 +411,4 @@ begin
    --  located at the top of the cpp file
 
    Register_Service_Creation_Function_Pointers (Registry_Service_Type_Names, Create'Access);
-end UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management;
+end UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Manager_Interfacing;

@@ -10,7 +10,7 @@ use UxAS.Messages.lmcptask.TaskPlanOptions;
 with UxAS.Messages.lmcptask.UniqueAutomationRequest;
 use UxAS.Messages.lmcptask.UniqueAutomationRequest;
 
-package body UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bounding is
+package body UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bound_Interfacing is
 
    -----------------------
    -- Local subprograms --
@@ -148,7 +148,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bounding 
    begin
       Result := True; --  per the C++ version
 
-      Assignment_Tree_Branch_Bound_Communication.Initialize
+      Assignment_Tree_Branch_Bound_Mailboxes.Initialize
         (This.Mailbox,
          Source_Group => Value (This.Message_Source_Group),
          Unique_Id    => Common.Int64 (UxAS.Comms.LMCP_Net_Client.Unique_Entity_Send_Message_Id),
@@ -211,4 +211,4 @@ begin
    --  All concrete service subclasses must call this procedure in their
    --  own package like this, with their own params.
    Register_Service_Creation_Function_Pointers (Registry_Service_Type_Names, Create'Access);
-end UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bounding;
+end UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bound_Interfacing;

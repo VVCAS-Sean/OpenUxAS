@@ -1,139 +1,114 @@
-OpenUxAS SPARK Service Template - README
-========================================
+OpenUxAS SPARK Service Design Template - README
+===============================================
+
+This README describes how to begin the design process for creating an OpenUxAS service in Ada and SPARK. In brief, the process starts with running a script to generate partially-complete source files. These files comprise the "design pattern" for any OpenUxAS service, with "TODO" comments within the source files for the service-specific implementation details. You then edit these files, filling in the TODO sections, resulting in a compilable implementation.
 
 # Setup
 
-Before starting to create a new OpenUxAS SPARK service, you should make sure you have a suitable development environment set up for Ada and SPARK.
-First, you should run:
+You should first make sure you have a suitable development environment set up for Ada and SPARK.
+To do so, run this command:
 
     OpenUxAS$ ./anod build uxas-ada
 
-This will ensure that you have GNAT on your path and will install GNAT and SPARK using Alire, if needed.
+This command will ensure that you have GNAT on your path. It will install GNAT and SPARK, using Alire, if needed.
 
 Each time you open a new shell in which you want to do development, you should run:
 
     OpenUxAS$ eval "$( ./anod printenv uxas-ada --build-env )"
 
-This will pull the Ada development environment into your shell, allowing you to run `gprbuild` and `gnatprove` as expected.
+This command will pull the Ada development environment into your shell, allowing you to run `gprbuild` and `gnatprove` as expected.
 
 Finally, you should also install VS Code and the Ada extension; this repository is configured to support Ada development using VS Code.
 
-# Instantiating the Template
+# Instantiating the Design Template
 
-Conceptually, there are two parts to an OpenUxAS service:
+Conceptually, the design of any OpenUxAS service consists of two parts:
 
 1. the part that interfaces with the rest of OpenUxAS.
 2. the part that implements the service functionality.
 
-In OpenUxAS - in both C++ and Ada - the first part inherits from ServiceBase; this is the means by which it accomplishes interfacing with the rest of OpenUxAS, via ZeroMQ and using LMCP.
+In OpenUxAS - in both C++ and Ada - the first part inherits from ServiceBase; this is the means by which it interfaces with the rest of OpenUxAS, via ZeroMQ and using LMCP.
 
 Ideally, the second part should have no knowledge of the first: this separation of concerns allows either the service functionality or the interfacing code to change independently of the other.
 In the C++ code, these two parts are intermixed.
 In the Ada code, we have separated them into distinct parts.
 
-We have also added a third part in the Ada code:
+In addition, the design for a SPARK/Ada implementation includes a third part:
 
 3. the part that passes data between the interface and the functionality (parts one and two), ensuring that the data is SPARK-compatible.
 
-Each of the three parts is implemented by a distinct package.
+Each of the three parts is implemented by a distinct package in a SPARK/Ada implementation. More packages could, of course, be added by the developer, depending on the specific implementation, but the three core packages will always be included.
 
-Each package requires a unique package name, and each defines a primary type that also needs a name.
-To date the schema for these names has been somewhat ad hoc.
-For example, consider the Route Aggregator Service.
-There are three forms of that name reflected in the package names:
+By default with GNAT, a package declaration and corresponding body occur in two separate source files. Hence there are at least six files for any given SPARK/Ada service implementation. 
 
-1. Route_Aggregation: the part that interfaces with the rest of OpenUxAS, in Ada.
-2. Route_Aggregator: the part that implements in the service functionality, in SPARK.
-3. Route_Aggregator_Communication: the part that passes data between (1) and (2).
+Therefore, we provide a script that will create these three packages in their six source files automatically, with package and type names reflecting the service involved and the purposes of the specific packages. 
 
-The full package name for the first part is "UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation".
-In terms of files and their file names for all three parts we then have the following:
-
-Part 1:
-    route_aggregator.adb
-    route_aggregator.ads
-
-Part 2:
-    uxas-comms-lmcp_net_client-service-route_aggregation.adb
-    uxas-comms-lmcp_net_client-service-route_aggregation.ads
-
-Part 3:
-    route_aggregator_communication.adb
-    route_aggregator_communication.ads
-
-In GNAT, by default the file names must reflect the package (unit) names within, so you can tell that the package name for part 3 in that file is Route_Aggregator_Communication.
-That's just the service name with "_Communication" appended so parts 1 and 3 directly reflect the service name, whereas part 2 does not.
-The package for part 2 is a "child" of package UxAS.Comms.LMCP_Net_Client.Service so it already has a prefix that would allow the use of "Route_Aggregator" for the last part of the package name.
-However that child package also includes package "Route_Aggregator" in a context clause, which could lead to confusion, both for the reader and for the compiler.
-A different name is more appropriate here.
-
-Rather than come up with some variation of the service name, "Route_Aggregation" for example, we can take the same approach as was used for the name of the package for part 2.
-We can append something appropriate to the service name.
-
-This all may sound complex, and indeed it is.
-(It is the same module and class name generation issue that C++ and other languages have, but multiplied by three because we refactored the code into three units.)
-
-Therefore, we have defined a script and an input template file that will create these six files automatically, with package and type names reflecting the service involved and the purposes of the specific packages.
-
-Within the template file, we name these packages based on just one name - i.e., the service name:
+The unit names for these generated packages are based on the service name itself. The three names are as follows, where "<Service_Name>" is a placeholder for the service name:
 
 1. <Service_Name>_Interfacing for the interfacing part.
 2. <Service_Name> for the functionality part.
 3. <Service_Name>_Mailboxes for the data-passing part.
 
-For part 2 packages, defining the interfacing facilities, we now simply append "_Interfacing" to the service name, rather than requiring the user to come up with some variation of the service name.
-Hence the complete file name is (for the spec):
-"uxas-comms-lmcp_net_client-service-<service_name>_interfacing.ads"
+As shown, the unit name for a part two package is simply the service name itself. The name thus reflects the fact that this package implements the service functionality.
 
-Note that we chose a more specific suffix for the name of part 3's packages, reflecting the primary type they define. Hence "_Communication" is now "_Mailboxes" in those package names.
+The unit name for a part three package is the service name with "_Mailboxes" appended. This package provides a data passing facility between the other two parts, using a type named "Mailbox", hence the name of the package reflects that type name.
 
-When invoking the script you must specify the service name, in Ada source code format.
-For example, for the Route Aggregator service you would specify "Route_Aggregator" as the single argument to the script.
-The argument must be a legal Ada name because the script uses it as-is in the generated source files.
-That's why the underscore is included in the argument.
-Although Ada is case-insensitive, we suggest that you use the casing indicated so that it will be consistent with the rest of the code generated in the files.
-That will enhance readability.
+The unit name for a part one package is the service name with "_Interfacing" appended, because this package provides the interfaces with the rest of OpenUxAS. However, that is not the full name for the package. The package for the first part is a hierarchical child package, a "child" of a package named "UxAS.Comms.LMCP_Net_Client.Service". Hence the complete package name is 
+"UxAS.Comms.LMCP_Net_Client.Service.<Service_Name>_Interfacing".
+
+For example, if the service name is Route_Aggregator, the package unit names will be as follows:
+
+1. UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregator_Interfacing
+2. Route_Aggregator
+3. Route_Aggregator_Mailboxes
+
+The names of the source files must reflect the unit names contained within them. That is the default naming scheme in GNAT. Other naming schemes are supported, but the script generates names conforming to the default scheme.
+
+Therefore, the source file names for the three packages will reflect the service name, with any dots in the unit names changed to dashes (for part one packages). The package declarations and bodies are in separate files, with file extensions of ".ads" and ".adb" respectively. 
+
+Continuing the Route_Aggregator service name example, the six generated files will be named as follows:
+
+1. uxas-comms-lmcp_net_client-service-route_aggregator_interfacing.ad[s|b]
+2. route_aggregator.ad[s|b]
+3. route_aggregator_mailboxes.ad[s|b]
 
 The script is named `instantiate`.
-You invoke the script with the name of the service to be supported.
-For example:
 
-    OpenUxAS/src/ada/src/services$ template/instantiate My_Route_Aggregator
+When invoking the script you must specify the service name. The name must be a single, syntactically legal Ada identifier. It is not a string and is not specified to the script within quotes. Furthermore, although Ada is not case-sensitive, the specified name should be given in mixed case format, as, for example, we have done with Route_Aggregator. This casing is not required but the generated code uses it throughout, so for the sake of readability we suggest you use that format as well.
 
-That will generate the six Ada/SPARK source files.
+For example, for the route aggregator service you would specify Route_Aggregator as the single argument to the script (i.e., without any  quotes). Note the underscore.
+
+    OpenUxAS/src/ada/src/services$ template/instantiate Route_Aggregator
+
+That will generate the six SPARK/Ada source files.
 
 The script uses the file `template.txt`, contained in this directory, to guide the generation.
-Updating this file will change the template behavior, although the need to do so is not expected.
+Users may alter this file to change the generated design pattern source files, although the need to do so is not expected.
 
-As a result, assuming the invocation illustrated above, the script will generate these files in a new subdirectory `my_route_aggregator` under `OpenUxAS/src/ada/src/services`:
+As a result, assuming the invocation illustrated above, the script will generate these files in a new subdirectory `route_aggregator` under `OpenUxAS/src/ada/src/services`:
 
-    my_route_aggregator.adb
-    my_route_aggregator.ads
-    my_route_aggregator_mailboxes.adb
-    my_route_aggregator_mailboxes.ads
-    uxas-comms-lmcp_net_client-service-my_route_aggregator_interfacing.adb
-    uxas-comms-lmcp_net_client-service-my_route_aggregator_interfacing.ads
+    route_aggregator.adb
+    route_aggregator.ads
+    route_aggregator_mailboxes.adb
+    route_aggregator_mailboxes.ads
+    uxas-comms-lmcp_net_client-service-route_aggregator_interfacing.adb
+    uxas-comms-lmcp_net_client-service-route_aggregator_interfacing.ads
 
-There is one final name to discuss.
+There is one final name to mention: the ServiceName. This is the name of the service as expected in the rest of OpenUxAS (in C++) and as it appears in the OpenUxAS XML configuration file. The name appears in the generated code as a string literal in the interfacing package, specifically as the value of the `Type_Name` constant.
 
-* ServiceName: the name of the service as expected in the rest of OpenUxAS (in C++) and as it appears in the OpenUxAS XML configuration file. The name appears in the generated code as a string literal in the interfacing package, specifically as the value of the `Type_Name` constant.
-
-The script generates the value for the constant, automatically.
-In particular, the script first removes all the underscores in the name passed as the script argument, and then appends "Service" to the result.
+The script generates the value for the constant, automatically. In particular, the script first removes all the underscores in the name passed as the script argument, and then appends "Service" to the result.
 
 For example, with the following invocation:
 
-    OpenUxAS/src/ada/src/services$ template/instantiate My_Route_Aggregator
+    OpenUxAS/src/ada/src/services$ template/instantiate Route_Aggregator
 
-the generated service name literal would be "MyRouteAggregatorService":
+the generated service name literal would be "RouteAggregatorService":
 
-   Type_Name : constant String := "MyRouteAggregatorService";
+   Type_Name : constant String := "RouteAggregatorService";
 
-One of the "TODO" entries in the generated source files is to verify that the string literal exactly matches the value expected by the rest of OpenUxAS.
+One of the "TODO" entries in the generated source files is to verify that the string literal exactly matches the value expected by the rest of OpenUxAS, in particular in the OpenUxAS XML configuration file.
 
-As templates, the six generated files are incomplete.
-Users must fill in the missing parts by editing the files. The "TODO" entries facilitate this effort.
-Because the files are incomplete, they are not immediately compilable.
+Because the generated files are incomplete, they are not immediately compilable. Users must fill in the missing parts by editing the files. The "TODO" entries facilitate this effort.
 
 In the sections that follow, we describe how to modify the generated files and make other changes necessary to include them in the Ada executable.
 We will refer to the names of the files, and the names of the packages within those files, using the <Service_Name> placeholder.
@@ -142,7 +117,7 @@ Likewise, we will refer to "package <Service_Name>_Mailboxes" and "package <Serv
 
 ## Add Messages
 
-If you need SPARK-compatible LMCP messages that have not previously been used in any existing SPARK/Ada UxAS service, you will need to manually add support for them. To do this, you must:
+If your implementation requires SPARK-compatible LMCP messages that have not previously been used in any existing SPARK/Ada UxAS service, you must manually add support for them. To do this, you must:
 
 1.  Add a type definition for the message to the SPARK package `LMCP_Messages` in
     `/src/services/spark/lmcp_messages.ads`. Note that you will need to
@@ -164,7 +139,7 @@ If you want to be able to broadcast SPARK-compatible LMCP messages directly from
 
 1.  Add a function to the body of package `LMCP_Message_Conversions` to
     convert the SPARK-compatible LMCP message type back to an access type or
-    classwide access type for the original Ada LMCP message type.
+    class-wide access type for the original Ada LMCP message type.
     -   By convention, such functions are named `As_<MessageType>_Any` or
         `As_<MessageType>_Acc` depending on whether they return a classwide
         access type or simply an access type.
@@ -181,7 +156,7 @@ If you want to be able to broadcast SPARK-compatible LMCP messages directly from
     Recursively add cases for any fields whose types are messages that
     are not currently handled in this function.
 
-## Modify Template Files
+## Modify Generated Files
 
 The following instructions walk through how to modify the contents of each of the generated service template files. Note that each instruction has a corresponding `__TODO__` comment in the template file itself, along with examples in a corresponding `__Example__` comment.
 
@@ -327,7 +302,7 @@ template files are as follows:
         pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.<Service_Name>_Interfacing);
 
 The with-clause is necessary for the package to be part of the Ada main's executable image.
-The pragma informs the compiler that it need note generate a warning about the fact that the package is not otherwise referenced with the body of the main procedure.
+The pragma informs the compiler that it need not generate a warning about the fact that the package is not otherwise referenced with the body of the main procedure.
 
 # Build and Run SPARK/Ada OpenUxAS
 

@@ -1,7 +1,7 @@
 with AVTAS.LMCP.Types;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 
-package body Waypoint_Plan_Manager_Communication is
+package body Waypoint_Plan_Manager_Mailboxes is
 
    ----------------
    -- Initialize --
@@ -48,4 +48,4 @@ package body Waypoint_Plan_Manager_Communication is
       This.Message_Sender_Pipe.Send_Shared_Broadcast_Message (As_Object_Any (Msg));
    end sendBroadcastMessage;
 
-end Waypoint_Plan_Manager_Communication;
+end Waypoint_Plan_Manager_Mailboxes;

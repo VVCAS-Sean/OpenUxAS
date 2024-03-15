@@ -1,14 +1,14 @@
 with DOM.Core;
 
 with Waypoint_Plan_Manager;               use Waypoint_Plan_Manager;
-with Waypoint_Plan_Manager_Communication; use Waypoint_Plan_Manager_Communication;
+with Waypoint_Plan_Manager_Mailboxes; use Waypoint_Plan_Manager_Mailboxes;
 
 with AFRL.CMASI.Enumerations; use AFRL.CMASI.Enumerations;
 with AFRL.CMASI.MissionCommand; use AFRL.CMASI.MissionCommand;
 
 with Common; use Common;
 
-package UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management is
+package UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Manager_Interfacing is
 
    type Waypoint_Plan_Manager_Service is new Service_Base with private;
 
@@ -56,4 +56,4 @@ private
 --  this function gets called when the tasks involved have not reported initialization in time
 --  void OnTasksReadyTimeout();
 
-end UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management;
+end UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Manager_Interfacing;

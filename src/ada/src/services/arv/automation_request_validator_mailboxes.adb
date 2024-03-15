@@ -1,14 +1,14 @@
 with AVTAS.LMCP.Types;
-with LMCP_Message_Conversions;                  use LMCP_Message_Conversions;
+with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 
-package body Assignment_Tree_Branch_Bound_Communication is
+package body Automation_Request_Validator_Mailboxes is
 
    ----------------
    -- Initialize --
    ----------------
 
    procedure Initialize
-     (This         : out Assignment_Tree_Branch_Bound_Mailbox;
+     (This         : out Automation_Request_Validator_Mailbox;
       Source_Group : String;
       Unique_Id    : Int64;
       Entity_Id    : UInt32;
@@ -39,7 +39,7 @@ package body Assignment_Tree_Branch_Bound_Communication is
    --  this is sendSharedLMCPObjectBroadcastMessage(), in our code Send_Shared_LMCP_Object_Broadcast_Message
 
    procedure sendBroadcastMessage
-     (This : in out Assignment_Tree_Branch_Bound_Mailbox;
+     (This : in out Automation_Request_Validator_Mailbox;
       Msg  : Message_Root'Class)
    is
    begin
@@ -48,22 +48,4 @@ package body Assignment_Tree_Branch_Bound_Communication is
       This.Message_Sender_Pipe.Send_Shared_Broadcast_Message (As_Object_Any (Msg));
    end sendBroadcastMessage;
 
-   ----------------------
-   -- sendErrorMessage --
-   ----------------------
-
-   procedure sendErrorMessage
-     (This         : in out Assignment_Tree_Branch_Bound_Mailbox;
-      Error_String : Unbounded_String)
-   is
-      KVP     : KeyValuePair := (Key   => To_Unbounded_String ("No UniqueAutomationResponse"),
-                                 Value => Error_String);
-      Message : ServiceStatus;
-   begin
-      Message.StatusType := Error;
-      Message.Info := Add (Message.Info, KVP);
-      This.Unique_Entity_Send_Message_Id := This.Unique_Entity_Send_Message_Id + 1;
-      This.Message_Sender_Pipe.Send_Shared_Broadcast_Message (As_Object_Any (Message));
-   end sendErrorMessage;
-
-end Assignment_Tree_Branch_Bound_Communication;
+end Automation_Request_Validator_Mailboxes;

@@ -1,10 +1,10 @@
 with SPARK.Containers.Formal.Hashed_Maps;
 with SPARK.Containers.Formal.Vectors;
 
-with Ada.Containers;                             use all type Ada.Containers.Count_Type;
-with Waypoint_Plan_Manager_Communication;        use Waypoint_Plan_Manager_Communication;
-with Common;                                     use Common;
-with LMCP_Messages;                              use LMCP_Messages;
+with Ada.Containers;                         use all type Ada.Containers.Count_Type;
+with Waypoint_Plan_Manager_Mailboxes;        use Waypoint_Plan_Manager_Mailboxes;
+with Common;                                 use Common;
+with LMCP_Messages;                          use LMCP_Messages;
 
 package Waypoint_Plan_Manager with SPARK_Mode is
 
