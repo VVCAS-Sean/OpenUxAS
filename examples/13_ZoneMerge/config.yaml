@@ -1,0 +1,7 @@
+amase:
+  scenario: MessagesToSend/ZoneMerge.xml
+
+uxases:
+  - config: cfgZoneMerge_1000.xml
+    rundir: UAV_1000
+

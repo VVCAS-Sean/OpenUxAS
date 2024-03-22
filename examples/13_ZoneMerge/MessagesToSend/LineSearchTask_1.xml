@@ -1,0 +1,46 @@
+<LineSearchTask Series="CMASI">
+  <PointList>
+    <Location3D Series="CMASI">
+      <Latitude>39.20721714659836</Latitude>
+      <Longitude>-87.20898266063917</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+    <Location3D Series="CMASI">
+      <Latitude>39.245800650729194</Latitude>
+      <Longitude>-87.13916323890977</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+    <Location3D Series="CMASI">
+      <Latitude>39.24734399089443</Latitude>
+      <Longitude>-87.07333349842206</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+    <Location3D Series="CMASI">
+      <Latitude>39.290557515520966</Latitude>
+      <Longitude>-86.9955347142093</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+    <Location3D Series="CMASI">
+      <Latitude>39.290557515520966</Latitude>
+      <Longitude>-86.9955347142093</Longitude>
+      <Altitude>0.0</Altitude>
+      <AltitudeType>MSL</AltitudeType>
+    </Location3D>
+  </PointList>
+  <ViewAngleList/>
+  <UseInertialViewAngles>false</UseInertialViewAngles>
+  <DesiredWavelengthBands/>
+  <DwellTime>0</DwellTime>
+  <GroundSampleDistance>0.0</GroundSampleDistance>
+  <TaskID>1</TaskID>
+  <Label/>
+  <EligibleEntities/>
+  <RevisitRate>0.0</RevisitRate>
+  <Parameters/>
+  <Priority>0</Priority>
+  <Required>true</Required>
+</LineSearchTask>
