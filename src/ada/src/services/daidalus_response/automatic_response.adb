@@ -1,5 +1,6 @@
 pragma Ada_2012;
 with Ada.Containers;
+with LMCP_Messages; use LMCP_Messages;
 package body automatic_response
 with SPARK_Mode => On is
 
@@ -54,6 +55,8 @@ with SPARK_Mode => On is
       PriorityStatus : Priority_Type := pStandard;
       RoW : ID_Type;
       m_StatusOld : Status_Type;
+      FlightDirectorAction : VA_Seq;
+      VehicleActionCommand : VehicleActionCommand;
       --  vpimy: integer := 0;
    begin
 
@@ -177,8 +180,10 @@ with SPARK_Mode => On is
                               PriorityStatus);
                Is_Tracking_Next_Waypoint := False;
                Send_Divert_Action_Command_ghost := True;
+               VehicleActionCommand.VehicleID := m_VehicleID;
+
                -----------------------------------------------------------------
-               --  SendDivertCommand(Divert_State, m_Vehicle_ID);
+               --TODO  SendDivertCommand(Divert_State, m_Vehicle_ID);
                -----------------------------------------------------------------
                m_Status := OnHold;
                pragma Assert (Diverted (Conflict_Resolution_List, RoW,
@@ -264,7 +269,7 @@ with SPARK_Mode => On is
                        Element (m_MissionCommand.waypoint_list, 2).
                        waypoint_number;
                      -----------------------------------------------------------
-                     --Send revised mission command
+                     --TODO: Send revised mission command
                      -----------------------------------------------------------
                      SendNewMissionCommand_ghost := True;
                      m_Status := OnMission;

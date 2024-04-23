@@ -510,6 +510,9 @@ package body LMCP_Message_Conversions is
       elsif Msg in LMCP_Messages.MissionCommand'Class then
          Result := AVTAS.LMCP.Object.Object_Any (As_MissionCommand_Acc (LMCP_Messages.MissionCommand (Msg)));
 
+      elsif Msg in LMCP_Messages.VehicleActionCommand'Class then
+         Result := AVTAS.LMCP.Object.Object_Any (As_VehicleActionCommand_Any (LMCP_Messages.VehicleActionCommand (Msg)));
+
       else
          raise Program_Error with "unexpected message kind in Route_Aggregator_Message_Conversions.As_Object_Any";
          --  UniqueAutomationRequest is in the class but not sent
