@@ -6,6 +6,8 @@ with Int64_Parsing;     use Int64_Parsing;
 
 package body Algebra with SPARK_Mode is
 
+   use Common.Count_Type_To_Big_Integer_Conversions;
+
    type Int64_Seq_Arr is array (Children_Index range <>) of Int64_Seq;
 
    -----------------------
@@ -184,7 +186,7 @@ package body Algebra with SPARK_Mode is
                   if not Encounter_Executed_Out then
                      for J in 1 .. Num_Children loop
                         for TaskOptionId of Children_Results (J) loop
-                           pragma Assume (Length (ResultThis) < Count_Type'Last);
+                           pragma Assume (Length (ResultThis) < To_Big_Integer (Count_Type'Last));
                            ResultThis := Add (ResultThis, TaskOptionId);
                         end loop;
                      end loop;
@@ -200,7 +202,7 @@ package body Algebra with SPARK_Mode is
 
                      --  All actions are candidate in a parallel assignment
                      for TaskOptionId of Children_Results (J) loop
-                        pragma Assume (Length (ResultThis) < Count_Type'Last);
+                        pragma Assume (Length (ResultThis) < To_Big_Integer (Count_Type'Last));
                         ResultThis := Add (ResultThis, TaskOptionId);
                      end loop;
 

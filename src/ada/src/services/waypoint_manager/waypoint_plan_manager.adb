@@ -19,7 +19,6 @@ package body Waypoint_Plan_Manager with SPARK_Mode is
       Id_To_Waypoint : in out Pos64_WP_Map;
       Id_To_Next_Id : in out Pos64_Nat64_Map)
    with
-     Pre => Length (WaypointList) <= Max,
      Post =>
        Waypoints_Are_Subset (Id_To_Waypoint, WaypointList)
        and then Have_Same_Keys (Id_To_Waypoint, Id_To_Next_Id)
@@ -391,7 +390,7 @@ package body Waypoint_Plan_Manager with SPARK_Mode is
             end if;
             WP_List := Add (WP_List, WP);
 
-            pragma Loop_Invariant (Positive (Length (WP_List)) = I);
+            pragma Loop_Invariant (Length (WP_List) = To_Big_Integer (I));
             pragma Loop_Invariant
               (for all J in First_Index (State.Segment) .. I =>
                    (if J /= Last_Index (State.Segment) then
