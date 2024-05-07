@@ -1,8 +1,11 @@
+with SPARK.Big_Integers;         use SPARK.Big_Integers;
 with Ada.Containers;             use Ada.Containers;
 with AVTAS.LMCP.Types;
 with UxAS.Comms.LMCP_Net_Client; use UxAS.Comms.LMCP_Net_Client;
 
 package body Automation_Request_Validator with SPARK_Mode is
+
+   use Common.Count_Type_To_Big_Integer_Conversions;
 
    -----------------------
    -- Local Subprograms --
@@ -247,7 +250,7 @@ package body Automation_Request_Validator with SPARK_Mode is
                             (not Contains (S, I) and then Contains (States, I))));
                   Id := Int64_Sets.Choose (S);
                   if Contains (States, Id) then
-                     pragma Assume (Length (EntityList) < Count_Type'Last, "we have less than Count_Type'Last vehicles");
+                     pragma Assume (Length (EntityList) < To_Big_Integer (Count_Type'Last), "we have less than Count_Type'Last vehicles");
                      EntityList := Add (EntityList, Id);
                      IsFoundAMatch := True;
                   end if;
@@ -445,8 +448,7 @@ package body Automation_Request_Validator with SPARK_Mode is
          declare
             Req : constant UniqueAutomationRequest := First_Element (State.Requests_Waiting_For_Tasks);
          begin
-            areAllTasksReady :=
-              (for all TaskId of Req.TaskList => Contains (Config.Available_Initialized_Tasks, TaskId));
+            areAllTasksReady := (for all TaskId of Req.TaskList => Contains (Config.Available_Initialized_Tasks, TaskId));
             if areAllTasksReady then
                isNewPendingRequest := True;
 

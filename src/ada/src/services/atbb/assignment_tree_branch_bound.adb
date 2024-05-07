@@ -1,3 +1,4 @@
+with SPARK.Big_Integers;                 use SPARK.Big_Integers;
 with Ada.Containers;                     use Ada.Containers;
 with Ada.Strings.Fixed;                  use Ada.Strings.Fixed;
 with Ada.Strings;                        use Ada.Strings;
@@ -7,6 +8,7 @@ with Bounded_Stack;
 with Int64_Parsing;                      use Int64_Parsing;
 
 package body Assignment_Tree_Branch_Bound with SPARK_Mode is
+   use Common.Count_Type_To_Big_Integer_Conversions;
 
    ---------------------------------------------------
    -- Types used in the computation of the solution --
@@ -23,7 +25,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
       Element_Type => VehicleAssignmentCost,
       Hash         => Int64_Hash);
    use Int64_VehicleAssignmentCost_Maps;
-   subtype Int64_VAC_Map is Int64_VehicleAssignmentCost_Maps.Map (Int64_VehicleAssignmentCost_Maps.Default_Modulus (10));
+   subtype Int64_VAC_Map is Int64_VehicleAssignmentCost_Maps.Map;
    package Int64_VehicleAssignmentCost_Maps_P renames Int64_VehicleAssignmentCost_Maps.Formal_Model.P;
    package Int64_VehicleAssignmentCost_Maps_K renames Int64_VehicleAssignmentCost_Maps.Formal_Model.K;
 
@@ -184,7 +186,6 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
    with Ghost,
         Pre => True,
         Subprogram_Variant => (Structural => Algebra);
-   pragma Annotate (GNATprove, Always_Return, All_Actions_In_Map);
 
    function TaskOptionId_In_Map
      (TaskOptionId        : Int64;
@@ -349,8 +350,8 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
         Ghost,
         Pre  => Is_Present (Alg, ID) and then All_Actions_In_Map (Alg, TaskPlanOptions_Map),
         Post => ID in 0 .. 9_999_999_999 and then TaskOptionId_In_Map (ID, TaskPlanOptions_Map),
-        Subprogram_Variant => (Structural => Alg);
-      pragma Annotate (GNATprove, Always_Return, Prove_TaskOptionId_In_Map);
+        Subprogram_Variant => (Structural => Alg),
+        Always_Terminates;
 
       procedure Prove_Travel_In_CostMatrix
         (EntityId : Int64;
@@ -553,7 +554,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
          Result : Int64_Seq;
       begin
          for J in TO_Sequences.First .. Last (Assignment.Assignment_Sequence) loop
-            pragma Assume (Length (Result) < Count_Type'Last);
+            pragma Assume (Length (Result) < To_Big_Integer (Count_Type'Last));
             Result :=
               Add (Result,
                    Get_TaskOptionID
@@ -765,7 +766,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
          taskPlanOptions          : in out Int64_TaskPlanOptions_Map_Map;
          uniqueAutomationRequests : Int64_UniqueAutomationRequest_Map)
       with
-        Annotate => (GNATprove, Always_Return),
+        Always_Terminates,
         Pre  =>
             (for all Req of taskPlanOptions =>
                (Valid_TaskPlanOptions (Element (taskPlanOptions, Req))
@@ -1292,7 +1293,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
         Pre  =>
           Valid_TaskPlanOptions (TaskPlanOptions_Map)
             and then Valid_Assignment (Assignment, TaskPlanOptions_Map, Automation_Request)
-            and then Length (Assignment.Assignment_Sequence) < Count_Type'Last
+            and then Length (Assignment.Assignment_Sequence) < To_Big_Integer (Count_Type'Last)
             and then TaskOpt.TaskID in 0 .. 99_999
             and then TaskOpt.OptionID in 0 .. 99_999
             and then Result.Assignment_Sequence = Add (Assignment.Assignment_Sequence,
@@ -1317,7 +1318,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
       procedure Prove_Initial_Value_Is_Valid with
         Ghost,
         Pre  =>
-          Length (Assignment.Assignment_Sequence) < Count_Type'Last
+          Length (Assignment.Assignment_Sequence) < To_Big_Integer (Count_Type'Last)
             and then TaskOpt.TaskID in 0 .. 99_999
             and then TaskOpt.OptionID in 0 .. 99_999
             and then
@@ -1474,7 +1475,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
    begin
       --  The assignment sequence is the enclosing assignment sequence with
       --  the new TaskAssignment added at the end.
-      pragma Assume (Length (Assignment.Assignment_Sequence) < Count_Type'Last);
+      pragma Assume (Length (Assignment.Assignment_Sequence) < To_Big_Integer (Count_Type'Last));
       Result.Assignment_Sequence :=
         Add (Assignment.Assignment_Sequence,
              (TaskOpt.TaskID,

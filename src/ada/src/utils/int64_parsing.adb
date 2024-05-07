@@ -45,7 +45,7 @@ package body Int64_Parsing with SPARK_Mode is
 
       for I in FirstZ .. First - 1 loop
          if S (I) /= '0' then
-            return;
+            raise Parsing_Error;
          end if;
          pragma Loop_Invariant (for all K in FirstZ .. I => S (K) = '0');
       end loop;
@@ -58,16 +58,19 @@ package body Int64_Parsing with SPARK_Mode is
             (abs (V) > Int64'Last / 10
              or else (abs (V) = Int64'Last / 10 and then S (I - 1 + First) > (if Is_Pos then '7' else '8')))
          then
-            return;
+            raise Parsing_Error;
          end if;
 
          V := V * 10 + (if Is_Pos then 1 else -1) * Char_To_Int (S (I - 1 + First));
 
          if I - 1 + First = S'Last then
-            Error := False;
             return;
          end if;
       end loop;
+<<<<<<< HEAD
+=======
+      raise Parsing_Error;
+>>>>>>> 83e902b9 (bla)
    end Parse_Int64;
 
    function Print_Int64 (V : Int64) return String is
