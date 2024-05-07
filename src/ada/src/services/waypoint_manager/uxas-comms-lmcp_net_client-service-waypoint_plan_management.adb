@@ -104,14 +104,6 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management is
         TurnType_Attribute (XML_Node, "TurnType",
                             Default => This.Config.TurnType);
 
-      --  Put_Line ("===== Configuration Done =====");
-      --  Put_Line ("VehicleID:" & This.Config.VehicleID'Image);
-      --  Put_Line ("NumberWaypointsToServe:" & This.Config.NumberWaypointsToServe'Image);
-      --  Put_Line ("NumberWaypointOverlap:" & This.Config.NumberWaypointsOverlap'Image);
-      --  Put_Line ("LoiterRadiusDefault:" & This.Config.LoiterRadiusDefault'Image);
-      --  Put_Line ("GimbalPayloadId:" & This.Config.GimbalPayloadId'Image);
-      --  Put_Line ("TurnType:" & This.Config.TurnType'Image);
-
       This.Add_Subscription_Address (AFRL.CMASI.AutomationResponse.Subscription, Unused);
       This.Add_Subscription_Address (AFRL.CMASI.AirVehicleState.Subscription, Unused);
       This.Add_Subscription_Address (AFRL.CMASI.MissionCommand.Subscription, Unused);
@@ -175,7 +167,6 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management is
    begin
       if Vehicle_ID = This.Config.VehicleID then
          Handle_MissionCommand (This.State, As_MissionCommand_Message (MC));
-         Put_Line ("Got MC.");
       end if;
    end Handle_MissionCommand_Msg;
 
@@ -193,8 +184,6 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management is
       for MC of Vec_MC_Acc_Acc.all loop
          if Common.Int64 (MC.getVehicleID) = This.Config.VehicleID then
             Handle_MissionCommand (This.State, As_MissionCommand_Message (MC));
-            -- Put_Line ("Got AR.");
-            -- Print (This.State);
             exit;
          end if;
       end loop;
@@ -243,15 +232,16 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management is
       end if;
 
       if This.Time_Elapsed then
-
-         if (This.State.New_Command and This.State.Next_Segment_Id > 0 and This.State.Next_First_Id > 0)
-           or else (not This.State.New_Command and This.State.Headed_To_First_Id)
+         if (This.State.New_Command and This.State.Next_Index > 0
+             and This.State.Next_First_Id > 0)
+           or else
+             (not This.State.New_Command and This.State.Headed_To_First_Id
+              and This.State.Next_Index > 0 and This.State.Next_First_Id > 0)
          then
             Produce_Segment (This.State, This.Config, This.Mailbox);
             This.Time_Elapsed := False;
             This.State.Headed_To_First_Id := False;
          end if;
-
       end if;
 
       Should_Terminate := False;
