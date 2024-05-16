@@ -3,6 +3,7 @@ with AFRL.CMASI.Enumerations;
 with AFRL.CMASI.MissionCommand;                     use AFRL.CMASI.MissionCommand;
 with AFRL.CMASI.ServiceStatus;                      use AFRL.CMASI.ServiceStatus;
 with AFRL.CMASI.VehicleActionCommand;               use AFRL.CMASI.VehicleActionCommand;
+with AFRL.CMASI.FlightDirectorAction;               use AFRL.CMASI.FlightDirectorAction;
 with AFRL.Impact.ImpactAutomationResponse;          use AFRL.Impact.ImpactAutomationResponse;
 with AVTAS.LMCP.Types;
 with Common;
@@ -100,6 +101,10 @@ package body LMCP_Message_Conversions is
      (Msg : LMCP_Messages.VehicleActionCommand)
       return VehicleActionCommand_Any;
 
+   function As_VehicleActionCommand_Acc
+     (Msg : LMCP_Messages.VehicleActionCommand_w_FlightDirectorAction)
+     return VehicleActionCommand_Acc;
+
    function As_VehicleActionCommand_Message
      (Msg : VehicleActionCommand_Any)
       return LMCP_Messages.VehicleActionCommand;
@@ -111,6 +116,10 @@ package body LMCP_Message_Conversions is
    function As_Waypoint_Acc
      (Msg : LMCP_Messages.Waypoint)
       return Waypoint_Acc;
+
+   function As_FlightDirectorAction_Acc
+     (Msg : LMCP_Messages.VehicleAction_Descendant_FlightDirectorAction)
+      return FlightDirectorAction_Acc;
 
    --  function As_GroundHeadingInterval_Acc
    --    (Msg : LMCP_Messages.GroundHeadingInterval'Class)
@@ -510,8 +519,11 @@ package body LMCP_Message_Conversions is
       elsif Msg in LMCP_Messages.MissionCommand'Class then
          Result := AVTAS.LMCP.Object.Object_Any (As_MissionCommand_Acc (LMCP_Messages.MissionCommand (Msg)));
 
-      elsif Msg in LMCP_Messages.VehicleActionCommand'Class then
-         Result := AVTAS.LMCP.Object.Object_Any (As_VehicleActionCommand_Any (LMCP_Messages.VehicleActionCommand (Msg)));
+      elsif Msg in LMCP_Messages.VehicleActionCommand_w_FlightDirectorAction'Class
+      then
+         Result := AVTAS.LMCP.Object.Object_Any
+           (As_VehicleActionCommand_Acc
+              (LMCP_Messages.VehicleActionCommand_w_FlightDirectorAction (Msg)));
 
       else
          raise Program_Error with "unexpected message kind in Route_Aggregator_Message_Conversions.As_Object_Any";
@@ -1155,6 +1167,42 @@ package body LMCP_Message_Conversions is
       return Result;
    end As_VehicleActionCommand_Any;
 
+   ---------------------------------
+   -- As_VehicleActionCommand_Acc --
+   ---------------------------------
+
+   function As_VehicleActionCommand_Acc
+     (Msg : LMCP_Messages.VehicleActionCommand_w_FlightDirectorAction)
+      return VehicleActionCommand_Acc
+   is
+      Result : constant VehicleActionCommand_Acc := new VehicleActionCommand;
+      use AVTAS.LMCP.Types;
+   begin
+      Result.setCommandID (Int64 (Msg.CommandId));
+      Result.setVehicleID (Int64 (Msg.VehicleId));
+
+      for VehicleAction of Msg.VehicleActionList loop
+         Result.getVehicleActionList.Append (VehicleAction_Any
+                                             (As_FlightDirectorAction_Acc
+                                                (VehicleAction)));
+      end loop;
+
+      case Msg.Status is
+         when LMCP_Messages.Pending => Result.setStatus (AFRL.CMASI.Enumerations
+                                                         .Pending);
+         when LMCP_Messages.Approved => Result.setStatus
+              (AFRL.CMASI.Enumerations.Approved);
+         when LMCP_Messages.InProcess => Result.setStatus
+              (AFRL.CMASI.Enumerations.InProcess);
+         when LMCP_Messages.Executed => Result.setStatus
+              (AFRL.CMASI.Enumerations.Executed);
+         when LMCP_Messages.Cancelled => Result.setStatus
+              (AFRL.CMASI.Enumerations.Cancelled);
+      end case;
+
+      return Result;
+   end As_VehicleActionCommand_Acc;
+
    -------------------------------------
    -- As_VehicleActionCommand_Message --
    -------------------------------------
@@ -1202,6 +1250,38 @@ package body LMCP_Message_Conversions is
       end loop;
       return Result;
    end As_VehicleAction_Acc;
+
+   ---------------------------------
+   -- As_FlightDirectorAction_Acc --
+   ---------------------------------
+
+   function As_FlightDirectorAction_Acc
+     (Msg : LMCP_Messages.VehicleAction_Descendant_FlightDirectorAction)
+      return FlightDirectorAction_Acc
+   is
+      use LMCP_Messages;
+      Result : constant FlightDirectorAction_Acc := new FlightDirectorAction;
+   begin
+
+      for Id : Common.Int64 of Msg.AssociatedTaskList loop
+         Result.getAssociatedTaskList.Append (AVTAS.LMCP.Types.Int64 (Id));
+      end loop;
+      Result.setSpeed (AVTAS.LMCP.Types.Real32 (Msg.Speed_mps));
+      Result.setHeading (AVTAS.LMCP.Types.Real32 (Msg.Heading_deg));
+      Result.setAltitude (AVTAS.LMCP.Types.Real32 (Msg.Altitude_m));
+      Result.setClimbRate (AVTAS.LMCP.Types.Real32 (Msg.ClimbRate_mps));
+      case Msg.AltitudeType is
+         when AGL => Result.setAltitudeType (AFRL.CMASI.Enumerations.AGL);
+         when MSL => Result.setAltitudeType (AFRL.CMASI.Enumerations.MSL);
+      end case;
+      case Msg.SpeedType is
+         when Airspeed => Result.setSpeedType
+              (AFRL.CMASI.Enumerations.Airspeed);
+         when Groundspeed => Result.setSpeedType
+              (AFRL.CMASI.Enumerations.Groundspeed);
+      end case;
+      return Result;
+   end As_FlightDirectorAction_Acc;
 
    ------------------------------
    -- As_VehicleAction_Message --

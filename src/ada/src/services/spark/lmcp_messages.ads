@@ -75,10 +75,25 @@ package LMCP_Messages with SPARK_Mode is
       AssociatedTaskList : Int64_Seq;
    end record;
 
+   type VehicleAction_Descendant_FlightDirectorAction is record
+      AssociatedTaskList : Int64_Seq;
+      Speed_mps : Real32 := 0.0;
+      SpeedType : SpeedTypeEnum := Airspeed;
+      Heading_deg : Real32 := 0.0;
+      Altitude_m : Real32 := 0.0;
+      AltitudeType : AltitudeTypeEnum := MSL;
+      ClimbRate_mps : Real32 := 0.0;
+   end record;
+
    package VA_Sequences is new SPARK.Containers.Functional.Vectors
      (Index_Type   => Positive,
       Element_Type => VehicleAction);
    type VA_Seq is new VA_Sequences.Sequence;
+
+   package VA_as_FDA_Sequences is new SPARK.Containers.Functional.Vectors
+     (Index_Type => Positive,
+      Element_Type => VehicleAction_Descendant_FlightDirectorAction);
+   type VA_FDR_Seq is new VA_as_FDA_Sequences.Sequence;
 
    type CommandStatusTypeEnum is (Pending, Approved, InProcess, Executed, Cancelled);
 
@@ -86,6 +101,14 @@ package LMCP_Messages with SPARK_Mode is
       CommandId : Int64 := 0;
       VehicleId : Int64 := 0;
       VehicleActionList : VA_Seq;
+      Status : CommandStatusTypeEnum := Pending;
+   end record;
+
+   type VehicleActionCommand_w_FlightDirectorAction is new Message_Root
+     with record
+      CommandId : Int64 := 0;
+      VehicleId : Int64 := 0;
+      VehicleActionList : VA_FDR_Seq;
       Status : CommandStatusTypeEnum := Pending;
    end record;
 

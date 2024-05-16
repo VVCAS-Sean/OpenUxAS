@@ -7,6 +7,7 @@ with AFRL.CMASI.Location3D;                           use AFRL.CMASI.Location3D;
 with AFRL.CMASI.MissionCommand;                       use AFRL.CMASI.MissionCommand;
 with AFRL.CMASI.VehicleAction;                        use AFRL.CMASI.VehicleAction;
 with AFRL.CMASI.Waypoint;                             use AFRL.CMASI.Waypoint;
+with AFRL.CMASI.FlightDirectorAction;                 use AFRL.CMASI.FlightDirectorAction;
 with AFRL.Impact.ImpactAutomationRequest;             use AFRL.Impact.ImpactAutomationRequest;
 with AVTAS.LMCP.Object;
 with UxAS.Messages.lmcptask.AssignmentCostMatrix;     use UxAS.Messages.lmcptask.AssignmentCostMatrix;

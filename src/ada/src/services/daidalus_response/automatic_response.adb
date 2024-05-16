@@ -1,6 +1,10 @@
 pragma Ada_2012;
 with Ada.Containers;
 with LMCP_Messages; use LMCP_Messages;
+with Common; use Common;
+with AVTAS.LMCP.Types;
+with LMCP_Message_Conversions; use LMCP_Message_Conversions;
+with UxAS.Comms.LMCP_Net_Client; use UxAS.Comms.LMCP_Net_Client;
 package body automatic_response
 with SPARK_Mode => On is
 
@@ -41,12 +45,13 @@ with SPARK_Mode => On is
       GroundSpeed_Min_mps             :     GroundSpeed_Type_mps;
       GroundSpeed_Interval_Buffer_mps :     GroundSpeed_Buffer_Type_mps;
       Is_Tracking_Next_Waypoint       : in out Boolean;
-      m_MissionCommand                : in out MissionCommand;
+      m_MissionCommand                : in out definitions.MissionCommand;
       RoW_ghost                       :    out ID_Type;
       ConflictResolutionList_ghost    :    out VehicleIDsVector;
       SendNewMissionCommand_ghost     :    out Boolean;
       Send_Divert_Action_Command_ghost :    out Boolean)
    is
+      use LMCP_Messages;
       Conflict_Resolution_List : VehicleIDsVector;
       found_acceptable_action_flag : Boolean;
       isSafeToReturnToMissionFlag : Boolean;
@@ -55,8 +60,8 @@ with SPARK_Mode => On is
       PriorityStatus : Priority_Type := pStandard;
       RoW : ID_Type;
       m_StatusOld : Status_Type;
-      FlightDirectorAction : VA_Seq;
-      VehicleActionCommand : VehicleActionCommand;
+      --FlightDirectorAction : VA_Seq;
+      --VehicleActionCommand : VehicleActionCommand_w_FlightDirectorAction;
       --  vpimy: integer := 0;
    begin
 
@@ -180,19 +185,52 @@ with SPARK_Mode => On is
                               PriorityStatus);
                Is_Tracking_Next_Waypoint := False;
                Send_Divert_Action_Command_ghost := True;
-               VehicleActionCommand.VehicleID := m_VehicleID;
 
                -----------------------------------------------------------------
-               --TODO  SendDivertCommand(Divert_State, m_Vehicle_ID);
+               -- SendDivertCommand(Divert_State, m_Vehicle_ID);--
+               -- Initialize local FlightDirectorAction and VehicleActionCommand
+               declare
+                  use LMCP_Messages;
+                  FlightDirectorAction :
+                  VehicleAction_Descendant_FlightDirectorAction;
+                  VehicleActionCommand :
+                  VehicleActionCommand_w_FlightDirectorAction;
+               begin
+                  --set FlightDirectorAction using the resulting Divert_State---
+                  FlightDirectorAction.Altitude_m := Real32 (Divert_State.
+                                                               altitude_m);
+                  --set altitude type to AGL to match C++ implementation that
+                  --differs from documentation of default FlightDirectorAction--
+                  FlightDirectorAction.AltitudeType := AGL;
+                  FlightDirectorAction.ClimbRate_mps := Real32 (Divert_State.
+                    verticalSpeed_mps);
+                  FlightDirectorAction.Heading_deg := Real32 (Divert_State.
+                                                                heading_deg);
+                  FlightDirectorAction.Speed_mps := Real32 (Divert_State.
+                                                              groundSpeed_mps);
+
+                  --Set VehicleActionCommand for the diverting vehicle----------
+                  VehicleActionCommand.VehicleId := m_Vehicle_ID;
+                  Get_Unique_Entity_Send_Message_Id (AVTAS.LMCP.Types.Int64
+                                                     (VehicleActionCommand.
+                                                          CommandId));
+                  VehicleActionCommand.Status := Approved;
+                  VehicleActionCommand.VehicleActionList := Add
+                    (VehicleActionCommand.VehicleActionList,
+                     FlightDirectorAction);
+
+               end;
+
                -----------------------------------------------------------------
                m_Status := OnHold;
                pragma Assert (Diverted (Conflict_Resolution_List, RoW,
                              m_Vehicle_ID, Send_Divert_Action_Command_ghost,
                              SendNewMissionCommand_ghost));
             end if;
-            --return to mission by sending updated missioncommand if safe-to-return
-            --when previously on hold, otherwise continue mission if previously
-            --on mission
+
+            -- return to mission by sending updated missioncommand if
+            -- safe-to-return when previously on hold, otherwise continue mission
+            -- if previously on mission-----------------------------------------
          when OnHold =>
             if Is_Tracking_Next_Waypoint then
                m_Status := OnMission;
@@ -200,7 +238,7 @@ with SPARK_Mode => On is
                              Send_Divert_Action_Command_ghost,
                              SendNewMissionCommand_ghost));
             else
-               --handle checking for SafetoReturnToMission
+               -- handle checking for SafetoReturnToMission----------------------
                SafeToReturn
                  (DAIDALUS_Altitude_Bands, DAIDALUS_Heading_Bands,
                   DAIDALUS_GroundSpeed_Bands,
@@ -213,15 +251,17 @@ with SPARK_Mode => On is
                   --send a new mission command containing only the portion of
                   --previous mission command that has not yet be accomplished
                   --Waypoint number of -1 indicates no mission command being
-                  --followed.
+                  --followed.---------------------------------------------------
                   if not (m_NextWaypoint.waypoint_number = -1)
                   then
-                     --set the 2nd waypoint as the first waypoint to better
-                     --allow pathing from the autopilot.
+                     --Establish a cutpoint on mission command starting at one
+                     --before the last waypoint headed to before divert---------
                      CutPoint := MyVectorOfWaypoints.Find_Index
                        (m_MissionCommand.waypoint_list, m_NextWaypoint,
                         MyVectorOfWaypoints.
                           First_Index (m_MissionCommand.waypoint_list));
+                     --remove waypoints up to cutpoint if cutpoint is not the
+                     --beginning or end of the waypoint list-------------------
                      if not (CutPoint = MyVectorOfWaypoints.No_Index)
                      then
                         if not (CutPoint = MyVectorOfWaypoints.First_Index
@@ -233,6 +273,7 @@ with SPARK_Mode => On is
                                                      Count_Type (CutPoint - 2));
                         end if;
 
+                        --Alternative cut code----------------------------------
                         --  MyVectorOfWaypoints.Delete(m_MissionCommand.
                         --                               waypoint_list,
                         --                         MyVectorOfWaypoints.First_Index
@@ -261,6 +302,7 @@ with SPARK_Mode => On is
                         --  end loop;
 
                      end if;
+                     --Minimum set for waypoint list includes 2 waypoints-------
                      pragma Assume (2 in MyVectorOfWaypoints.First_Index
                                    (m_MissionCommand.waypoint_list) ..
                                      MyVectorOfWaypoints.Last_Index
@@ -269,7 +311,132 @@ with SPARK_Mode => On is
                        Element (m_MissionCommand.waypoint_list, 2).
                        waypoint_number;
                      -----------------------------------------------------------
-                     --TODO: Send revised mission command
+                     --Transcribe mission command into LMCP.Messages.
+                     --MissionCommand-------------------------------------------
+                     declare
+                        use LMCP_Messages;
+                        LMCP_MissionCommand : LMCP_Messages.MissionCommand;
+                        waypoint_temp : LMCP_Messages.Waypoint;
+                     begin
+                        LMCP_MissionCommand.VehicleId := m_MissionCommand.
+                          vehicle_id;
+                        LMCP_MissionCommand.FirstWaypoint := m_MissionCommand.
+                          first_waypoint;
+                        case m_MissionCommand.status is
+                           when Pending =>
+                              LMCP_MissionCommand.Status := Pending;
+                           when Approved =>
+                              LMCP_MissionCommand.Status := Approved;
+                           when InProcess =>
+                              LMCP_MissionCommand.Status := InProcess;
+                           when Executed =>
+                              LMCP_MissionCommand.Status := Executed;
+                           when Cancelled =>
+                              LMCP_MissionCommand.Status := Cancelled;
+                        end case;
+                     -- Begin transcription of waypoint list--------------------
+                        for waypoint of m_MissionCommand.waypoint_list loop
+                           waypoint_temp.Number := Int64
+                             (waypoint.waypoint_number);
+                           waypoint_temp.NextWaypoint := Int64
+                             (waypoint.next_waypoint);
+                           waypoint_temp.Speed := Real32 (waypoint.speed);
+                           case waypoint.speed_type is
+                              when definitions.Airspeed =>
+                                 waypoint_temp.SpeedType := Airspeed;
+                              when definitions.Groundspeed =>
+                                 waypoint_temp.SpeedType := Groundspeed;
+                           end case;
+                           waypoint_temp.ClimbRate := Real32
+                             (waypoint.climb_rate);
+                           case waypoint.turn_type is
+                              when definitions.TurnShort =>
+                                 waypoint_temp.TurnType := TurnShort;
+                              when definitions.FlyOver =>
+                                 waypoint_temp.TurnType := FlyOver;
+                           end case;
+                           declare
+                              lmcp_vehicle_action_list : VA_Seq;
+                              vehicle_action_temp : LMCP_Messages.VehicleAction;
+                           begin
+                              for wp_val of waypoint.vehicle_action_list loop
+                                 declare
+                                    lmcp_associated_task_list : Int64_Seq;
+                                 begin
+                                    for atl of wp_val.AssociatedTaskList loop
+                                       lmcp_associated_task_list := Add
+                                         (lmcp_associated_task_list, Int64
+                                            (atl));
+                                    end loop;
+                                    vehicle_action_temp.AssociatedTaskList :=
+                                      lmcp_associated_task_list;
+                                    lmcp_vehicle_action_list := Add
+                                      (lmcp_vehicle_action_list,
+                                       vehicle_action_temp);
+                                 end;
+                              end loop;
+                              waypoint_temp.VehicleActionList :=
+                                lmcp_vehicle_action_list;
+                           end;
+                           waypoint_temp.ContingencyWaypointA := Int64
+                             (waypoint.contingency_waypoint_A);
+                           waypoint_temp.ContingencyWaypointB := Int64
+                             (waypoint.contingency_waypoint_B);
+                           declare
+                              lmcp_associated_task_list : Int64_Seq;
+                           begin
+                              for wpatl of waypoint.associated_tasks loop
+                                 lmcp_associated_task_list := Add
+                                   (lmcp_associated_task_list, Int64 (wpatl));
+                              end loop;
+                              waypoint_temp.AssociatedTasks :=
+                                lmcp_associated_task_list;
+                           end;
+                           waypoint_temp.Latitude := Real64
+                             (waypoint.latitude_deg);
+                           waypoint_temp.Longitude := Real64
+                             (waypoint.longitude_deg);
+                           waypoint_temp.Altitude := Real32
+                             (waypoint.altitude_m);
+                           case waypoint.altitude_type is
+                              when definitions.AGL =>
+                                 waypoint_temp.AltitudeType := AGL;
+                              when definitions.MSL =>
+                                 waypoint_temp.AltitudeType := MSL;
+                           end case;
+
+                           LMCP_MissionCommand.WaypointList := Add
+                             (LMCP_MissionCommand.WaypointList, waypoint_temp);
+
+                        end loop;
+                        -- End transcription of waypoint list-------------------
+                        LMCP_MissionCommand.CommandId := Int64
+                          (m_MissionCommand.command_id);
+                        declare
+                           lmcp_vehicle_action_list : VA_Seq;
+                           vehicle_action_temp : LMCP_Messages.VehicleAction;
+                        begin
+                           for val of m_MissionCommand.vehicle_action_list
+                           loop
+                              declare
+                                 associated_task_list : Int64_Seq;
+                              begin
+                                 for atl of val.AssociatedTaskList loop
+                                    associated_task_list := Add
+                                      (associated_task_list, Int64 (atl));
+                                 end loop;
+                                 vehicle_action_temp.AssociatedTaskList :=
+                                   associated_task_list;
+                              end;
+                              lmcp_vehicle_action_list := Add
+                                (lmcp_vehicle_action_list,
+                                 vehicle_action_temp);
+                           end loop;
+                        end;
+
+                     end;
+                     -- end of LMCP_Messages.MissionCommand transcription-------
+
                      -----------------------------------------------------------
                      SendNewMissionCommand_ghost := True;
                      m_Status := OnMission;

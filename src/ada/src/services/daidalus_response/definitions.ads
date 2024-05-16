@@ -97,9 +97,14 @@ is
       Intruder_time_to_violation_isNan : Boolean;
       Intruder_time_to_violation : ttlowc_sec;
    end record;
+   
+   package MyVectorOfIntegers is new SPARK.Containers.Formal.Vectors
+     (Element_Type => Int64, Index_Type => myvector_index_type);
+   
+   subtype Associated_Tasks_List is MyVectorOfIntegers.Vector (8);   
 
    type VehicleAction is record
-      AssociatedTaskList : Int64;
+      AssociatedTaskList : Associated_Tasks_List;
    end record;
       
    type waypoint_speed_type is (Airspeed, Groundspeed);
@@ -111,12 +116,7 @@ is
    
    subtype VehicleActionList is MyVectorOfVehicleActions.Vector (8);
    
-   package MyVectorOfIntegers is new SPARK.Containers.Formal.Vectors
-     (Element_Type => Int64, Index_Type => myvector_index_type);
-   
-   subtype Associated_Tasks_List is MyVectorOfIntegers.Vector (8);
-   
-   type cmasi_altitude_type is (AGL, MGL);
+   type cmasi_altitude_type is (AGL, MSL);
    
    --record containing Waypoint information
    type Waypoint_info is record
