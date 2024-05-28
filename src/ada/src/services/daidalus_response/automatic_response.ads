@@ -1,10 +1,12 @@
 with Common; use Common;
+with Daidalus_Response_Communication; use Daidalus_Response_Communication;
 with set_divert_state; use set_divert_state;
 with Heading_Resolution; use Heading_Resolution;
 with Altitude_Resolution; use Altitude_Resolution;
 with speed_resolution; use speed_resolution;
 with definitions; use definitions;
 with CheckSafeToReturn; use CheckSafeToReturn;
+with Daidalus_Response; use Daidalus_Response;
 package automatic_response with SPARK_Mode => On is
 
    function NeedToResolveConflict (Resolution_list : VehicleIDsVector) return
@@ -47,7 +49,8 @@ package automatic_response with SPARK_Mode => On is
         not SentDivertCommand and then not SentMissionCommand) with Ghost;
 
    procedure Process_DAIDALUS_Bands
-     (Current_State : state_parameters;
+     (Mailbox : in out Daidalus_Response_Mailbox;
+      Current_State : state_parameters;
       Divert_State : out state_parameters;
       DAIDALUS_Altitude_Bands : OrderedIntervalVector;
       DAIDALUS_Heading_Bands : OrderedIntervalVector;

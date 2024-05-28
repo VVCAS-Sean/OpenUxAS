@@ -2,6 +2,7 @@ pragma Ada_2012;
 with Ada.Containers;
 with LMCP_Messages; use LMCP_Messages;
 with Common; use Common;
+with Daidalus_Response_Communication; use Daidalus_Response_Communication;
 with AVTAS.LMCP.Types;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 with UxAS.Comms.LMCP_Net_Client; use UxAS.Comms.LMCP_Net_Client;
@@ -17,7 +18,8 @@ with SPARK_Mode => On is
    ----------------------------
 
    procedure Process_DAIDALUS_Bands
-     (Current_State                   :     state_parameters;
+     (Mailbox                         : in out Daidalus_Response_Communication;
+      Current_State                   :     state_parameters;
       Divert_State                    :    out state_parameters;
       DAIDALUS_Altitude_Bands         :     OrderedIntervalVector;
       DAIDALUS_Heading_Bands          :     OrderedIntervalVector;
@@ -218,6 +220,7 @@ with SPARK_Mode => On is
                   VehicleActionCommand.VehicleActionList := Add
                     (VehicleActionCommand.VehicleActionList,
                      FlightDirectorAction);
+                  sendBroadcastMessage(Mailbox, VehicleActionCommand);
 
                end;
 
@@ -409,13 +412,14 @@ with SPARK_Mode => On is
                              (LMCP_MissionCommand.WaypointList, waypoint_temp);
 
                         end loop;
-                        -- End transcription of waypoint list-------------------
+                        -- End transcription of waypoint list ------------------
                         LMCP_MissionCommand.CommandId := Int64
                           (m_MissionCommand.command_id);
                         declare
                            lmcp_vehicle_action_list : VA_Seq;
                            vehicle_action_temp : LMCP_Messages.VehicleAction;
                         begin
+                           -- begin transcription of vehicle_action_list -------
                            for val of m_MissionCommand.vehicle_action_list
                            loop
                               declare
@@ -432,10 +436,13 @@ with SPARK_Mode => On is
                                 (lmcp_vehicle_action_list,
                                  vehicle_action_temp);
                            end loop;
+                           -- end of vehicle_action_list transcription ---------
+                           LMCP_MissionCommand.VehicleActionList :=
+                             lmcp_vehicle_action_list;
                         end;
-
-                     end;
                      -- end of LMCP_Messages.MissionCommand transcription-------
+                        sendBroadcastMessage (Mailbox, LMCP_MissionCommand);
+                     end;
 
                      -----------------------------------------------------------
                      SendNewMissionCommand_ghost := True;

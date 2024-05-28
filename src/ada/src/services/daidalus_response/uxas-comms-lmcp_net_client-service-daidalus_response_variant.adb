@@ -7,6 +7,7 @@ with Ada.Text_IO;  use Ada.Text_IO;
 with Common;                   use Common;
 with LMCP_Messages;            -- use LMCP_Messages;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
+with definitions;              -- use definitions;
 
 -- __TODO__
 -- Include any messages used by this service.
@@ -87,8 +88,14 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
       --
       -- __Example__
       --
-      -- This.Add_Subscription_Address (AFRL.CMASI.AirVehicleState.Subscription, Unused);
-      -- This.Add_Subscription_Address (AFRL.CMASI.MissionCommand.Subscription, Unused);
+      
+      --  This.Add_Subscription_Address (AFRL.CMASI.AirVehicleState.Subscription, Unused);
+      This.Add_Subscription_Address (AFRL.CMASI.MissionCommand.Subscription, Unused);
+      This.Add_Subscription_Address (larcfm.DAIDALUS.DAIDALUSConfiguration, 
+                                      Unused);
+      This.Add_Subscription_Address (larcfm.DAIDALUS.WellClearViolationIntervals,
+                                     Unused);
+      
 
       Result := True;
    end Configure;
@@ -150,21 +157,21 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
    --    end if;
    -- end Handle_AirVehicleState_Msg;
    -- 
-   -- --------------------------------
-   -- -- Handle_Mission_Command_Msg --
-   -- --------------------------------
-   -- 
-   -- procedure Handle_MissionCommand_Msg
-   --   (This : in out <Service_Name>_Service;
-   --    Msg  : Any_LMCP_Message)
-   --  is
-   --    MC : constant MissionCommand_Acc := MissionCommand_Acc (Msg.Payload);
-   --    Vehicle_ID : Common.Int64 := Common.Int64 (MC.getVehicleID);
-   -- begin
-   --    if Vehicle_ID = This.Config.VehicleID then
-   --       Handle_MissionCommand (This.State, As_MissionCommand_Message (MC));
-   --    end if;
-   -- end Handle_MissionCommand_Msg;
+    --------------------------------
+    -- Handle_Mission_Command_Msg --
+    --------------------------------
+   
+    procedure Handle_MissionCommand_Msg
+    (This : in out Daidalus_Response_Service;
+     Msg  : Any_LMCP_Message)
+   is
+     MC : constant MissionCommand_Acc := MissionCommand_Acc (Msg.Payload);
+     Vehicle_ID : Common.Int64 := Common.Int64 (MC.getVehicleID);
+    begin
+     if Vehicle_ID = This.Config.VehicleID then
+        Handle_MissionCommand (This.State, As_MissionCommand_Message (MC));
+     end if;
+    end Handle_MissionCommand_Msg;
 
    ----------------
    -- Initialize --
