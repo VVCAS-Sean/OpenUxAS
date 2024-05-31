@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="altergo" version="1.30-gnatprove" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC5" version="0.0.7-gnatprove" timelimit="0" steplimit="2016" memlimit="0"/>
+<prover id="1" name="CVC5" version="0.0.7-gnatprove" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.5.1-gnatprove" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Trivial" version="1.0" alternative="trivial" timelimit="1" steplimit="1" memlimit="1000"/>
 <file format="gnat-json" proved="true">
@@ -23,7 +23,7 @@
   </goal>
   <goal name="def&#39;vc.3" proved="true">
   <proof prover="0"><result status="highfailure"/></proof>
-  <proof prover="1" steplimit="1367"><result status="valid" steps="1242"/></proof>
+  <proof prover="1"><result status="valid" steps="979"/></proof>
   <proof prover="2"><result status="highfailure"/></proof>
   </goal>
   <goal name="def&#39;vc.4" proved="true">
@@ -31,13 +31,13 @@
   </goal>
   <goal name="def&#39;vc.5" proved="true">
   <proof prover="0"><result status="highfailure"/></proof>
-  <proof prover="1" steplimit="2017"><result status="valid" steps="1833"/></proof>
-  <proof prover="2"><result status="highfailure"/></proof>
+  <proof prover="1"><result status="valid" steps="1575"/></proof>
+  <proof prover="2"><result status="valid" steps="7487"/></proof>
   </goal>
   <goal name="def&#39;vc.6" proved="true">
   <proof prover="0"><result status="highfailure"/></proof>
-  <proof prover="1"><result status="valid" steps="1832"/></proof>
-  <proof prover="2"><result status="valid" steps="8824"/></proof>
+  <proof prover="1"><result status="valid" steps="1574"/></proof>
+  <proof prover="2"><result status="highfailure"/></proof>
   </goal>
   <goal name="def&#39;vc.7" proved="true">
   <proof prover="3"><result status="valid" steps="1"/></proof>
