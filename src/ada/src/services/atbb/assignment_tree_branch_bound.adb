@@ -407,10 +407,11 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
               TaskAssignment.OptionID in 0 .. 99_999)),
             Post =>
               (for all TaskAssignment of Assignment.Assignment_Sequence =>
-                 Exists_TaskOptionId
+                 Contains
                    (To_Sequence_Of_TaskOptionId'Result,
-                    TaskAssignment.TaskID,
-                    TaskAssignment.OptionID));
+                    Int64_Sequences.First,
+                    Last (To_Sequence_Of_TaskOptionId'Result),
+                    Get_TaskOptionID (TaskAssignment.TaskID, TaskAssignment.OptionID)));
 
       --------------------------------------------------
       -- Prove_TaskOpt_Different_From_Last_TaskOption --
