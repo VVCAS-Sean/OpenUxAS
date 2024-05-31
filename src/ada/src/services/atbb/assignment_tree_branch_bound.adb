@@ -64,7 +64,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
          and then
        All_EligibleEntities_In_EntityList (Automation_Request, TaskPlanOptions_Map)
          and then
-       All_Travels_In_CostMatrix (Automation_Request, TaskPlanOptions_Map, Assignment_Cost_Matrix),
+       All_Travels_In_CostMatrix (Automation_Request, TaskPlanOptions_Map, Assignment_Cost_Matrix.CostMatrix),
      Post =>
         (for all Child of Children'Result => Valid_Assignment (Child, TaskPlanOptions_Map, Automation_Request));
    --  Returns a sequence of Elements corresponding to all the possible
@@ -97,7 +97,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
    with
      Pre =>
        Valid_AssignmentCostMatrix (Assignment_Cost_Matrix)
-          and then Travel_In_CostMatrix (VehicleId, DestTaskOption, Assignment_Cost_Matrix),
+          and then Travel_In_CostMatrix (VehicleId, DestTaskOption, Assignment_Cost_Matrix.CostMatrix),
      Post =>
        VehicleId = Corresponding_TaskOptionCost'Result.VehicleID
          and then 0 = Corresponding_TaskOptionCost'Result.InitialTaskID
@@ -114,7 +114,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
    with
      Pre =>
        Valid_AssignmentCostMatrix (Assignment_Cost_Matrix)
-          and then Travel_In_CostMatrix (VehicleId, InitTaskOption, DestTaskOption, Assignment_Cost_Matrix),
+          and then Travel_In_CostMatrix (VehicleId, InitTaskOption, DestTaskOption, Assignment_Cost_Matrix.CostMatrix),
      Post =>
        VehicleId = Corresponding_TaskOptionCost'Result.VehicleID
          and then InitTaskOption.TaskID = Corresponding_TaskOptionCost'Result.InitialTaskID
@@ -170,8 +170,8 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                   and then Is_Eligible (Automation_Request, TaskOpt, VehicleId)))
            and then
          (if Contains (Assignment.Vehicle_Assignments, VehicleId)
-          then Travel_In_CostMatrix (VehicleId, Element (Assignment.Vehicle_Assignments, VehicleId).Last_TaskOption, TaskOpt, Assignment_Cost_Matrix)
-          else Travel_In_CostMatrix (VehicleId, TaskOpt, Assignment_Cost_Matrix)),
+          then Travel_In_CostMatrix (VehicleId, Element (Assignment.Vehicle_Assignments, VehicleId).Last_TaskOption, TaskOpt, Assignment_Cost_Matrix.CostMatrix)
+          else Travel_In_CostMatrix (VehicleId, TaskOpt, Assignment_Cost_Matrix.CostMatrix)),
      Post =>
        Valid_Assignment (New_Assignment'Result, TaskPlanOptions_Map, Automation_Request);
    --  This function returns a new Element. It assigns the TaskOptionId to
@@ -362,7 +362,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
       with
         Ghost,
         Pre  =>
-          All_Travels_In_CostMatrix (Automation_Request, TaskPlanOptions_Map, Assignment_Cost_Matrix)
+          All_Travels_In_CostMatrix (Automation_Request, TaskPlanOptions_Map, Assignment_Cost_Matrix.CostMatrix)
             and then
           (for some TaskId of TaskPlanOptions_Map =>
              (declare
@@ -390,11 +390,11 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
             (if not Contains (Assignment.Vehicle_Assignments, EntityId)
              then Travel_In_CostMatrix (EntityId,
                                         TaskOpt,
-                                        Assignment_Cost_Matrix)
+                                        Assignment_Cost_Matrix.CostMatrix)
              else Travel_In_CostMatrix (EntityId,
                                         Element (Assignment.Vehicle_Assignments, EntityId).Last_TaskOption,
                                         TaskOpt,
-                                        Assignment_Cost_Matrix));
+                                        Assignment_Cost_Matrix.CostMatrix));
 
       function To_Sequence_Of_TaskOptionId
         (Assignment : Assignment_Info)
@@ -405,10 +405,12 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
              (TaskAssignment.TaskID in 0 .. 99_999
                 and then
               TaskAssignment.OptionID in 0 .. 99_999)),
-        Post =>
-          (for all TaskAssignment of Assignment.Assignment_Sequence =>
-             (for some TaskOptionId of To_Sequence_Of_TaskOptionId'Result =>
-                 (Get_TaskOptionID (TaskAssignment.TaskID, TaskAssignment.OptionID) = TaskOptionId)));
+            Post =>
+              (for all TaskAssignment of Assignment.Assignment_Sequence =>
+                 Exists_TaskOptionId
+                   (To_Sequence_Of_TaskOptionId'Result,
+                    TaskAssignment.TaskID,
+                    TaskAssignment.OptionID));
 
       --------------------------------------------------
       -- Prove_TaskOpt_Different_From_Last_TaskOption --
@@ -422,6 +424,36 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
          if Contains (Assignment.Vehicle_Assignments, EntityId) then
             declare
                Last_TaskOption : constant TaskOption := Element (Assignment.Vehicle_Assignments, EntityId).Last_TaskOption;
+               procedure Lemma (Assignment_Sequence : TaskAssignment_Sequence;
+                                Sequence_Of_TaskOptionId : Int64_Seq;
+                                Last_TaskOption : TaskOption)
+               with
+                 Pre =>
+                   Last_TaskOption.TaskID in 0 .. 99_999
+                     and then
+                   Last_TaskOption.OptionID in 0 .. 99_999
+                     and then
+                  (for all TaskAssignment of Assignment_Sequence =>
+                     (TaskAssignment.TaskID in 0 .. 99_999
+                        and then
+                      TaskAssignment.OptionID in 0 .. 99_999
+                        and then
+                      (for some TaskOptionId of Sequence_Of_TaskOptionId =>
+                         (Get_TaskOptionID (TaskAssignment.TaskID, TaskAssignment.OptionID) = TaskOptionId))))
+                     and then
+                  (for some TaskAssignment of Assignment_Sequence =>
+                     (TaskAssignment.TaskID = Last_TaskOption.TaskID
+                        and then TaskAssignment.OptionID = Last_TaskOption.OptionID
+                        and then Get_TaskOptionID (TaskAssignment.TaskID, TaskAssignment.OptionID)
+                               = Get_TaskOptionID (Last_TaskOption.TaskID, Last_TaskOption.OptionID))),
+                 Post =>
+                   (for some TaskOptionId of Sequence_Of_TaskOptionId =>
+                      (Get_TaskOptionID (Last_TaskOption.TaskID, Last_TaskOption.OptionID)) = TaskOptionId);
+
+               procedure Lemma (Assignment_Sequence : TaskAssignment_Sequence;
+                                Sequence_Of_TaskOptionId : Int64_Seq;
+                                Last_TaskOption : TaskOption)
+                                is null;
             begin
                pragma Assert
                  (for some TaskId of TaskPlanOptions_Map =>
@@ -438,16 +470,14 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                 Get_TaskOptionID (TaskOpt.TaskID, TaskOpt.OptionID)));
                pragma Assert
                  (for some TaskAssignment of Assignment.Assignment_Sequence =>
-                    (TaskAssignment.TaskID = Last_TaskOption.TaskID
-                     and then TaskAssignment.OptionID = Last_TaskOption.OptionID
-                     and then Get_TaskOptionID (TaskAssignment.TaskID, TaskAssignment.OptionID)
-                              = Get_TaskOptionID (Last_TaskOption.TaskID, Last_TaskOption.OptionID)));
+                    Get_TaskOptionID (TaskAssignment.TaskID, TaskAssignment.OptionID)
+                              = Get_TaskOptionID (Last_TaskOption.TaskID, Last_TaskOption.OptionID));
+               Lemma (Assignment.Assignment_Sequence, To_Sequence_Of_TaskOptionId (Assignment), Last_TaskOption);
                pragma Assert
-                 (Contains
-                    (To_Sequence_Of_TaskOptionId (Assignment),
-                     TO_Sequences.First,
-                     Last (To_Sequence_Of_TaskOptionId (Assignment)),
-                     Get_TaskOptionID (Last_TaskOption.TaskID, Last_TaskOption.OptionID)));
+                 (Contains (To_Sequence_Of_TaskOptionId (Assignment),
+                            Int64_Sequences.First,
+                            Last (To_Sequence_Of_TaskOptionId (Assignment)),
+                            Get_TaskOptionID (Last_TaskOption.TaskID, Last_TaskOption.OptionID)));
             end;
          end if;
       end Prove_TaskOpt_Different_From_Last_TaskOption;
@@ -499,7 +529,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
               (for all TaskId of TaskPlanOptions_Map =>
                  (for all Option of Get (TaskPlanOptions_Map, TaskId).Options =>
                       (if Is_Eligible (Automation_Request, Option, EntityId)
-                       then Travel_In_CostMatrix (EntityId, Option, Assignment_Cost_Matrix))));
+                       then Travel_In_CostMatrix (EntityId, Option, Assignment_Cost_Matrix.CostMatrix))));
          else
             declare
                Last_Option : constant TaskOption := Element (Assignment.Vehicle_Assignments, EntityId).Last_TaskOption;
@@ -515,7 +545,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                  then Travel_In_CostMatrix (EntityId,
                                                             Option,
                                                             Option_2,
-                                                            Assignment_Cost_Matrix)))))));
+                                                            Assignment_Cost_Matrix.CostMatrix)))))));
                pragma Assert
                  (for some TaskId of TaskPlanOptions_Map =>
                     (declare
@@ -530,7 +560,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                   then Travel_In_CostMatrix (EntityId,
                                                              Last_Option,
                                                              Option_2,
-                                                             Assignment_Cost_Matrix))))));
+                                                             Assignment_Cost_Matrix.CostMatrix))))));
                pragma Assert
                  (for all TaskId of TaskPlanOptions_Map =>
                     (for all Option of Get (TaskPlanOptions_Map, TaskId).Options =>
@@ -538,9 +568,9 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                         then Travel_In_CostMatrix (EntityId,
                                                    Last_Option,
                                                    Option,
-                                                   Assignment_Cost_Matrix))));
+                                                   Assignment_Cost_Matrix.CostMatrix))));
                pragma Assert
-                 (Travel_In_CostMatrix (EntityId, Element (Assignment.Vehicle_Assignments, EntityId).Last_TaskOption, TaskOpt, Assignment_Cost_Matrix));
+                 (Travel_In_CostMatrix (EntityId, Element (Assignment.Vehicle_Assignments, EntityId).Last_TaskOption, TaskOpt, Assignment_Cost_Matrix.CostMatrix));
             end;
          end if;
       end Prove_Travel_In_CostMatrix;
@@ -787,7 +817,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                    All_Travels_In_CostMatrix
                      (Element (uniqueAutomationRequests, Req),
                       Element (taskPlanOptions, Req),
-                      Element (assignmentCostMatrixes, Req)))
+                      Element (assignmentCostMatrixes, Req).CostMatrix))
                and then
              Contains (taskPlanOptions, ReqId)
                and then
@@ -813,7 +843,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                  All_Travels_In_CostMatrix
                    (Element (uniqueAutomationRequests, Req),
                     Element (taskPlanOptions, Req),
-                    Element (assignmentCostMatrixes, Req)));
+                    Element (assignmentCostMatrixes, Req).CostMatrix));
 
       ------------------------
       -- Add_TaskPlanOption --

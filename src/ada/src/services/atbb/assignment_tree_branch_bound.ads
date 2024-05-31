@@ -58,19 +58,19 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
    function Travel_In_CostMatrix
      (VehicleId              : Int64;
       DestOption             : TaskOption;
-      Assignment_Cost_Matrix : AssignmentCostMatrix)
+      Cost_Matrix            : TOC_Seq)
       return Boolean with Ghost, Post => True;
 
    function Travel_In_CostMatrix
      (VehicleId              : Int64;
       InitOption, DestOption : TaskOption;
-      Assignment_Cost_Matrix : AssignmentCostMatrix)
+      Cost_Matrix            : TOC_Seq)
       return Boolean with Ghost, Post => True;
 
    function All_Travels_In_CostMatrix
      (Request             : UniqueAutomationRequest;
       TaskPlanOptions_Map : Int64_TPO_Map;
-      Matrix              : AssignmentCostMatrix)
+      Cost_Matrix         : TOC_Seq)
       return Boolean with Ghost, Post => True;
 
    function All_EligibleEntities_In_EntityList
@@ -104,16 +104,19 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
              Element (m_taskPlanOptions, ReqId))))
           and then
        (for all ReqId of m_assignmentCostMatrixes =>
-          Valid_AssignmentCostMatrix (Element (m_assignmentCostMatrixes, ReqId))
+          Valid_AssignmentCostMatrix (Element (m_assignmentCostMatrixes, ReqId)))
             and then
-          Contains (m_uniqueAutomationRequests, ReqId)
+       (for all ReqId of m_assignmentCostMatrixes =>
+          Contains (m_uniqueAutomationRequests, ReqId))
             and then
-          Contains (m_taskPlanOptions, ReqId)
+         (for all ReqId of m_assignmentCostMatrixes =>
+          Contains (m_taskPlanOptions, ReqId))
             and then
+           (for all ReqId of m_assignmentCostMatrixes =>
           All_Travels_In_CostMatrix
             (Element (m_uniqueAutomationRequests, ReqId),
              Element (m_taskPlanOptions, ReqId),
-             Element (m_assignmentCostMatrixes, ReqId)));
+             Element (m_assignmentCostMatrixes, ReqId).CostMatrix));
 
    ---------------------------
    -- Service functionality --
@@ -161,11 +164,15 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
    with Pre =>
      not Contains (State.m_assignmentCostMatrixes, Matrix.CorrespondingAutomationRequestID)
        and then Valid_AssignmentCostMatrix (Matrix)
-       and then Contains (State.m_uniqueAutomationRequests, Matrix.CorrespondingAutomationRequestID)
-       and then Contains (State.m_taskPlanOptions, Matrix.CorrespondingAutomationRequestID)
-       and then All_Travels_In_CostMatrix (Element (State.m_uniqueAutomationRequests, Matrix.CorrespondingAutomationRequestID),
-                                           Element (State.m_taskPlanOptions, Matrix.CorrespondingAutomationRequestID),
-                                           Matrix);
+       and then
+          Contains (State.m_uniqueAutomationRequests, Matrix.CorrespondingAutomationRequestID)
+         and then
+          Contains (State.m_taskPlanOptions, Matrix.CorrespondingAutomationRequestID)
+           and then
+          All_Travels_In_CostMatrix
+            (Element (State.m_uniqueAutomationRequests, Matrix.CorrespondingAutomationRequestID),
+             Element (State.m_taskPlanOptions, Matrix.CorrespondingAutomationRequestID),
+             Matrix.CostMatrix);
 
    procedure Check_Assignment_Ready
      (Mailbox : in out Assignment_Tree_Branch_Bound_Mailbox;
@@ -209,9 +216,10 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
        (for all Id of TaskPlanOptions_Map =>
           (for all TaskOption of Get (TaskPlanOptions_Map, Id).Options => TaskOption.TaskID = Id))
          and then
-       All_Travels_In_CostMatrix (Automation_Request, TaskPlanOptions_Map, Assignment_Cost_Matrix)
+       All_Travels_In_CostMatrix (Automation_Request, TaskPlanOptions_Map, Assignment_Cost_Matrix.CostMatrix)
          and then
-       All_EligibleEntities_In_EntityList (Automation_Request, TaskPlanOptions_Map);
+       All_EligibleEntities_In_EntityList (Automation_Request, TaskPlanOptions_Map),
+     Exceptional_Cases => (Parsing_Error => Message'Initialized);
    --  Returns the assignment that minimizes the cost.
 
 private
@@ -239,10 +247,10 @@ private
    function Travel_In_CostMatrix
      (VehicleId              : Int64;
       DestOption             : TaskOption;
-      Assignment_Cost_Matrix : AssignmentCostMatrix)
+      Cost_Matrix            : TOC_Seq)
       return Boolean
    is
-     (for some TOC of Assignment_Cost_Matrix.CostMatrix =>
+     (for some TOC of Cost_Matrix =>
         (VehicleId = TOC.VehicleID
            and then 0 = TOC.InitialTaskID
            and then 0 = TOC.InitialTaskOption
@@ -252,10 +260,10 @@ private
    function Travel_In_CostMatrix
      (VehicleId              : Int64;
       InitOption, DestOption : TaskOption;
-      Assignment_Cost_Matrix : AssignmentCostMatrix)
+      Cost_Matrix : TOC_Seq)
       return Boolean
    is
-     (for some TOC of Assignment_Cost_Matrix.CostMatrix =>
+     (for some TOC of Cost_Matrix =>
         (VehicleId = TOC.VehicleID
            and then InitOption.TaskID = TOC.InitialTaskID
            and then InitOption.OptionID = TOC.InitialTaskOption
@@ -270,7 +278,7 @@ private
    function All_Travels_In_CostMatrix
      (Request             : UniqueAutomationRequest;
       TaskPlanOptions_Map : Int64_TPO_Map;
-      Matrix              : AssignmentCostMatrix)
+      Cost_Matrix         : TOC_Seq)
       return Boolean
    is
      (for all VehicleId of Request.EntityList =>
@@ -278,7 +286,7 @@ private
            (for all Option_1 of Get (TaskPlanOptions_Map, TaskId_1).Options =>
                (if Is_Eligible (Request, Option_1, VehicleId)
                 then
-                   Travel_In_CostMatrix (VehicleId, Option_1, Matrix)
+                   Travel_In_CostMatrix (VehicleId, Option_1, Cost_Matrix)
                      and then
                    (for all TaskId_2 of TaskPlanOptions_Map =>
                       (for all Option_2 of Get (TaskPlanOptions_Map, TaskId_2).Options =>
@@ -287,7 +295,7 @@ private
                              Travel_In_CostMatrix (VehicleId,
                                                    Option_1,
                                                    Option_2,
-                                                   Matrix))))))));
+                                                   Cost_Matrix))))))));
 
    function All_EligibleEntities_In_EntityList
      (Request             : UniqueAutomationRequest;
