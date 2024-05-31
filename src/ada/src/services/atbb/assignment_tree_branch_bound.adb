@@ -132,10 +132,13 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
    procedure Initialize_Algebra
      (Automation_Request  : UniqueAutomationRequest;
       TaskPlanOptions_Map : Int64_TPO_Map;
-      Algebra             : out Algebra_Tree;
-      Error               : out Boolean;
+      Algebra             : aliased out Algebra_Tree;
       Message             : out Unbounded_String)
-   with Post => (if not Error then Algebra /= null and then All_Actions_In_Map (Algebra, TaskPlanOptions_Map));
+   with
+     Relaxed_Initialization => Message,
+     Post                   =>
+       Algebra /= null and then All_Actions_In_Map (Algebra, TaskPlanOptions_Map),
+     Exceptional_Cases      => (Parsing_Error => Message'Initialized);
    --  Returns the algebra tree corresponding to the formulas stored in
    --  Automation_Request and the several TaskPlanOptions.
 
@@ -864,8 +867,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
    procedure Initialize_Algebra
      (Automation_Request  : UniqueAutomationRequest;
       TaskPlanOptions_Map : Int64_TPO_Map;
-      Algebra             : out Algebra_Tree;
-      Error               : out Boolean;
+      Algebra             : aliased out Algebra_Tree;
       Message             : out Unbounded_String)
    is
       package Unb renames Common.Unbounded_Strings_Subprograms;
@@ -875,7 +877,6 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
    begin
       Algebra := null;
       Message := Null_Unbounded_String;
-      Error   := False;
 
       for M in Iterate (TaskPlanOptions_Map) loop
          pragma Loop_Variant (Decreases => Int64_TaskPlanOptions_Maps.Length (M));
@@ -886,8 +887,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                Append_To_Msg (Message, "TaskID ");
                Append_To_Msg (Message, Print_Int64 (taskId));
                Append_To_Msg (Message, " should be in range 0 .. 99_999.");
-               Error := True;
-               return;
+               raise Parsing_Error;
             end if;
 
             declare
@@ -901,8 +901,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                   Append_To_Msg (Message, "Composition string of TaskID ");
                   Append_To_Msg (Message, Print_Int64 (taskId));
                   Append_To_Msg (Message, " is too long.");
-                  Error := True;
-                  return;
+                  raise Parsing_Error;
                end if;
                while not isFinished loop
                   pragma Loop_Invariant (Length (compositionString) < Natural'Last);
@@ -916,8 +915,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                               Append_To_Msg (Message, "Composition string of TaskID ");
                               Append_To_Msg (Message, Print_Int64 (taskId));
                               Append_To_Msg (Message, " is too long.");
-                              Error := True;
-                              return;
+                              raise Parsing_Error;
                            end if;
                            algebraCompositionTaskOptionId :=
                              algebraCompositionTaskOptionId
@@ -934,8 +932,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                  Append_To_Msg (Message, "Substring " & '"');
                                  Append_To_Msg (Message, Unb.Slice (compositionString, position, Length (compositionString)));
                                  Append_To_Msg (Message, '"' & ": optionID after character 'p' should be followed by character ' ' or ')'.");
-                                 Error := True;
-                                 return;
+                                 raise Parsing_Error;
                               elsif positionSpace /= 0 and then positionParen /= 0 then
                                  positionAfterId := Natural'Min (positionSpace, positionParen);
                               else
@@ -946,30 +943,28 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                  Append_To_Msg (Message, "Substring " & '"');
                                  Append_To_Msg (Message, Unb.Slice (compositionString, position, Length (compositionString)));
                                  Append_To_Msg (Message, '"' & ": character 'p' should be followed by an optionID.");
-                                 Error := True;
-                                 return;
+                                 raise Parsing_Error;
                               end if;
 
                               declare
                                  optionId, taskOptionId : Int64;
-                                 Parsing_Error          : Boolean;
                               begin
-                                 Parse_Int64 (Unb.Slice (compositionString, position + 1, positionAfterId - 1), optionId, Parsing_Error);
+                                 begin
+                                    Parse_Int64 (Unb.Slice (compositionString, position + 1, positionAfterId - 1), optionId);
+                                 exception
+                                    when Parsing_Error =>
 
-                                 if Parsing_Error then
-                                    Append_To_Msg (Message, "Substring " & '"');
-                                    Append_To_Msg (Message, Unb.Slice (compositionString, position + 1, positionAfterId - 1));
-                                    Append_To_Msg (Message, '"' & ": does not correspond to an Int64.");
-                                    Error := True;
-                                    return;
-                                 end if;
+                                       Append_To_Msg (Message, "Substring " & '"');
+                                       Append_To_Msg (Message, Unb.Slice (compositionString, position + 1, positionAfterId - 1));
+                                       Append_To_Msg (Message, '"' & ": does not correspond to an Int64.");
+                                       raise Parsing_Error;
+                                 end;
 
                                  if optionId not in 0 .. 99_999 then
                                     Append_To_Msg (Message, "OptionID ");
                                     Append_To_Msg (Message, Print_Int64 (optionId));
                                     Append_To_Msg (Message, " should be in range 0 .. 99_999.");
-                                    Error := True;
-                                    return;
+                                    raise Parsing_Error;
                                  end if;
 
                                  taskOptionId := Get_TaskOptionID (taskId, optionId);
@@ -981,8 +976,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                        Append_To_Msg (Message, "Composition string of TaskID ");
                                        Append_To_Msg (Message, Print_Int64 (taskId));
                                        Append_To_Msg (Message, " is too long.");
-                                       Error := True;
-                                       return;
+                                       raise Parsing_Error;
                                     end if;
                                     algebraCompositionTaskOptionId :=
                                       algebraCompositionTaskOptionId & Image;
@@ -1013,8 +1007,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
          begin
             if Length (TaskRelationships) = Natural'Last then
                Append_To_Msg (Message, "TaskRelationships string is too long.");
-               Error := True;
-               return;
+               raise Parsing_Error;
             end if;
             while not isFinished loop
                pragma Loop_Invariant (Length (TaskRelationships) < Natural'Last);
@@ -1028,8 +1021,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                      if position > 0 then
                         if Length (algebraString) >= Natural'Last - position + 1 then
                            Append_To_Msg (Message, "Algebra string is too long.");
-                           Error := True;
-                           return;
+                           raise Parsing_Error;
                         end if;
                         algebraString :=
                           algebraString &
@@ -1046,8 +1038,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                               Append_To_Msg (Message, "Substring " & '"');
                               Append_To_Msg (Message, Slice (TaskRelationships, position, Length (TaskRelationships)));
                               Append_To_Msg (Message, '"' & ": taskID after character 'p' should be followed by character ' ' or ')'.");
-                              Error := True;
-                              return;
+                              raise Parsing_Error;
                            elsif positionSpace /= 0 and then positionParen /= 0 then
                               positionAfterId := Natural'Min (positionSpace, positionParen);
                            else
@@ -1058,37 +1049,33 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                               Append_To_Msg (Message, "Substring " & '"');
                               Append_To_Msg (Message, Unb.Slice (TaskRelationships, position, Length (TaskRelationships)));
                               Append_To_Msg (Message, '"' & ": character 'p' should be followed by an optionID.");
-                              Error := True;
-                              return;
+                              raise Parsing_Error;
                            end if;
 
                            declare
                               taskId        : Int64;
-                              Parsing_Error : Boolean;
                            begin
-                              Parse_Int64 (Unb.Slice (TaskRelationships, position + 1, positionAfterId - 1), taskId, Parsing_Error);
-
-                              if Parsing_Error then
-                                 Append_To_Msg (Message, "Substring " & '"');
-                                 Append_To_Msg (Message, Unb.Slice (TaskRelationships, position + 1, positionAfterId - 1));
-                                 Append_To_Msg (Message, '"' & ": does not correspond to an Int64.");
-                                 Error := True;
-                                 return;
-                              end if;
+                              begin
+                                 Parse_Int64 (Unb.Slice (TaskRelationships, position + 1, positionAfterId - 1), taskId);
+                              exception
+                                 when Parsing_Error =>
+                                    Append_To_Msg (Message, "Substring " & '"');
+                                    Append_To_Msg (Message, Unb.Slice (TaskRelationships, position + 1, positionAfterId - 1));
+                                    Append_To_Msg (Message, '"' & ": does not correspond to an Int64.");
+                                    raise Parsing_Error;
+                              end;
 
                               if taskId not in 0 .. 99_999 then
                                  Append_To_Msg (Message, "TaskID ");
                                  Append_To_Msg (Message, Print_Int64 (taskId));
                                  Append_To_Msg (Message, " should be in range 0 .. 99_999.");
-                                 Error := True;
-                                 return;
+                                 raise Parsing_Error;
                               end if;
 
                               if Has_Key (taskIdVsAlgebraString, taskId) then
                                  if Length (algebraString) > Natural'Last - Length (Get (taskIdVsAlgebraString, taskId)) then
                                     Append_To_Msg (Message, "Algebra string is too long.");
-                                    Error := True;
-                                    return;
+                                    raise Parsing_Error;
                                  end if;
                                  algebraString :=
                                    algebraString & Get (taskIdVsAlgebraString, taskId);
@@ -1096,8 +1083,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                  Append_To_Msg (Message, "TaskID ");
                                  Append_To_Msg (Message, Print_Int64 (taskId));
                                  Append_To_Msg (Message, " does not exist.");
-                                 Error := True;
-                                 return;
+                                 raise Parsing_Error;
                               end if;
                               Delete (TaskRelationships, 1, positionAfterId - 1);
                            end;
@@ -1118,8 +1104,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
          for taskID of Iterate (taskIdVsAlgebraString) loop
             if Length (algebraString) >= Natural'Last - 1 - Length (Get (taskIdVsAlgebraString, taskID)) then
                Append_To_Msg (Message, "Algebra string is too long.");
-               Error := True;
-               return;
+               raise Parsing_Error;
             end if;
             algebraString :=
               algebraString
@@ -1133,14 +1118,11 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
       Put_Line (To_String (algebraString));
       if Length (algebraString) <= 1 then
          Append_To_Msg (Message, "Algebra string is too short.");
-         Error := True;
-         return;
+         raise Parsing_Error;
       end if;
 
-      if not Error then
-         Parse_Formula (algebraString, Algebra, Error, Message);
+         Parse_Formula (algebraString, Algebra, Message);
 
-         if not Error then
             declare
                function Action_In_TaskPlanOptions_Map (TaskOptionId : Int64)
                                                        return Boolean
@@ -1155,9 +1137,10 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                               or else TaskOption.OptionID /= Get_OptionID (TaskOptionId))));
 
                procedure Check_Actions_In_Map_Rec (Tree : not null access constant Algebra_Tree_Cell) with
-                 Post => (if not Error then All_Actions_In_Map (Tree, TaskPlanOptions_Map)),
+                 Post => All_Actions_In_Map (Tree, TaskPlanOptions_Map),
                  Subprogram_Variant => (Structural => Tree),
-                 Annotate => (GNATprove, Always_Return);
+                 Always_Terminates,
+                 Exceptional_Cases => (Parsing_Error => Message'Initialized);
 
                function Action_In_TaskPlanOptions_Map (TaskOptionId : Int64)
                                                        return Boolean
@@ -1201,43 +1184,37 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                   case Tree.all.Node_Kind is
                   when Action =>
                      if Tree.TaskOptionId not in 0 .. 9_999_999_999 then
+                        Message := Null_Unbounded_String;
                         Append_To_Msg (Message, "TaskOptionId ");
                         Append_To_Msg (Message, Print_Int64 (Tree.TaskOptionId));
                         Append_To_Msg (Message, " should be in range 0 .. 9_999_999_999.");
-                        Error := True;
-                        return;
+                        raise Parsing_Error;
                      end if;
 
                      if not Action_In_TaskPlanOptions_Map (Tree.TaskOptionId) then
+                        Message := Null_Unbounded_String;
                         Append_To_Msg (Message, "OptionId ");
                         Append_To_Msg (Message, Print_Int64 (Get_OptionID (Tree.TaskOptionId)));
                         Append_To_Msg (Message, " does not exist for TaskId ");
                         Append_To_Msg (Message, Print_Int64 (Get_TaskID (Tree.TaskOptionId)));
                         Append_To_Msg (Message, '.');
-                        Error := True;
-                        return;
+                        raise Parsing_Error;
                      end if;
                   when Operator =>
                      for J in 1 .. Tree.Collection.Num_Children loop
                         Check_Actions_In_Map_Rec (Tree.Collection.Children (J));
 
-                        if Error then
-                           return;
-                        end if;
-
                         pragma Loop_Invariant (for all K in 1 .. J => All_Actions_In_Map (Tree.Collection.Children (K), TaskPlanOptions_Map));
                      end loop;
                   when Undefined =>
+                     Message := Null_Unbounded_String;
                      Append_To_Msg (Message, "Algebra tree is not well formed.");
-                     Error := True;
-                     return;
+                     raise Parsing_Error;
                   end case;
                end Check_Actions_In_Map_Rec;
             begin
                Check_Actions_In_Map_Rec (Algebra);
             end;
-         end if;
-      end if;
    end Initialize_Algebra;
 
    --------------------
@@ -1524,7 +1501,6 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
       Assignment_Cost_Matrix : AssignmentCostMatrix;
       TaskPlanOptions_Map    : Int64_TPO_Map;
       Summary                : out TaskAssignmentSummary;
-      Error                  : out Boolean;
       Message                : out Unbounded_String)
    is
 
@@ -1641,7 +1617,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
          end case;
       end record;
 
-      Algebra         : Algebra_Tree;
+      Algebra         : aliased Algebra_Tree;
       Min             : Min_Option := (Found => False);
       Search_Stack    : Stack;
       Current_Element : Assignment_Info;
@@ -1649,90 +1625,92 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
       Empty_VA_Map    : Int64_VAC_Map;
       Nodes_Visited   : Int64 := 0;
    begin
-      Initialize_Algebra (Automation_Request, TaskPlanOptions_Map, Algebra, Error, Message);
-      Put_Line (To_String (Message));
-      if not Error then
-         Put_Line ("Algebra Tree:");
-         Print_Tree (Algebra);
+      Initialize_Algebra (Automation_Request, TaskPlanOptions_Map, Algebra, Message);
 
-         --  The first element is a null assignment
+      Put_Line ("Algebra Tree:");
+      Print_Tree (Algebra);
 
-         pragma Assume (Size (Search_Stack) < Count_Type'Last, "we have space for another child");
-         Push (Search_Stack,
-                       (Empty_TA_Seq,
-                        Empty_VA_Map));
-         pragma Assert (for all K in 1 .. Size (Search_Stack) => Valid_Assignment (Get (Search_Stack, K), TaskPlanOptions_Map, Automation_Request));
+      --  The first element is a null assignment
 
-         --  If the stack is empty, all solutions have been explored
+      pragma Assume (Size (Search_Stack) < Count_Type'Last, "we have space for another child");
+      Push (Search_Stack,
+            (Empty_TA_Seq,
+             Empty_VA_Map));
+      pragma Assert (for all K in 1 .. Size (Search_Stack) => Valid_Assignment (Get (Search_Stack, K), TaskPlanOptions_Map, Automation_Request));
 
-         while Size (Search_Stack) /= 0
+      --  If the stack is empty, all solutions have been explored
 
-         --  We continue at least until we find a solution
+      while Size (Search_Stack) /= 0
 
-           and then (if Min.Found
-                     then (Nodes_Visited in 1 .. Data.Number_Nodes_Maximum - 1))
-         loop
-            pragma Loop_Invariant (for all K in 1 .. Size (Search_Stack) => Valid_Assignment (Get (Search_Stack, K), TaskPlanOptions_Map, Automation_Request));
+      --  We continue at least until we find a solution
 
-            --  The element at the top of the stack is popped
+        and then (if Min.Found
+                  then (Nodes_Visited in 1 .. Data.Number_Nodes_Maximum - 1))
+       loop
+         pragma Loop_Invariant (for all K in 1 .. Size (Search_Stack) => Valid_Assignment (Get (Search_Stack, K), TaskPlanOptions_Map, Automation_Request));
 
-            Pop (Search_Stack, Current_Element);
+         --  The element at the top of the stack is popped
 
-            if not Min.Found or else Cost (Current_Element, Data.Cost_Function) < Min.Cost then
-               declare
-                  Children_A   : Children_Arr :=
-                    Children (Current_Element,
-                              Algebra,
-                              Automation_Request,
-                              TaskPlanOptions_Map,
-                              Assignment_Cost_Matrix);
-                  Current_Cost : constant Int64 := Cost (Current_Element, Data.Cost_Function);
-               begin
+         Pop (Search_Stack, Current_Element);
 
-                  --  If this element has no children, it means that this node
-                  --  has assigned every task, so we compare it to the current
-                  --  assignment that minimizes the cost.
-                  if Children_A'Length = 0 then
-                     if not Min.Found or else Current_Cost < Min.Cost then
-                        Min := (Found => True, Info => Current_Element, Cost => Current_Cost);
-                     end if;
+         if not Min.Found or else Cost (Current_Element, Data.Cost_Function) < Min.Cost then
+            declare
+               Children_A   : Children_Arr :=
+                 Children (Current_Element,
+                           Algebra,
+                           Automation_Request,
+                           TaskPlanOptions_Map,
+                           Assignment_Cost_Matrix);
+               Current_Cost : constant Int64 := Cost (Current_Element, Data.Cost_Function);
+            begin
 
-                     --  Else, we compute the cost for every child and push them into the
-                     --  stack if their cost is lower than the current minimal cost.
-
-                  else
-                     Bubble_Sort (Children_A);
-                     for J in reverse Children_A'Range loop
-                        pragma Loop_Invariant (for all K in 1 .. Size (Search_Stack) => Valid_Assignment (Get (Search_Stack, K), TaskPlanOptions_Map, Automation_Request));
-                        declare
-                           Child : Assignment_Info := Children_A (J);
-                        begin
-                           if not Min.Found or else Cost (Child, Data.Cost_Function) < Min.Cost then
-                              pragma Assume (Size (Search_Stack) < Count_Type'Last, "we have space for another child");
-                              Push (Search_Stack, Child);
-                           end if;
-                        end;
-                     end loop;
-                     pragma Assert (for all K in 1 .. Size (Search_Stack) => Valid_Assignment (Get (Search_Stack, K), TaskPlanOptions_Map, Automation_Request));
+               --  If this element has no children, it means that this node
+               --  has assigned every task, so we compare it to the current
+               --  assignment that minimizes the cost.
+               if Children_A'Length = 0 then
+                  if not Min.Found or else Current_Cost < Min.Cost then
+                     Min := (Found => True, Info => Current_Element, Cost => Current_Cost);
                   end if;
-               end;
-               pragma Assume (Nodes_Visited < Int64'Last, "a solution is found in less than Int64'Last steps");
-               Nodes_Visited := Nodes_Visited + 1;
-            end if;
-         end loop;
 
-         Summary.CorrespondingAutomationRequestID := Automation_Request.RequestID;
-         Summary.OperatingRegion := Automation_Request.OperatingRegion;
-         Summary.TaskList := Min.Info.Assignment_Sequence;
-      else
+                  --  Else, we compute the cost for every child and push them into the
+                  --  stack if their cost is lower than the current minimal cost.
+
+               else
+                  Bubble_Sort (Children_A);
+                  for J in reverse Children_A'Range loop
+                     pragma Loop_Invariant (for all K in 1 .. Size (Search_Stack) => Valid_Assignment (Get (Search_Stack, K), TaskPlanOptions_Map, Automation_Request));
+                     declare
+                        Child : Assignment_Info := Children_A (J);
+                     begin
+                        if not Min.Found or else Cost (Child, Data.Cost_Function) < Min.Cost then
+                           pragma Assume (Size (Search_Stack) < Count_Type'Last, "we have space for another child");
+                           Push (Search_Stack, Child);
+                        end if;
+                     end;
+                  end loop;
+                  pragma Assert (for all K in 1 .. Size (Search_Stack) => Valid_Assignment (Get (Search_Stack, K), TaskPlanOptions_Map, Automation_Request));
+               end if;
+            end;
+            pragma Assume (Nodes_Visited < Int64'Last, "a solution is found in less than Int64'Last steps");
+            Nodes_Visited := Nodes_Visited + 1;
+         end if;
+      end loop;
+
+      Summary.CorrespondingAutomationRequestID := Automation_Request.RequestID;
+      Summary.OperatingRegion := Automation_Request.OperatingRegion;
+      Summary.TaskList := Min.Info.Assignment_Sequence;
+      Free_Tree (Algebra);
+      pragma Assert (Algebra = null);
+
+   exception
+      when Parsing_Error =>
          declare
             Null_TAS : TaskAssignmentSummary;
          begin
             Summary := Null_TAS;
          end;
-      end if;
-      Free_Tree (Algebra);
-      pragma Assert (Algebra = null);
+         Free_Tree (Algebra);
+         pragma Assert (Algebra = null);
    end Run_Calculate_Assignment;
 
    ---------------------------------
@@ -1746,8 +1724,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
       ReqId   : Int64)
    is
       Summary : TaskAssignmentSummary;
-      Error   : Boolean;
-      Message : Unbounded_String;
+      Message : Unbounded_String with Relaxed_Initialization;
    begin
       pragma Assert
         (Contains (State.m_assignmentCostMatrixes, ReqId));
@@ -1755,22 +1732,21 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
         (All_Travels_In_CostMatrix
            (Element (State.m_uniqueAutomationRequests, ReqId),
             Element (State.m_taskPlanOptions, ReqId),
-            Element (State.m_assignmentCostMatrixes, ReqId)));
+            Element (State.m_assignmentCostMatrixes, ReqId).CostMatrix));
+      begin
+         Run_Calculate_Assignment
+           (Data,
+            Element (State.m_uniqueAutomationRequests, ReqId),
+            Element (State.m_assignmentCostMatrixes, ReqId),
+            Element (State.m_taskPlanOptions, ReqId),
+            Summary,
+            Message);
 
-      Run_Calculate_Assignment
-        (Data,
-         Element (State.m_uniqueAutomationRequests, ReqId),
-         Element (State.m_assignmentCostMatrixes, ReqId),
-         Element (State.m_taskPlanOptions, ReqId),
-         Summary,
-         Error,
-         Message);
-
-      if not Error then
          sendBroadcastMessage (Mailbox, Summary);
-      else
-         sendErrorMessage (Mailbox, Message);
-      end if;
+      exception
+         when Parsing_Error =>
+            sendErrorMessage (Mailbox, Message);
+      end;
       Delete (State.m_assignmentCostMatrixes, ReqId);
       Delete (State.m_taskPlanOptions, ReqId);
       Delete (State.m_uniqueAutomationRequests, ReqId);
