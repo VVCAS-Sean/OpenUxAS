@@ -32,6 +32,19 @@ package body Automation_Request_Validator_Mailboxes is
       This.Unique_Entity_Send_Message_Id := Unique_Id;
    end Initialize;
 
+   ----------------------------------------
+   -- Get_Next_Unique_Sending_Message_Id --
+   ----------------------------------------
+
+   procedure Get_Next_Unique_Sending_Message_Id
+     (This  : in out Automation_Request_Validator_Mailbox;
+      Value : out Int64)
+   is
+   begin
+      This.Unique_Entity_Send_Message_Id := This.Unique_Entity_Send_Message_Id + 1;
+      Value := This.Unique_Entity_Send_Message_Id;
+   end Get_Next_Unique_Sending_Message_Id;
+
    --------------------------
    -- sendBroadcastMessage --
    --------------------------

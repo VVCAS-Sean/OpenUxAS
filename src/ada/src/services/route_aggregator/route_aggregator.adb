@@ -423,6 +423,8 @@ package body Route_Aggregator with SPARK_Mode is
       --  Check pending automation requests
 
       while Has_Element (State.m_pendingAutoReq, i) loop
+
+         pragma Loop_Variant (Increases => Int_Set_Maps_P.Get (Positions (State.m_pendingAutoReq), i), Decreases => Length (State.m_pendingAutoReq));
          pragma Loop_Invariant (Has_Element (State.m_pendingAutoReq, i));
 
          pragma Loop_Invariant
@@ -466,6 +468,8 @@ package body Route_Aggregator with SPARK_Mode is
             C : Int64_Formal_Sets.Cursor := First (Formal_Set);
          begin
             while Has_Element (Formal_Set, C) loop
+
+               pragma Loop_Variant (Increases => Int_Set_P.Get (Positions (Formal_Set), C));
                pragma Loop_Invariant
                  ((for all K in 1 .. Int_Set_P.Get (Positions (Formal_Set), C) - 1 =>
                       Contains (State.m_routePlanResponses, Int_Set_E.Get (Elements (Formal_Set), K)))
@@ -536,6 +540,8 @@ package body Route_Aggregator with SPARK_Mode is
    begin
       -- check pending route requests
       while Has_Element (State.m_pendingRoute, i) loop
+
+         pragma Loop_Variant (Increases => Int_Set_Maps_P.Get (Positions (State.m_pendingRoute), i), Decreases => Length (State.m_pendingRoute));
          pragma Loop_Invariant (Has_Element (State.m_pendingRoute, i));
 
          pragma Loop_Invariant
@@ -576,6 +582,8 @@ package body Route_Aggregator with SPARK_Mode is
             C : Int64_Formal_Sets.Cursor := First (Formal_Set);
          begin
             while Has_Element (Formal_Set, C) loop
+
+               pragma Loop_Variant (Increases => Int_Set_P.Get (Positions (Formal_Set), C));
                pragma Loop_Invariant
                  ((for all K in 1 .. Int_Set_P.Get (Positions (Formal_Set), C) - 1 =>
                       Contains (State.m_routePlanResponses, Int_Set_E.Get (Elements (Formal_Set), K)))

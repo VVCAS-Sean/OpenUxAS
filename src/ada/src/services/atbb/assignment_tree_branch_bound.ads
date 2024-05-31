@@ -7,7 +7,7 @@ with Assignment_Tree_Branch_Bound_Mailboxes; use Assignment_Tree_Branch_Bound_Ma
 with Common;                                 use Common;
 with LMCP_Messages;                          use LMCP_Messages;
 
-package Assignment_Tree_Branch_Bound with SPARK_Mode is
+package Assignment_Tree_Branch_Bound with SPARK_Mode, Always_Terminates is
 
    type Cost_Function_Kind is (Minmax, Cumulative);
 

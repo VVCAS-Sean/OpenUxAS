@@ -23,11 +23,11 @@ package Route_Aggregator_Mailboxes with SPARK_Mode is
    procedure sendLimitedCastMessage
      (This : in out Route_Aggregator_Mailbox;
       Group : MessageGroup;
-      Msg   : Message_Root'Class);
+      Msg   : Message_Root'Class) with Always_Terminates;
 
    procedure sendBroadcastMessage
      (This : in out Route_Aggregator_Mailbox;
-      Msg   : Message_Root'Class);
+      Msg   : Message_Root'Class) with Always_Terminates;
 
    procedure Get_Next_Unique_Sending_Message_Id
      (This  : in out Route_Aggregator_Mailbox;
