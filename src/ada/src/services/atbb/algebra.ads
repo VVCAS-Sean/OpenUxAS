@@ -3,7 +3,7 @@ with Common;                use Common;
 with Ada.Unchecked_Deallocation;
 with SPARK.Big_Integers; use SPARK.Big_Integers;
 
-package Algebra with SPARK_Mode, Annotate => (GNATprove, Always_Return) is
+package Algebra with SPARK_Mode, Always_Terminates is
 
    Max_Children : constant := 50;
 

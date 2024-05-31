@@ -59,8 +59,6 @@ package body Automation_Request_Validator with SPARK_Mode is
                        Available_Point_of_Interest_Ids,
                        TaskIds));
 
-   procedure Get_Unique_Request_Id (Val : out Int64);
-
    procedure Send_Next_Request
      (Mailbox          : in out Automation_Request_Validator_Mailbox;
       Pending_Requests : UniqueAutomationRequest_Ref_Deque);
@@ -445,6 +443,8 @@ package body Automation_Request_Validator with SPARK_Mode is
       isNewPendingRequest : Boolean := False;
    begin
       while areAllTasksReady and then Length (State.Requests_Waiting_For_Tasks) > 0 loop
+         pragma Loop_Variant (Decreases => Length (State.Requests_Waiting_For_Tasks));
+
          declare
             Req : constant UniqueAutomationRequest := First_Element (State.Requests_Waiting_For_Tasks);
          begin
@@ -463,17 +463,6 @@ package body Automation_Request_Validator with SPARK_Mode is
       end if;
    end Check_Tasks_Initialized;
 
-   ---------------------------
-   -- Get_Unique_Request_Id --
-   ---------------------------
-
-   procedure Get_Unique_Request_Id (Val : out Int64) is
-      Id : AVTAS.LMCP.Types.Int64;
-   begin
-      Get_Unique_Entity_Send_Message_Id (Id);
-      Val := Int64 (Id);
-   end Get_Unique_Request_Id;
-
    -------------------------------
    -- Handle_Automation_Request --
    -------------------------------
@@ -490,7 +479,7 @@ package body Automation_Request_Validator with SPARK_Mode is
       isReady                   : Boolean;
    begin
 
-      Get_Unique_Request_Id (ReqId);
+      Get_Next_Unique_Sending_Message_Id (Mailbox, ReqId);
       pragma Assume (not Has_Key (State.Sandbox, ReqId), "returned Id is actually unique");
 
       Unique_Automation_Request.RequestID := ReqId;

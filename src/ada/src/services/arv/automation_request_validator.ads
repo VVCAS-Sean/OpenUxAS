@@ -11,7 +11,7 @@ with LMCP_Messages;                          use LMCP_Messages;
 --  Package containing the functionality of the service. It uses its communication
 --  counter-part to send and receive messages.
 
-package Automation_Request_Validator with SPARK_Mode is
+package Automation_Request_Validator with SPARK_Mode, Always_Terminates is
    pragma Unevaluated_Use_Of_Old (Allow);
 
    --  Configuration data is separated from the service state as it is not

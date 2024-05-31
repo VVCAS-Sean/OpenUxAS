@@ -20,11 +20,13 @@ package Assignment_Tree_Branch_Bound_Mailboxes with SPARK_Mode is
 
    procedure sendBroadcastMessage
      (This : in out Assignment_Tree_Branch_Bound_Mailbox;
-      Msg   : Message_Root'Class);
+      Msg   : Message_Root'Class)
+   with Always_Terminates;
 
    procedure sendErrorMessage
      (This         : in out Assignment_Tree_Branch_Bound_Mailbox;
-      Error_String : Unbounded_String);
+      Error_String : Unbounded_String)
+   with Always_Terminates;
 private
    pragma SPARK_Mode (Off);
 

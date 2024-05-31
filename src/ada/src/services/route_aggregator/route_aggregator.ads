@@ -11,7 +11,7 @@ with Common;                     use Common;
 with LMCP_Messages;              use LMCP_Messages;
 with Route_Aggregator_Mailboxes; use Route_Aggregator_Mailboxes;
 
-package Route_Aggregator with SPARK_Mode is
+package Route_Aggregator with SPARK_Mode, Always_Terminates is
    pragma Unevaluated_Use_Of_Old (Allow);
 
    pragma Assertion_Policy (Ignore);
@@ -263,7 +263,7 @@ package Route_Aggregator with SPARK_Mode is
 
    package Message_History with
      Ghost,
-     Annotate => (GNATprove, Always_Return)
+     Always_Terminates
    is
       type Event_Kind is
         (Receive_RouteRequest, Send_PlanRequest, Receive_PlanResponse, Send_RouteResponse);

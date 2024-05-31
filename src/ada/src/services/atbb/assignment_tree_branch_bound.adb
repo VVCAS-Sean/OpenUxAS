@@ -935,6 +935,8 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                end if;
                while not isFinished loop
                   pragma Loop_Invariant (Length (compositionString) < Natural'Last);
+                  pragma Loop_Variant (Decreases => Length (compositionString));
+
                   if Length (compositionString) > 0 then
 
                      declare
@@ -1041,6 +1043,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
             end if;
             while not isFinished loop
                pragma Loop_Invariant (Length (TaskRelationships) < Natural'Last);
+               pragma Loop_Variant (Decreases => Length (TaskRelationships));
 
                if Length (TaskRelationships) > 0 then
 
@@ -1297,6 +1300,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
 
       procedure Prove_Final_Value_Is_Valid with
         Ghost,
+        Always_Terminates,
         Pre  =>
           Valid_TaskPlanOptions (TaskPlanOptions_Map)
             and then Valid_Assignment (Assignment, TaskPlanOptions_Map, Automation_Request)
@@ -1324,6 +1328,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
 
       procedure Prove_Initial_Value_Is_Valid with
         Ghost,
+        Always_Terminates,
         Pre  =>
           Length (Assignment.Assignment_Sequence) < To_Big_Integer (Count_Type'Last)
             and then TaskOpt.TaskID in 0 .. 99_999
@@ -1382,6 +1387,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                     Key (Result.Vehicle_Assignments, I));
             end if;
 
+            pragma Loop_Variant (Increases => Int64_VehicleAssignmentCost_Maps_P.Get (Positions (Result.Vehicle_Assignments), I));
             pragma Loop_Invariant (Has_Element (Result.Vehicle_Assignments, I));
             pragma Loop_Invariant
               (for all K in 1 .. Int64_VehicleAssignmentCost_Maps_P.Get (Positions (Result.Vehicle_Assignments), I) =>
@@ -1444,6 +1450,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                                  Element (Result.Vehicle_Assignments, I).Last_TaskOption,
                                  Key (Result.Vehicle_Assignments, I));
 
+            pragma Loop_Variant (Increases => Int64_VehicleAssignmentCost_Maps_P.Get (Positions (Result.Vehicle_Assignments), I));
             pragma Loop_Invariant (Has_Element (Result.Vehicle_Assignments, I));
             pragma Loop_Invariant
               (for all K in 1 .. Int64_VehicleAssignmentCost_Maps_P.Get (Positions (Result.Vehicle_Assignments), I) =>
@@ -1549,11 +1556,13 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
               (Valid_Assignment (Child, TaskPlanOptions_Map, Automation_Request))),
         Post =>
           (for all Child of Arr =>
-             (Valid_Assignment (Child, TaskPlanOptions_Map, Automation_Request)));
+             (Valid_Assignment (Child, TaskPlanOptions_Map, Automation_Request))),
+        Always_Terminates;
       --  Sorts the array of assignments in the ascending order of cost.
 
       procedure Equal_Implies_Valid_Assignment (A, B : Assignment_Info) with
         Ghost,
+        Always_Terminates,
         Pre  => A = B and then Valid_TaskPlanOptions (TaskPlanOptions_Map) and then Valid_Assignment (A, TaskPlanOptions_Map, Automation_Request),
         Post => Valid_Assignment (B, TaskPlanOptions_Map, Automation_Request);
 
@@ -1564,11 +1573,13 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
       procedure Bubble_Sort (Arr : in out Children_Arr) is
          Switched : Boolean;
       begin
-         loop
-            Switched := False;
+         for C in reverse 0 .. Arr'Length - 1 loop
             pragma Loop_Invariant (for all Child of Arr => Valid_Assignment (Child, TaskPlanOptions_Map, Automation_Request));
-            for J in Arr'First .. Arr'Last - 1 loop
+
+            Switched := False;
+            for J in Arr'First .. Arr'First + C - 1 loop
                pragma Loop_Invariant (for all Child of Arr => Valid_Assignment (Child, TaskPlanOptions_Map, Automation_Request));
+
                if Cost (Arr (J + 1), Data.Cost_Function) < Cost (Arr (J), Data.Cost_Function) then
                   declare
                      Tmp : Assignment_Info := Arr (J + 1);
@@ -1619,6 +1630,7 @@ package body Assignment_Tree_Branch_Bound with SPARK_Mode is
                 Element (B.Vehicle_Assignments, I).Last_TaskOption,
                 Key (B.Vehicle_Assignments, I));
 
+            pragma Loop_Variant (Increases => Int64_VehicleAssignmentCost_Maps_P.Get (Positions (B.Vehicle_Assignments), I));
             pragma Loop_Invariant (Has_Element (B.Vehicle_Assignments, I));
             pragma Loop_Invariant
               (for all K in 1 .. Int64_VehicleAssignmentCost_Maps_P.Get (Positions (B.Vehicle_Assignments), I) =>
