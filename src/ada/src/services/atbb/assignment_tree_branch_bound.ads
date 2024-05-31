@@ -195,9 +195,9 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
       Assignment_Cost_Matrix : AssignmentCostMatrix;
       TaskPlanOptions_Map    : Int64_TPO_Map;
       Summary                : out TaskAssignmentSummary;
-      Error                  : out Boolean;
       Message                : out Unbounded_String)
    with
+     Relaxed_Initialization => Message,
      Pre =>
        Valid_AssignmentCostMatrix (Assignment_Cost_Matrix)
          and then

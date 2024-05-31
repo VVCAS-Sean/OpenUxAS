@@ -128,4 +128,6 @@ package Common with SPARK_Mode is
          High   : Natural) return String
       is (Ada.Strings.Unbounded.Slice (Source, Low, High));
    end Unbounded_Strings_Subprograms;
+
+   Parsing_Error : exception;
 end Common;
