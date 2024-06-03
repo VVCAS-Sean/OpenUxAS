@@ -6,19 +6,53 @@ with Daidalus_Response_Communication; use Daidalus_Response_Communication;
 with AVTAS.LMCP.Types;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 with UxAS.Comms.LMCP_Net_Client; use UxAS.Comms.LMCP_Net_Client;
-package body automatic_response
-with SPARK_Mode => On is
+package body automatic_response with SPARK_Mode => On is
 
    ----------------------------
    -- Process_DAIDALUS_Bands --
    ----------------------------
-
+   --  procedure Process_DAIDALUS_Bands
+   --    (Mailbox                         : in out Daidalus_Response_Communication;
+   --     Current_State                   :     state_parameters;
+   --     Divert_State                    :    out state_parameters;
+   --     DAIDALUS_Altitude_Bands         :     OrderedIntervalVector;
+   --     DAIDALUS_Heading_Bands          :     OrderedIntervalVector;
+   --     DAIDALUS_GroundSpeed_Bands      :     OrderedIntervalVector;
+   --     Recovery_Altitude_Bands         :     OrderedIntervalVector;
+   --     Recovery_Heading_Bands          :     OrderedIntervalVector;
+   --     Recovery_GroundSpeed_Bands      :     OrderedIntervalVector;
+   --     m_Vehicle_ID                    :     VehicleID_type;
+   --     Intruders                       :     Intruder_info_Vector;
+   --     DAIDALUS_Altitude_Zones         :     ZoneVector;
+   --     DAIDALUS_Heading_Zones          :     ZoneVector;
+   --     DAIDALUS_GroundSpeed_Zones      :     ZoneVector;
+   --     m_isReady_to_Act                :     Boolean;
+   --     m_Action_Time_Thresold_s        :     action_time_sec;
+   --     m_Priority_Time_Threshold_s     :     priority_time_sec;
+   --     m_Status                        : in out Status_Type;
+   --     m_NextWaypoint                  :     Waypoint_info;
+   --     Altitude_Max_m                  :     Altitude_Type_m;
+   --     Altitude_Min_m                  :     Altitude_Type_m;
+   --     Altitude_Interval_Buffer_m      :     Altitude_Buffer_Type_m;
+   --     Heading_Max_deg                 :     Heading_Type_deg;
+   --     Heading_Min_deg                 :     Heading_Type_deg;
+   --     Heading_Interval_Buffer_deg     :     Heading_Buffer_Type_deg;
+   --     GroundSpeed_Max_mps             :     GroundSpeed_Type_mps;
+   --     GroundSpeed_Min_mps             :     GroundSpeed_Type_mps;
+   --     GroundSpeed_Interval_Buffer_mps :     GroundSpeed_Buffer_Type_mps;
+   --     Is_Tracking_Next_Waypoint       : in out Boolean;
+   --     m_MissionCommand                : in out definitions.MissionCommand;
+   --     RoW_ghost                       :    out ID_Type;
+   --     ConflictResolutionList_ghost    :    out VehicleIDsVector;
+   --     SendNewMissionCommand_ghost     :    out Boolean;
+   --     Send_Divert_Action_Command_ghost :    out Boolean);
+   --
    ----------------------------
    -- Process_DAIDALUS_Bands --
    ----------------------------
 
    procedure Process_DAIDALUS_Bands
-     (Mailbox                         : in out Daidalus_Response_Communication;
+     (Mailbox                         : in out Daidalus_Response_Mailbox;
       Current_State                   :     state_parameters;
       Divert_State                    :    out state_parameters;
       DAIDALUS_Altitude_Bands         :     OrderedIntervalVector;
@@ -220,7 +254,7 @@ with SPARK_Mode => On is
                   VehicleActionCommand.VehicleActionList := Add
                     (VehicleActionCommand.VehicleActionList,
                      FlightDirectorAction);
-                  sendBroadcastMessage(Mailbox, VehicleActionCommand);
+                  sendBroadcastMessage (Mailbox, VehicleActionCommand);
 
                end;
 
