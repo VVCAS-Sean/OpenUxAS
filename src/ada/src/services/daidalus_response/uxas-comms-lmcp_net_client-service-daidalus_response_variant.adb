@@ -21,7 +21,6 @@ with larcfm.DAIDALUS.WellClearViolationIntervals;
 use larcfm.DAIDALUS.DAIDALUSConfiguration; 
 use larcfm.DAIDALUS.WellClearViolationIntervals;
 
-
 package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
 
    -----------------------
@@ -53,13 +52,96 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
    --    (This : in out <Service_Name>_Service;
    --     Msg  : Any_LMCP_Message);
 
-   procedure Handle_MissionCommand_Msg 
-     (This : in out Daidalus_Response_Service;
-      Msg : Any_LMCP_Message);
+   --  procedure Handle_MissionCommand_Msg
+   --    (This : in out Daidalus_Response_Service;
+   --     Msg : Any_LMCP_Message);
+   --  
+   --  Procedure Handle_AutomationResponse_Msg
+   --    (This : in out Daidalus_Response_Service;
+   --     Msg : Any_LMCP_Message);
    
-   Procedure Handle_AutomationResponse_Msg 
-     (This : in out Daidalus_Response_Service;
-      Msg : Any_LMCP_Message);
+   -- ------------------------
+   -- -- TurnType_Attribute --
+   -- ------------------------
+   -- 
+   -- function TurnType_Attribute
+   --    (XML_Node : DOM.Core.Element;
+   --    Name     : String;
+   --    Default  : LMCP_Messages.TurnTypeEnum)
+   --    return LMCP_Messages.TurnTypeEnum
+   -- is
+   --    use DOM.Core;
+   --    Attr_Value : constant DOM_String := Elements.Get_Attribute (XML_Node, Name);
+   -- begin
+   --    if Attr_Value /= ""
+   --    then
+   --       begin
+   --          return LMCP_Messages.TurnTypeEnum'Value (Attr_Value);
+   --       exception
+   --          when others =>
+   --             Put_Line ("Could not convert " & Attr_Value &
+   --                         " to TurnTypeEnum. Using default " & Default'Image);
+   --             return Default;
+   --       end;
+   --    else
+   --       return Default;
+   --    end if;
+   -- end TurnType_Attribute;
+ 
+   function InterpretXMLNodeAsInt64 
+     (XML_Node : DOM.Core.Element;
+      Name : String;
+      Default : Common.Int64) return Common.Int64;
+   
+   function InterpretXMLNodeAsInt64 
+     (XML_Node : DOM.Core.Element;
+      Name : String;
+      Default : Common.Int64) return Common.Int64 is
+      use DOM.Core;
+      Attr_Value : constant DOM_String := Elements.Get_Attribute (XML_Node, 
+                                                                  Name);
+   begin
+      if Attr_Value /= ""
+      then
+         begin
+            return Common.Int64'Value (Attr_Value);
+         exception
+            when others =>
+               Put_Line ("Could not convert " & Attr_Value &
+                           " to Int64. Using default " & Default'Image);
+               return Default;
+         end;
+      else
+         return Default;
+      end if;
+   end InterpretXMLNodeAsInt64;
+   
+   function InterpretXMLNodeAsReal64 
+     (XML_Node : DOM.Core.Element;
+      Name : String;
+      Default : Common.Real64) return Common.Real64;
+   function InterpretXMLNodeAsReal64 
+     (XML_Node : DOM.Core.Element;
+      Name : String;
+      Default : Common.Real64) return Common.Real64 is
+      use DOM.Core;
+      Attr_Value : constant DOM_String := Elements.Get_Attribute (XML_Node, 
+                                                                  Name);
+   begin
+      if Attr_Value /= " "
+      then 
+         begin
+            return Common.Real64'Value (Attr_Value);
+         exception
+            when others =>
+               Put_Line ("Could not convert " & Attr_Value &
+                           " to Real64. Using default " & Default'Image);
+               return Default;
+         end;
+      else
+         return Default;
+      end if;
+   end InterpretXMLNodeAsReal64;
    
    ---------------
    -- Configure --
@@ -71,7 +153,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
       XML_Node : DOM.Core.Element;
       Result   : out Boolean)
    is
-   
+      Unused : Boolean;
    begin
       -- __TODO__
       -- Configure service-specific parameters, generally fields of This.Config, 
@@ -87,15 +169,26 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
       -- Subscribe to messages this service needs to receive.
       --
       -- __Example__
-      --
       
-      --  This.Add_Subscription_Address (AFRL.CMASI.AirVehicleState.Subscription, Unused);
-      This.Add_Subscription_Address (AFRL.CMASI.MissionCommand.Subscription, Unused);
-      This.Add_Subscription_Address (larcfm.DAIDALUS.DAIDALUSConfiguration, 
-                                      Unused);
-      This.Add_Subscription_Address (larcfm.DAIDALUS.WellClearViolationIntervals,
+      This.Config.VehicleID := InterpretXMLNodeAsInt64 (XML_Node, "VehicleID",
+                                                        This.Config.VehicleID);
+      This.Config.ActionTimeThreshold := InterpretXMLNodeAsReal64 (XML_Node, 
+                                                     "ActionTimeThreshold", 
+                                               This.Config.ActionTimeThreshold);
+      This.Config.PriorityTimeThreshold := InterpretXMLNodeAsReal64 (XML_Node, 
+                                                      "PriorityTimeThreshold", 
+                                             This.Config.PriorityTimeThreshold);
+      
+      -- Subscribe to Mission Command Messages ---------------------------------
+      This.Add_Subscription_Address (AFRL.CMASI.MissionCommand.Subscription, 
                                      Unused);
-      
+      --Subscribe to DAIDALUS Configuration Message ----------------------------
+      This.Add_Subscription_Address (larcfm.DAIDALUS.DAIDALUSConfiguration.
+                                       Subscription, Unused);
+      --Subscrib to WellClear Violation Interval Messages ----------------------
+      This.Add_Subscription_Address (larcfm.DAIDALUS.
+                                       WellClearViolationIntervals.Subscription,
+                                     Unused);     
 
       Result := True;
    end Configure;
@@ -161,17 +254,17 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
     -- Handle_Mission_Command_Msg --
     --------------------------------
    
-    procedure Handle_MissionCommand_Msg
-    (This : in out Daidalus_Response_Service;
-     Msg  : Any_LMCP_Message)
-   is
-     MC : constant MissionCommand_Acc := MissionCommand_Acc (Msg.Payload);
-     Vehicle_ID : Common.Int64 := Common.Int64 (MC.getVehicleID);
-    begin
-     if Vehicle_ID = This.Config.VehicleID then
-        Handle_MissionCommand (This.State, As_MissionCommand_Message (MC));
-     end if;
-    end Handle_MissionCommand_Msg;
+   --  procedure Handle_MissionCommand_Msg
+   --    (This : in out Daidalus_Response_Service;
+   --     Msg  : Any_LMCP_Message)
+   --  is
+   --     MC : constant MissionCommand_Acc := MissionCommand_Acc (Msg.Payload);
+   --     Vehicle_ID : Common.Int64 := Common.Int64 (MC.getVehicleID);
+   --  begin
+   --     if Vehicle_ID = This.Config.VehicleID then
+   --        Handle_MissionCommand (This.State, As_MissionCommand_Message (MC));
+   --     end if;
+   --  end Handle_MissionCommand_Msg;
 
    ----------------
    -- Initialize --
@@ -203,21 +296,32 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
       Received_Message : not null Any_LMCP_Message;
       Should_Terminate : out Boolean)
    is
+      DAIDALUSConfigurationMessage : LMCP_Messages.DAIDALUSConfiguration;
+      WellClearViolationItervalsMessage : LMCP_Messages.
+        WellClearViolationIntervals;
+      MissionCommandMessage : LMCP_Messages.MissionCommand;
    begin
 
-      -- __TODO__
-      -- By convention, add an if-elsif block to handle every type of message
-      -- this service subscribes to. For each type of message, call either the
-      -- local Ada message handler or the SPARK message handler from package
-      -- <Service_Name>.
-      --
-      -- __Example__
-      -- 
-      -- if Received_Message.Payload.all in AirVehicleState'Class then
-      --    This.Handle_AirVehicleState_Msg (Received_Message);
-      -- elsif Received_Message.Payload.all in MissionCommand'Class then
-      --    This.Handle_MissionCommand_Msg (Received_Message);
-      -- end if;
+      if Received_Message.Payload.all in DAIDALUSConfiguration'Class then
+         -- Convert from Ada message to SPARK message---------------------------
+         DAIDALUSConfigurationMessage := As_DAIDALUSConfiguration_Message 
+           (DAIDALUSConfiguration_Any (Received_Message.Payload));
+         -- Process DAIDALUSConfiguration message to set state------------------
+         null;
+      elsif Received_Message.Payload.all in MissionCommand'Class then
+         -- Convert from Ada message to SPARK message---------------------------
+         MissionCommandMessage := As_MissionCommand_Message
+           (MissionCommand_Acc (Received_Message.Payload));
+         -- Process MissionCommand message to set state-------------------------
+      elsif Received_Message.Payload.all in WellClearViolationIntervals'Class
+      then
+         -- Convert from Ada message to SPARK message---------------------------
+         WellClearViolationItervalsMessage := 
+           As_WellClearViolationsIntervals_Message 
+             (WellClearViolationIntervals_Any (Received_Message.Payload));
+         -- Use DAIDALUS information in prosecution of collision avoidance -----
+         
+      end if;
 
       -- __TODO__
       -- Add any additional processing that should be performed after a message
@@ -243,34 +347,6 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
    --
    -- __Example__
    -- 
-   -- ------------------------
-   -- -- TurnType_Attribute --
-   -- ------------------------
-   -- 
-   -- function TurnType_Attribute
-   --    (XML_Node : DOM.Core.Element;
-   --    Name     : String;
-   --    Default  : LMCP_Messages.TurnTypeEnum)
-   --    return LMCP_Messages.TurnTypeEnum
-   -- is
-   --    use DOM.Core;
-   --    Attr_Value : constant DOM_String := Elements.Get_Attribute (XML_Node, Name);
-   -- begin
-   --    if Attr_Value /= ""
-   --    then
-   --       begin
-   --          return LMCP_Messages.TurnTypeEnum'Value (Attr_Value);
-   --       exception
-   --          when others =>
-   --             Put_Line ("Could not convert " & Attr_Value &
-   --                         " to TurnTypeEnum. Using default " & Default'Image);
-   --             return Default;
-   --       end;
-   --    else
-   --       return Default;
-   --    end if;
-   -- end TurnType_Attribute;
-
 
    -----------------------------
    -- Package Executable Part --

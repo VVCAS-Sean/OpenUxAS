@@ -65,22 +65,21 @@ package Daidalus_Response with SPARK_Mode is
       -- VehicleID : Common.Int64 := -1;
    end record;
 
-   type Daidalus_Response_State is new LMCP_Messages.DAIDALUSConfiguration with
-      record 
-         MissionCommand : LMCP_Messages.MissionCommand;
-         ReadyToAct : Boolean := True;
-         NextWaypoint : LMCP_Messages.Waypoint;
-         IsTrackingNextWaypoint : Boolean := True;
-         Altitude_Max_m : Altitude_Type_m := 10_000.0;
-         Altitude_Min_m : Altitude_Type_m := 100.0;
-         Altitude_Interval_Buffer_m : Altitude_Type_m := 20.0;
-         Heading_Max_deg : Heading_Type_deg := 360.0;
-         Heading_Min_deg : Heading_Type_deg := 0.0;
-         Heading_Interval_Buffer_deg : Heading_Type_deg:= 5.0;
-         GroundSpeed_Max_mps : GroundSpeed_Type_mps :=360.111;
-         GroundSpeed_Min_mps : GroundSpeed_Type_mps := 5.1444;
-         GroundSpeed_Interval_Buffer_mps : GroundSpeed_Buffer_Type_mps := 10.0;
-      end record;
+   type Daidalus_Response_State is record 
+      MissionCommand : definitions.MissionCommand;
+      ReadyToAct : Boolean := True;
+      NextWaypoint : definitions.Waypoint_info;
+      IsTrackingNextWaypoint : Boolean := True;
+      Altitude_Max_m : Altitude_Type_m := 10_000.0;
+      Altitude_Min_m : Altitude_Type_m := 100.0;
+      Altitude_Interval_Buffer_m : Altitude_Type_m := 20.0;
+      Heading_Max_deg : Heading_Type_deg := 360.0;
+      Heading_Min_deg : Heading_Type_deg := 0.0;
+      Heading_Interval_Buffer_deg : Heading_Type_deg := 5.0;
+      GroundSpeed_Max_mps : GroundSpeed_Type_mps := 360.111;
+      GroundSpeed_Min_mps : GroundSpeed_Type_mps := 5.1444;
+      GroundSpeed_Interval_Buffer_mps : GroundSpeed_Buffer_Type_mps := 10.0;
+   end record;
    
       -- __TODO__
       -- Define fields for this record, which is intended to hold data that tend
