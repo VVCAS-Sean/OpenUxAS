@@ -1,14 +1,14 @@
 with DOM.Core;
 
 with Daidalus_Response;               use Daidalus_Response;
-with Daidalus_Response_Communication; use Daidalus_Response_Communication;
+with Daidalus_Response_Mailboxes; use Daidalus_Response_Mailboxes;
 
 -- __TODO__
 -- Include any additional necessary packages.
 
 with Common; use Common;
 
-package UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
+package UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Interfacing is
 
    type Daidalus_Response_Service is new Service_Base with private;
 
@@ -57,4 +57,4 @@ private
       Received_Message : not null Any_LMCP_Message;
       Should_Terminate : out Boolean);
 
-end UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant;
+end UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Interfacing;

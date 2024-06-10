@@ -6,7 +6,7 @@ with UxAS.Comms.LMCP_Object_Message_Sender_Pipes;
 --  Package only concerned with message passing. It defines its own state,
 --  named Mailbox here, which is not mixed with the state of the service.
 
-package Daidalus_Response_Communication with SPARK_Mode is
+package Daidalus_Response_Mailboxes with SPARK_Mode is
 
    type Daidalus_Response_Mailbox is limited private;
 
@@ -32,4 +32,4 @@ private
       Unique_Entity_Send_Message_Id : Int64;
    end record;
 
-end Daidalus_Response_Communication;
+end Daidalus_Response_Mailboxes;

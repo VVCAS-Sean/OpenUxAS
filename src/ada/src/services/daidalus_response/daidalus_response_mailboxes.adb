@@ -1,7 +1,7 @@
 with AVTAS.LMCP.Types;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 
-package body Daidalus_Response_Communication is
+package body Daidalus_Response_Mailboxes is
 
    ----------------
    -- Initialize --
@@ -48,4 +48,4 @@ package body Daidalus_Response_Communication is
       This.Message_Sender_Pipe.Send_Shared_Broadcast_Message (As_Object_Any (Msg));
    end sendBroadcastMessage;
 
-end Daidalus_Response_Communication;
+end Daidalus_Response_Mailboxes;
