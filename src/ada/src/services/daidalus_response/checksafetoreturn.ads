@@ -1,5 +1,6 @@
 with Ada.Numerics.Elementary_Functions; use Ada.Numerics.Elementary_Functions;
 with definitions; use definitions;
+with Common; use Common;
 with Heading_Resolution; use Heading_Resolution;
 with FlatEarth; use FlatEarth;
 package CheckSafeToReturn with SPARK_Mode => on is
@@ -63,7 +64,7 @@ package CheckSafeToReturn with SPARK_Mode => on is
       DAIDALUS_GroundSpeed_Classification_Bands : ZoneVector;
       Current_State : state_parameters;
       SyntheticCheckState : out state_parameters;
-      PreviousMissionWaypoint : Waypoint_info;
+      PreviousMissionWaypoint : Int64;
       Mission_Command : MissionCommand;
       isSafeToReturn : out Boolean)  with
        Pre => SameIndices

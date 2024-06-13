@@ -249,6 +249,7 @@ package body LMCP_Message_Conversions is
       Result.Id := Int64 (Msg.getID);
       Result.Location := As_Location3D_Message (Msg.getLocation);
       Result.Heading := Real32 (Msg.getHeading);
+      Result.CurrentWaypoint := Int64 (Msg.getCurrentWaypoint);
 
       return Result;
    end As_EntityState_Message;

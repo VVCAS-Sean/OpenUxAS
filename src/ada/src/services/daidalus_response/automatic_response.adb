@@ -2,7 +2,7 @@ pragma Ada_2012;
 with Ada.Containers;
 with LMCP_Messages; use LMCP_Messages;
 with Common; use Common;
-with Daidalus_Response_Communication; use Daidalus_Response_Communication;
+with Daidalus_Response_Mailboxes; use Daidalus_Response_Mailboxes;
 with AVTAS.LMCP.Types;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 with UxAS.Comms.LMCP_Net_Client; use UxAS.Comms.LMCP_Net_Client;
@@ -30,7 +30,7 @@ package body automatic_response with SPARK_Mode => On is
    --     m_Action_Time_Thresold_s        :     action_time_sec;
    --     m_Priority_Time_Threshold_s     :     priority_time_sec;
    --     m_Status                        : in out Status_Type;
-   --     m_NextWaypoint                  :     Waypoint_info;
+   --     m_NextWaypoint                  :     Int64;
    --     Altitude_Max_m                  :     Altitude_Type_m;
    --     Altitude_Min_m                  :     Altitude_Type_m;
    --     Altitude_Interval_Buffer_m      :     Altitude_Buffer_Type_m;
@@ -70,7 +70,7 @@ package body automatic_response with SPARK_Mode => On is
       m_Action_Time_Thresold_s        :     action_time_sec;
       m_Priority_Time_Threshold_s     :     priority_time_sec;
       m_Status                        : in out Status_Type;
-      m_NextWaypoint                  :     Waypoint_info;
+      m_NextWaypoint                  :     Int64;
       Altitude_Max_m                  :     Altitude_Type_m;
       Altitude_Min_m                  :     Altitude_Type_m;
       Altitude_Interval_Buffer_m      :     Altitude_Buffer_Type_m;
@@ -289,14 +289,26 @@ package body automatic_response with SPARK_Mode => On is
                   --previous mission command that has not yet be accomplished
                   --Waypoint number of -1 indicates no mission command being
                   --followed.---------------------------------------------------
-                  if not (m_NextWaypoint.waypoint_number = -1)
+                  if not (m_NextWaypoint = -1)
                   then
                      --Establish a cutpoint on mission command starting at one
                      --before the last waypoint headed to before divert---------
-                     CutPoint := MyVectorOfWaypoints.Find_Index
-                       (m_MissionCommand.waypoint_list, m_NextWaypoint,
-                        MyVectorOfWaypoints.
-                          First_Index (m_MissionCommand.waypoint_list));
+                     for wp in MyVectorOfWaypoints.First_Index
+                       (m_MissionCommand.waypoint_list) .. MyVectorOfWaypoints.
+                       Last_Index (m_MissionCommand.waypoint_list) loop
+                        if MyVectorOfWaypoints.Element
+                          (m_MissionCommand.waypoint_list, wp).waypoint_number =
+                          m_NextWaypoint
+                        then
+                           CutPoint := wp;
+                           exit;
+                        end if;
+                     end loop;
+
+                     --  CutPoint := MyVectorOfWaypoints.Find_Index
+                     --    (m_MissionCommand.waypoint_list, m_NextWaypoint,
+                     --     MyVectorOfWaypoints.
+                     --       First_Index (m_MissionCommand.waypoint_list));
                      --remove waypoints up to cutpoint if cutpoint is not the
                      --beginning or end of the waypoint list-------------------
                      if not (CutPoint = MyVectorOfWaypoints.No_Index)

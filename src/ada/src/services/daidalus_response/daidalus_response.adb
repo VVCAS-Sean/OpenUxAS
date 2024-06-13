@@ -3,6 +3,7 @@ with AVTAS.LMCP.Types;           use AVTAS.LMCP.Types;
 with UxAS.Comms.LMCP_Net_Client; use UxAS.Comms.LMCP_Net_Client;
 with LMCP_Messages;              use LMCP_Messages;
 with Ada.Text_IO;                use Ada.Text_IO;
+with Common;                     use Common;
 
 -- __TODO__
 -- Include any other necessary packages.
@@ -91,5 +92,48 @@ package body Daidalus_Response with SPARK_Mode is
    --   Construct_Path (...);
    --   ... 
    -- end Produce_Segment;
+   procedure Process_WellclearViolation_Message 
+     (m_DAIDALUSResponseServiceState : in out Daidalus_Response_State;
+      m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
+      WCV_Intervals : LMCP_Messages.WellClearViolationIntervals) is
+   begin
+      if Common.Int64 (WCV_Intervals.EntityID) = m_DAIDALUSResponseServiceConfig.
+        VehicleID
+      then
+         null;
+      end if;
+      
+   end Process_WellclearViolation_Message;
+   
+   procedure Process_DAIDALUSConfiguration_Message 
+     (m_DAIDALUSResponseServiceState : in out Daidalus_Response_State;
+      m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
+      ConfigurationMessage : LMCP_Messages.DAIDALUSConfiguration)
+   is 
+   begin
+      --Set State parameters from DAIDALUSConfiguration message when message is 
+      --for configured ownship -------------------------------------------------
+      if Common.Int64 (ConfigurationMessage.EntityID) = 
+        m_DAIDALUSResponseServiceConfig.VehicleID 
+      then
+         m_DAIDALUSResponseServiceState.ReadyToAct := True;
+         m_DAIDALUSResponseServiceState.Altitude_Min_m := ConfigurationMessage.
+           MinAltitude;
+         m_DAIDALUSResponseServiceState.Altitude_Max_m := ConfigurationMessage.
+           MaxAltitude;
+         m_DAIDALUSResponseServiceState.Altitude_Interval_Buffer_m := 
+           ConfigurationMessage.AltitudeStep / 2.0;
+         m_DAIDALUSResponseServiceState.Heading_Interval_Buffer_deg := 
+           ConfigurationMessage.TrackStep / 2.0;
+         m_DAIDALUSResponseServiceState.GroundSpeed_Interval_Buffer_mps := 
+           ConfigurationMessage.GroundSpeedStep / 2.0;
+         m_DAIDALUSResponseServiceState.GroundSpeed_Min_mps :=
+           ConfigurationMessage.MinGroundSpeed;
+         m_DAIDALUSResponseServiceState.GroundSpeed_Max_mps := 
+           ConfigurationMessage.MaxGroundSpeed;
+         
+      end if;
+
+   end Process_DAIDALUSConfiguration_Message;
 
 end Daidalus_Response;

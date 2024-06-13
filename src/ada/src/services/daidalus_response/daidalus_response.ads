@@ -10,7 +10,7 @@
 with Common;                                     use Common;
 with definitions;                                use definitions;
 with LMCP_Messages;                              use LMCP_Messages;
-with Daidalus_Response_Communication;               use Daidalus_Response_Communication;
+with Daidalus_Response_Mailboxes;               use Daidalus_Response_Mailboxes;
 
 package Daidalus_Response with SPARK_Mode is
 
@@ -68,7 +68,8 @@ package Daidalus_Response with SPARK_Mode is
    type Daidalus_Response_State is record 
       MissionCommand : definitions.MissionCommand;
       ReadyToAct : Boolean := True;
-      NextWaypoint : definitions.Waypoint_info;
+      Status : definitions.Status_Type := OnMission;
+      NextWaypoint : Int64;
       IsTrackingNextWaypoint : Boolean := True;
       Altitude_Max_m : Altitude_Type_m := 10_000.0;
       Altitude_Min_m : Altitude_Type_m := 100.0;
@@ -128,6 +129,15 @@ package Daidalus_Response with SPARK_Mode is
    --       ...
    --     Post =>
    --      ...
+   procedure Process_WellclearViolation_Message 
+     (m_DAIDALUSResponseServiceState : in out Daidalus_Response_State;
+      m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
+      WCV_Intervals : LMCP_Messages.WellClearViolationIntervals);
+   
+   procedure Process_DAIDALUSConfiguration_Message 
+     (m_DAIDALUSResponseServiceState : in out Daidalus_Response_State;
+      m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
+      ConfigurationMessage : LMCP_Messages.DAIDALUSConfiguration);
 
 private
 

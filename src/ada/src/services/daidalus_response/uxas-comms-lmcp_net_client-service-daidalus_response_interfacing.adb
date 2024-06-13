@@ -8,12 +8,14 @@ with Common;                   use Common;
 with LMCP_Messages;            -- use LMCP_Messages;
 with LMCP_Message_Conversions; use LMCP_Message_Conversions;
 with definitions;              -- use definitions;
+with Daidalus_Response;        use Daidalus_Response;
 
 -- __TODO__
 -- Include any messages used by this service.
 --
 -- __Example__
---  with AFRL.CMASI.AirVehicleState;       use AFRL.CMASI.AirVehicleState;
+with AFRL.CMASI.EntityState;           use AFRL.CMASI.EntityState;
+with AFRL.CMASI.AirVehicleState;       use AFRL.CMASI.AirVehicleState;
 with AFRL.CMASI.MissionCommand;        use AFRL.CMASI.MissionCommand;
 with AFRL.CMASI.AutomationResponse;    use AFRL.CMASI.AutomationResponse;
 with larcfm.DAIDALUS.DAIDALUSConfiguration; 
@@ -21,7 +23,7 @@ with larcfm.DAIDALUS.WellClearViolationIntervals;
 use larcfm.DAIDALUS.DAIDALUSConfiguration; 
 use larcfm.DAIDALUS.WellClearViolationIntervals;
 
-package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
+package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Interfacing is
 
    -----------------------
    -- Local subprograms --
@@ -178,7 +180,9 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
       This.Config.PriorityTimeThreshold := InterpretXMLNodeAsReal64 (XML_Node, 
                                                       "PriorityTimeThreshold", 
                                              This.Config.PriorityTimeThreshold);
-      
+      --Subscribe to AirVehicleState Messages ----------------------------------
+      This.Add_Subscription_Address (AFRL.CMASI.AirVehicleState.Subscription,
+                                     Unused);
       -- Subscribe to Mission Command Messages ---------------------------------
       This.Add_Subscription_Address (AFRL.CMASI.MissionCommand.Subscription, 
                                      Unused);
@@ -276,7 +280,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
       Result : out Boolean)
    is
    begin
-      Daidalus_Response_Communication.Initialize
+      Daidalus_Response_Mailboxes.Initialize
         (This.Mailbox,
          Source_Group => Value (This.Message_Source_Group),
          Unique_Id    => Common.Int64 (UxAS.Comms.LMCP_Net_Client.Unique_Entity_Send_Message_Id),
@@ -300,6 +304,7 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
       WellClearViolationItervalsMessage : LMCP_Messages.
         WellClearViolationIntervals;
       MissionCommandMessage : LMCP_Messages.MissionCommand;
+      EntityStateMessage : LMCP_Messages.EntityState;
    begin
 
       if Received_Message.Payload.all in DAIDALUSConfiguration'Class then
@@ -307,12 +312,14 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
          DAIDALUSConfigurationMessage := As_DAIDALUSConfiguration_Message 
            (DAIDALUSConfiguration_Any (Received_Message.Payload));
          -- Process DAIDALUSConfiguration message to set state------------------
-         null;
+         Process_DAIDALUSConfiguration_Message 
+           (This.State, This.Config, DAIDALUSConfigurationMessage);
       elsif Received_Message.Payload.all in MissionCommand'Class then
          -- Convert from Ada message to SPARK message---------------------------
          MissionCommandMessage := As_MissionCommand_Message
            (MissionCommand_Acc (Received_Message.Payload));
          -- Process MissionCommand message to set state-------------------------
+         null; -- TODO replace with procedure call from SPARK part -------------
       elsif Received_Message.Payload.all in WellClearViolationIntervals'Class
       then
          -- Convert from Ada message to SPARK message---------------------------
@@ -320,7 +327,17 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
            As_WellClearViolationsIntervals_Message 
              (WellClearViolationIntervals_Any (Received_Message.Payload));
          -- Use DAIDALUS information in prosecution of collision avoidance -----
-         
+         null; --TODO replace with procedure call from SPARK part
+      elsif Received_Message.Payload.all in AirVehicleState'Class then 
+         -- Convert from Ada message to SPARK message --------------------------
+         EntityStateMessage := As_EntityState_Message 
+           (EntityState_Any (Received_Message.Payload));
+         -- Set State if EnityState Message is for ownship ---------------------
+         if Common.Int64 (EntityStateMessage.Id) = This.Config.VehicleID then
+            This.State.NextWaypoint := Common.Int64 
+              (EntityStateMessage.CurrentWaypoint);
+         end if;
+      
       end if;
 
       -- __TODO__
@@ -355,4 +372,4 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant is
 begin
 
    Register_Service_Creation_Function_Pointers (Registry_Service_Type_Names, Create'Access);
-end UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Variant;
+end UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Interfacing;

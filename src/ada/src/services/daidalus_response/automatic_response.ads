@@ -1,5 +1,5 @@
 with Common; use Common;
-with Daidalus_Response_Communication; use Daidalus_Response_Communication;
+with Daidalus_Response_Mailboxes; use Daidalus_Response_Mailboxes;
 with set_divert_state; use set_divert_state;
 with Heading_Resolution; use Heading_Resolution;
 with Altitude_Resolution; use Altitude_Resolution;
@@ -67,7 +67,7 @@ package automatic_response with SPARK_Mode => On is
       m_Action_Time_Thresold_s : action_time_sec;
       m_Priority_Time_Threshold_s : priority_time_sec;
       m_Status : in out Status_Type;
-      m_NextWaypoint : Waypoint_info;
+      m_NextWaypoint : Int64;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
       Altitude_Interval_Buffer_m : Altitude_Buffer_Type_m;

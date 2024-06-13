@@ -27,6 +27,7 @@ package LMCP_Messages with SPARK_Mode is
       Id : Int64 := 0;
       Location : Location3D;
       Heading : Real32 := 0.0;
+      CurrentWaypoint : Int64 := 0;
    end record;
 
    type PlanningState is record

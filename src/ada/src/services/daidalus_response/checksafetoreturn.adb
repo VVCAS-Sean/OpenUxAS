@@ -157,7 +157,7 @@ package body CheckSafeToReturn with SPARK_Mode => On is
       DAIDALUS_GroundSpeed_Classification_Bands :     ZoneVector;
       Current_State                             :     state_parameters;
       SyntheticCheckState                       : out state_parameters;
-      PreviousMissionWaypoint                   :     Waypoint_info;
+      PreviousMissionWaypoint                   :     Int64;
       Mission_Command                           :     MissionCommand;
       isSafeToReturn                            : out Boolean)
    is
@@ -174,12 +174,11 @@ package body CheckSafeToReturn with SPARK_Mode => On is
                     (Mission_Command.waypoint_list) .. MyVectorOfWaypoints.
                       Last_Index (Mission_Command.waypoint_list) =>
                      MyVectorOfWaypoints.Element (Mission_Command.waypoint_list,
-                        J).waypoint_number = PreviousMissionWaypoint.
-                      waypoint_number);
+                        J).waypoint_number = PreviousMissionWaypoint);
       for I in MyVectorOfWaypoints.First_Index (Mission_Command.waypoint_list)
         .. MyVectorOfWaypoints.Last_Index (Mission_Command.waypoint_list) loop
          if MyVectorOfWaypoints.Element (Mission_Command.waypoint_list, I).
-           waypoint_number = PreviousMissionWaypoint.waypoint_number
+           waypoint_number = PreviousMissionWaypoint
          then
             SyntheticCheckState.latitude_deg := MyVectorOfWaypoints.Element
               (Mission_Command.waypoint_list, I).latitude_deg;
