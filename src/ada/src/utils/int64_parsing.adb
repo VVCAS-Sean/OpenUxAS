@@ -32,7 +32,6 @@ package body Int64_Parsing with SPARK_Mode is
       Is_Pos : constant Boolean := S'Length = 0 or else S (S'First) /= '-';
       FirstZ : constant Integer := (if Is_Pos then S'First else S'First + 1);
       First  : Integer;
-      Error  : Boolean := True;
    begin
       V := 0;
       if FirstZ > S'Last then
