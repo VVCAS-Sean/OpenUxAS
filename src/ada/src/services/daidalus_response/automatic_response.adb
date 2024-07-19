@@ -92,7 +92,7 @@ package body automatic_response with SPARK_Mode => On is
       found_acceptable_action_flag : Boolean;
       isSafeToReturnToMissionFlag : Boolean;
       CheckState : state_parameters;
-      CutPoint : Integer;
+      CutPoint : Integer := MyVectorOfWaypoints.No_Index;
       PriorityStatus : Priority_Type := pStandard;
       RoW : ID_Type;
       m_StatusOld : Status_Type;
@@ -412,6 +412,15 @@ package body automatic_response with SPARK_Mode => On is
                                  declare
                                     lmcp_associated_task_list : Int64_Seq;
                                  begin
+                                    pragma Assert
+                                      (MyVectorOfIntegers.Last_Index
+                                         (wp_val.AssociatedTaskList) <
+                                           Positive'Last);
+                                    pragma Assert (Last
+                                                   (lmcp_associated_task_list)
+                                                   <= MyVectorOfIntegers.
+                                                     Last_Index
+                                                       (wp_val.AssociatedTaskList));
                                     for atl of wp_val.AssociatedTaskList loop
                                        lmcp_associated_task_list := Add
                                          (lmcp_associated_task_list, Int64

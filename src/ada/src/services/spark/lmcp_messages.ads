@@ -486,31 +486,31 @@ package LMCP_Messages with SPARK_Mode is
      (Index_Type                     => Positive,
       Element_Type                   => Real64_Array);
 
-   type Altitude_Sequence is new Generic_Real64_Sequences.Sequence;
+   subtype Altitude_Sequence is  Generic_Real64_Sequences.Sequence;
 
    type AltitudeInterval is new Message_Root with record
       Altitude : Altitude_Sequence;
    end record;
 
-   type Recovery_Altitude_Sequence is new Generic_Real64_Sequences.Sequence;
+   subtype Recovery_Altitude_Sequence is Generic_Real64_Sequences.Sequence;
 
    type AltitudeRecoveryInterval is new Message_Root with record
       RecoveryAltitude : Recovery_Altitude_Sequence;
    end record;
 
-   type GroundHeading_Sequence is new Generic_Real64_Sequences.Sequence;
+   subtype GroundHeading_Sequence is Generic_Real64_Sequences.Sequence;
 
    type GroundHeadingInterval is new Message_Root with record
       GroundHeadings : GroundHeading_Sequence;
    end record;
 
-   type Recovery_GroundHeading_Sequence is new Generic_Real64_Sequences.Sequence;
+   subtype Recovery_GroundHeading_Sequence is Generic_Real64_Sequences.Sequence;
 
    type GroundHeadingRecoveryInterval is new Message_Root with record
       RecoveryGroundHeadings : Recovery_GroundHeading_Sequence;
    end record;
 
-   type GroundSpeed_Sequence is new Generic_Real64_Sequences.Sequence;
+   subtype GroundSpeed_Sequence is Generic_Real64_Sequences.Sequence;
 
    type GroundSpeedInterval is new Message_Root with record
       GroundSpeeds : GroundSpeed_Sequence;
@@ -520,7 +520,7 @@ package LMCP_Messages with SPARK_Mode is
       RecoveryGroundSpeeds : GroundSpeed_Sequence;
    end record;
 
-   type VerticalSpeed_Sequence is new Generic_Real64_Sequences.Sequence;
+   subtype VerticalSpeed_Sequence is Generic_Real64_Sequences.Sequence;
 
    type VerticalSpeedInterval is new Message_Root with record
       VerticalSpeeds : VerticalSpeed_Sequence;
@@ -540,7 +540,7 @@ package LMCP_Messages with SPARK_Mode is
      (Index_Type => Positive,
       Element_Type => BandsRegionEnum);
 
-   type BandsRegion_seq is new BandsRegion_sequences.Sequence;
+   subtype BandsRegion_seq is BandsRegion_sequences.Sequence;
 
    type WellClearViolationIntervals is new Message_Root with record
       EntityList : Int64_Seq;

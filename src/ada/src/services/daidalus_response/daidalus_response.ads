@@ -13,6 +13,8 @@ with LMCP_Messages;                              use LMCP_Messages;
 with Daidalus_Response_Mailboxes;               use Daidalus_Response_Mailboxes;
 
 package Daidalus_Response with SPARK_Mode is
+   
+   type WCV_data is private;
 
    -- __TODO__
    -- Define SPARK-compatible types needed by the SPARK portion of the service.
@@ -138,7 +140,25 @@ package Daidalus_Response with SPARK_Mode is
      (m_DAIDALUSResponseServiceState : in out Daidalus_Response_State;
       m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
       ConfigurationMessage : LMCP_Messages.DAIDALUSConfiguration);
+   
+   procedure Process_MissionCommand_Message 
+     (m_DAIDALUSResponseServiceState : in out Daidalus_Response_State;
+      m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
+      MissionCommandMessage : LMCP_Messages.MissionCommand);
 
 private
+   type WCV_data is record
+      CurrentState : definitions.state_parameters;
+      AltitudeBands : definitions.OrderedIntervalVector;
+      HeadingBands : definitions.OrderedIntervalVector;
+      GroundspeedBands : definitions.OrderedIntervalVector;
+      RAltitudeBands : definitions.OrderedIntervalVector;
+      RHeadingBands : definitions.OrderedIntervalVector;
+      RGroundspeedBands : definitions.OrderedIntervalVector;
+      IntrudersInfo : definitions.Intruder_info;
+      AltitudeZones : definitions.ZoneVector;
+      HeadingZones : definitions.ZoneVector;
+      GroundspeedZones : definitions.ZoneVector;      
+   end record;         
 
 end Daidalus_Response;

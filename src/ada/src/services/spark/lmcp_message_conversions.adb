@@ -1630,27 +1630,32 @@ package body LMCP_Message_Conversions is
       all loop
          Temp := As_GroundHeadingInterval_Message
            (GroundHeadingInterval_Vector);
-         Result.WCVGroundHeadingIntervals.GroundHeadings := LMCP_Messages.Add
-           (Result.WCVGroundHeadingIntervals.GroundHeadings,
+         Result.WCVGroundHeadingIntervals.GroundHeadings := LMCP_Messages.
+           Generic_Real64_Sequences.Add
+             (Result.WCVGroundHeadingIntervals.GroundHeadings,
                                        Temp);
       end loop;
       for GroundHeadingBandsRegion_vector of Msg.all.getWCVGroundHeadingRegions.
       all loop
          case GroundHeadingBandsRegion_vector is
             when larcfm.DAIDALUS.Enumerations.NEAR =>
-               Result.WCVGroundHeadingRegions := LMCP_Messages.Add
-                 (Result.WCVGroundHeadingRegions, LMCP_Messages.NEAR);
+               Result.WCVGroundHeadingRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add (Result.WCVGroundHeadingRegions,
+                                            LMCP_Messages.NEAR);
             when larcfm.DAIDALUS.Enumerations.MID =>
-               Result.WCVGroundHeadingRegions := LMCP_Messages.Add
+               Result.WCVGroundHeadingRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVGroundHeadingRegions, LMCP_Messages.MID);
             when larcfm.DAIDALUS.Enumerations.FAR =>
-               Result.WCVGroundHeadingRegions := LMCP_Messages.Add
+               Result.WCVGroundHeadingRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVGroundHeadingRegions, LMCP_Messages.FAR);
          end case;
       end loop;
       for GroundSpeedInterval_Vector of Msg.all.getWCVGroundSpeedIntervals.all
       loop
-         Result.WCVGroundSpeedIntervals.GroundSpeeds := LMCP_Messages.Add
+         Result.WCVGroundSpeedIntervals.GroundSpeeds := LMCP_Messages.
+           Generic_Real64_Sequences.Add
            (Result.WCVGroundSpeedIntervals.GroundSpeeds,
             As_GroundSpeedInterval_Message (GroundSpeedInterval_Vector));
       end loop;
@@ -1658,19 +1663,23 @@ package body LMCP_Message_Conversions is
       loop
          case GroundSpeedBandsRegion_Vector is
             when larcfm.DAIDALUS.Enumerations.NEAR =>
-               Result.WCVGroundSpeedRegions := LMCP_Messages.Add
+               Result.WCVGroundSpeedRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVGroundSpeedRegions, LMCP_Messages.NEAR);
             when larcfm.DAIDALUS.Enumerations.MID =>
-               Result.WCVGroundSpeedRegions := LMCP_Messages.Add
+               Result.WCVGroundSpeedRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVGroundSpeedRegions, LMCP_Messages.MID);
             when larcfm.DAIDALUS.Enumerations.FAR =>
-               Result.WCVGroundSpeedRegions := LMCP_Messages.Add
+               Result.WCVGroundSpeedRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVGroundSpeedRegions, LMCP_Messages.FAR);
          end case;
       end loop;
       for VerticalSpeedInterval_Vector of Msg.all.getWCVVerticalSpeedIntervals.
       all loop
-         Result.WCVVerticalSpeedIntervals.VerticalSpeeds := LMCP_Messages.Add
+         Result.WCVVerticalSpeedIntervals.VerticalSpeeds := LMCP_Messages.
+           Generic_Real64_Sequences.Add
            (Result.WCVVerticalSpeedIntervals.VerticalSpeeds,
             As_VerticalSpeedInterval_Message (VerticalSpeedInterval_Vector));
       end loop;
@@ -1678,61 +1687,69 @@ package body LMCP_Message_Conversions is
       all loop
          case VerticalSpeedBandsRegion_Vector is
             when larcfm.DAIDALUS.Enumerations.NEAR =>
-               Result.WCVVerticalSpeedRegions := LMCP_Messages.Add
+               Result.WCVVerticalSpeedRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVVerticalSpeedRegions, LMCP_Messages.NEAR);
             when larcfm.DAIDALUS.Enumerations.MID =>
-               Result.WCVVerticalSpeedRegions := LMCP_Messages.Add
+               Result.WCVVerticalSpeedRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVVerticalSpeedRegions, LMCP_Messages.MID);
             when larcfm.DAIDALUS.Enumerations.FAR =>
-               Result.WCVVerticalSpeedRegions := LMCP_Messages.Add
+               Result.WCVVerticalSpeedRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVVerticalSpeedRegions, LMCP_Messages.FAR);
          end case;
       end loop;
       for AltitudeInterval_Vector of Msg.all.getWCVAlitudeIntervals.all loop
-         Result.WCVAltitudeIntervals.Altitude := LMCP_Messages.Add
+         Result.WCVAltitudeIntervals.Altitude := LMCP_Messages.
+           Generic_Real64_Sequences.Add
            (Result.WCVAltitudeIntervals.Altitude,
             As_AltitudeInterval_Message (AltitudeInterval_Vector));
       end loop;
       for AltitudeBandsRegion_Vector of Msg.all.getWCVAltitudeRegions.all loop
          case AltitudeBandsRegion_Vector is
             when larcfm.DAIDALUS.Enumerations.NEAR =>
-               Result.WCVAltitudeRegions := LMCP_Messages.Add
+               Result.WCVAltitudeRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVAltitudeRegions, LMCP_Messages.NEAR);
             when larcfm.DAIDALUS.Enumerations.MID =>
-               Result.WCVAltitudeRegions := LMCP_Messages.Add
+               Result.WCVAltitudeRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVAltitudeRegions, LMCP_Messages.MID);
             when larcfm.DAIDALUS.Enumerations.FAR =>
-               Result.WCVAltitudeRegions := LMCP_Messages.Add
+               Result.WCVAltitudeRegions := LMCP_Messages.
+                 BandsRegion_sequences.Add
                  (Result.WCVAltitudeRegions, LMCP_Messages.FAR);
          end case;
       end loop;
       for RecoveryGroundHeadingInterval_Vector of Msg.all.
         getRecoveryGroundHeadingIntervals.all loop
          Result.RecoveryGroundHeadingIntervals.RecoveryGroundHeadings :=
-           LMCP_Messages.Add (Result.RecoveryGroundHeadingIntervals.
-                                RecoveryGroundHeadings,
+           LMCP_Messages.Generic_Real64_Sequences.Add
+             (Result.RecoveryGroundHeadingIntervals.RecoveryGroundHeadings,
                               As_GroundHeadingRecoveryInterval_Message
                                 (RecoveryGroundHeadingInterval_Vector));
       end loop;
       for RecoveryGroundSpeedInterval_Vector of Msg.all.
         getRecoveryGroundSpeedIntervals.all loop
          Result.RecoveryGroundSpeedIntervals.RecoveryGroundSpeeds :=
-           LMCP_Messages.Add (Result.RecoveryGroundSpeedIntervals.
-                                RecoveryGroundSpeeds,
+           LMCP_Messages.Generic_Real64_Sequences.Add
+             (Result.RecoveryGroundSpeedIntervals.RecoveryGroundSpeeds,
                               As_GroundSpeedRecoveryInterval_Message
                                 (RecoveryGroundSpeedInterval_Vector));
       end loop;
       for RecoveryVerticalSpeedInterval_Vector of Msg.all.
         getRecoveryVerticalSpeedIntervals.all loop
          Result.RecovertyVerticalSpeedIntervals.RecoveryVerticalSpeed :=
-           LMCP_Messages.Add (Result.RecovertyVerticalSpeedIntervals.
-                                RecoveryVerticalSpeed,
+           LMCP_Messages.Generic_Real64_Sequences.Add
+             (Result.RecovertyVerticalSpeedIntervals.RecoveryVerticalSpeed,
                               As_VerticalSpeedRecoveryInterval_Message
                                 (RecoveryVerticalSpeedInterval_Vector));
       end loop;
       for RecoveryAltitudeInterval_Vector of Msg.all.
         getRecoveryAltitudeIntervals.all loop
-         Result.RecoveryAltitudeIntervals.RecoveryAltitude := LMCP_Messages.Add
+         Result.RecoveryAltitudeIntervals.RecoveryAltitude := LMCP_Messages.
+           Generic_Real64_Sequences.Add
            (Result.RecoveryAltitudeIntervals.RecoveryAltitude,
             As_AltitudeRecoveryInterval_Message
               (RecoveryAltitudeInterval_Vector));
