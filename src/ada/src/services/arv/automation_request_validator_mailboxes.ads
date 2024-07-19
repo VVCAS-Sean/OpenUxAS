@@ -17,9 +17,13 @@ package Automation_Request_Validator_Mailboxes with SPARK_Mode is
       Entity_Id    : UInt32;
       Service_Id   : UInt32);
 
+   procedure Get_Next_Unique_Sending_Message_Id
+     (This  : in out Automation_Request_Validator_Mailbox;
+      Value : out Int64) with Always_Terminates;
+
    procedure sendBroadcastMessage
      (This : in out Automation_Request_Validator_Mailbox;
-      Msg   : Message_Root'Class);
+      Msg   : Message_Root'Class) with Always_Terminates;
 
 private
    pragma SPARK_Mode (Off);

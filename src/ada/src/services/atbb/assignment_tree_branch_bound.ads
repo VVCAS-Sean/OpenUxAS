@@ -1,3 +1,4 @@
+with SPARK.Big_Integers;                         use SPARK.Big_Integers;
 with SPARK.Containers.Formal.Unbounded_Hashed_Maps;
 with SPARK.Containers.Functional.Maps;
 with Ada.Containers;                         use Ada.Containers;
@@ -6,7 +7,7 @@ with Assignment_Tree_Branch_Bound_Mailboxes; use Assignment_Tree_Branch_Bound_Ma
 with Common;                                 use Common;
 with LMCP_Messages;                          use LMCP_Messages;
 
-package Assignment_Tree_Branch_Bound with SPARK_Mode is
+package Assignment_Tree_Branch_Bound with SPARK_Mode, Always_Terminates is
 
    type Cost_Function_Kind is (Minmax, Cumulative);
 
@@ -14,8 +15,7 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
        (Key_Type     => Int64,
         Element_Type => UniqueAutomationRequest,
         Hash         => Int64_Hash);
-   subtype Int64_UniqueAutomationRequest_Map is
-     Int64_UAR_Maps.Map (Int64_UAR_Maps.Default_Modulus (10));
+   subtype Int64_UniqueAutomationRequest_Map is Int64_UAR_Maps.Map;
    use Int64_UAR_Maps;
 
    package Int64_TaskPlanOptions_Maps is new SPARK.Containers.Functional.Maps
@@ -27,8 +27,7 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
      (Key_Type => Int64,
       Element_Type => Int64_TPO_Map,
       Hash  => Int64_Hash);
-   subtype Int64_TaskPlanOptions_Map_Map is
-     Int64_TPO_Map_Maps.Map (Int64_TPO_Map_Maps.Default_Modulus (10));
+   subtype Int64_TaskPlanOptions_Map_Map is Int64_TPO_Map_Maps.Map;
    use Int64_TPO_Map_Maps;
    --use Int64_TPO_Map_Maps.Formal_Model;
    package Int64_TaskPlanOptions_Map_Maps_P renames Int64_TPO_Map_Maps.Formal_Model.P;
@@ -38,8 +37,7 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
        (Key_Type     => Int64,
         Element_Type => AssignmentCostMatrix,
         Hash         => Int64_Hash);
-   subtype Int64_AssignmentCostMatrix_Map is
-     Int64_ACM_Maps.Map (Int64_ACM_Maps.Default_Modulus (10));
+   subtype Int64_AssignmentCostMatrix_Map is Int64_ACM_Maps.Map;
    use Int64_ACM_Maps;
    --use Int64_ACM_Maps.Formal_Model;
    package Int64_AssignmentCostMatrix_Maps_P renames Int64_ACM_Maps.Formal_Model.P;
@@ -51,34 +49,34 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
 
    function Valid_TaskPlanOptions
      (TaskPlanOptions_Map : Int64_TPO_Map)
-      return Boolean with Post => True;
+      return Boolean with Ghost, Post => True;
 
    function Valid_AssignmentCostMatrix
      (Assignment_Cost_Matrix : AssignmentCostMatrix)
-      return Boolean with Post => True;
+      return Boolean with Ghost, Post => True;
 
    function Travel_In_CostMatrix
      (VehicleId              : Int64;
       DestOption             : TaskOption;
-      Assignment_Cost_Matrix : AssignmentCostMatrix)
-      return Boolean with Post => True;
+      Cost_Matrix            : TOC_Seq)
+      return Boolean with Ghost, Post => True;
 
    function Travel_In_CostMatrix
      (VehicleId              : Int64;
       InitOption, DestOption : TaskOption;
-      Assignment_Cost_Matrix : AssignmentCostMatrix)
-      return Boolean with Post => True;
+      Cost_Matrix            : TOC_Seq)
+      return Boolean with Ghost, Post => True;
 
    function All_Travels_In_CostMatrix
      (Request             : UniqueAutomationRequest;
       TaskPlanOptions_Map : Int64_TPO_Map;
-      Matrix              : AssignmentCostMatrix)
-      return Boolean with Post => True;
+      Cost_Matrix         : TOC_Seq)
+      return Boolean with Ghost, Post => True;
 
    function All_EligibleEntities_In_EntityList
      (Request             : UniqueAutomationRequest;
       TaskPlanOptions_Map : Int64_TPO_Map)
-      return Boolean with Post => True;
+      return Boolean with Ghost, Post => True;
 
    ----------------------------------------
    -- Assignment Tree Branch Bound types --
@@ -95,7 +93,7 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
       m_taskPlanOptions          : Int64_TaskPlanOptions_Map_Map;
       m_assignmentCostMatrixes   : Int64_AssignmentCostMatrix_Map;
    end record with
-     Predicate =>
+     Ghost_Predicate =>
        (for all ReqId of m_taskPlanOptions =>
           (Valid_TaskPlanOptions (Element (m_taskPlanOptions, ReqId))
              and then
@@ -106,16 +104,19 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
              Element (m_taskPlanOptions, ReqId))))
           and then
        (for all ReqId of m_assignmentCostMatrixes =>
-          Valid_AssignmentCostMatrix (Element (m_assignmentCostMatrixes, ReqId))
+          Valid_AssignmentCostMatrix (Element (m_assignmentCostMatrixes, ReqId)))
             and then
-          Contains (m_uniqueAutomationRequests, ReqId)
+       (for all ReqId of m_assignmentCostMatrixes =>
+          Contains (m_uniqueAutomationRequests, ReqId))
             and then
-          Contains (m_taskPlanOptions, ReqId)
+         (for all ReqId of m_assignmentCostMatrixes =>
+          Contains (m_taskPlanOptions, ReqId))
             and then
+           (for all ReqId of m_assignmentCostMatrixes =>
           All_Travels_In_CostMatrix
             (Element (m_uniqueAutomationRequests, ReqId),
              Element (m_taskPlanOptions, ReqId),
-             Element (m_assignmentCostMatrixes, ReqId)));
+             Element (m_assignmentCostMatrixes, ReqId).CostMatrix));
 
    ---------------------------
    -- Service functionality --
@@ -163,11 +164,15 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
    with Pre =>
      not Contains (State.m_assignmentCostMatrixes, Matrix.CorrespondingAutomationRequestID)
        and then Valid_AssignmentCostMatrix (Matrix)
-       and then Contains (State.m_uniqueAutomationRequests, Matrix.CorrespondingAutomationRequestID)
-       and then Contains (State.m_taskPlanOptions, Matrix.CorrespondingAutomationRequestID)
-       and then All_Travels_In_CostMatrix (Element (State.m_uniqueAutomationRequests, Matrix.CorrespondingAutomationRequestID),
-                                           Element (State.m_taskPlanOptions, Matrix.CorrespondingAutomationRequestID),
-                                           Matrix);
+       and then
+          Contains (State.m_uniqueAutomationRequests, Matrix.CorrespondingAutomationRequestID)
+         and then
+          Contains (State.m_taskPlanOptions, Matrix.CorrespondingAutomationRequestID)
+           and then
+          All_Travels_In_CostMatrix
+            (Element (State.m_uniqueAutomationRequests, Matrix.CorrespondingAutomationRequestID),
+             Element (State.m_taskPlanOptions, Matrix.CorrespondingAutomationRequestID),
+             Matrix.CostMatrix);
 
    procedure Check_Assignment_Ready
      (Mailbox : in out Assignment_Tree_Branch_Bound_Mailbox;
@@ -197,9 +202,9 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
       Assignment_Cost_Matrix : AssignmentCostMatrix;
       TaskPlanOptions_Map    : Int64_TPO_Map;
       Summary                : out TaskAssignmentSummary;
-      Error                  : out Boolean;
       Message                : out Unbounded_String)
    with
+     Relaxed_Initialization => Message,
      Pre =>
        Valid_AssignmentCostMatrix (Assignment_Cost_Matrix)
          and then
@@ -211,9 +216,10 @@ package Assignment_Tree_Branch_Bound with SPARK_Mode is
        (for all Id of TaskPlanOptions_Map =>
           (for all TaskOption of Get (TaskPlanOptions_Map, Id).Options => TaskOption.TaskID = Id))
          and then
-       All_Travels_In_CostMatrix (Automation_Request, TaskPlanOptions_Map, Assignment_Cost_Matrix)
+       All_Travels_In_CostMatrix (Automation_Request, TaskPlanOptions_Map, Assignment_Cost_Matrix.CostMatrix)
          and then
-       All_EligibleEntities_In_EntityList (Automation_Request, TaskPlanOptions_Map);
+       All_EligibleEntities_In_EntityList (Automation_Request, TaskPlanOptions_Map),
+     Exceptional_Cases => (Parsing_Error => Message'Initialized);
    --  Returns the assignment that minimizes the cost.
 
 private
@@ -241,10 +247,10 @@ private
    function Travel_In_CostMatrix
      (VehicleId              : Int64;
       DestOption             : TaskOption;
-      Assignment_Cost_Matrix : AssignmentCostMatrix)
+      Cost_Matrix            : TOC_Seq)
       return Boolean
    is
-     (for some TOC of Assignment_Cost_Matrix.CostMatrix =>
+     (for some TOC of Cost_Matrix =>
         (VehicleId = TOC.VehicleID
            and then 0 = TOC.InitialTaskID
            and then 0 = TOC.InitialTaskOption
@@ -254,10 +260,10 @@ private
    function Travel_In_CostMatrix
      (VehicleId              : Int64;
       InitOption, DestOption : TaskOption;
-      Assignment_Cost_Matrix : AssignmentCostMatrix)
+      Cost_Matrix : TOC_Seq)
       return Boolean
    is
-     (for some TOC of Assignment_Cost_Matrix.CostMatrix =>
+     (for some TOC of Cost_Matrix =>
         (VehicleId = TOC.VehicleID
            and then InitOption.TaskID = TOC.InitialTaskID
            and then InitOption.OptionID = TOC.InitialTaskOption
@@ -272,7 +278,7 @@ private
    function All_Travels_In_CostMatrix
      (Request             : UniqueAutomationRequest;
       TaskPlanOptions_Map : Int64_TPO_Map;
-      Matrix              : AssignmentCostMatrix)
+      Cost_Matrix         : TOC_Seq)
       return Boolean
    is
      (for all VehicleId of Request.EntityList =>
@@ -280,7 +286,7 @@ private
            (for all Option_1 of Get (TaskPlanOptions_Map, TaskId_1).Options =>
                (if Is_Eligible (Request, Option_1, VehicleId)
                 then
-                   Travel_In_CostMatrix (VehicleId, Option_1, Matrix)
+                   Travel_In_CostMatrix (VehicleId, Option_1, Cost_Matrix)
                      and then
                    (for all TaskId_2 of TaskPlanOptions_Map =>
                       (for all Option_2 of Get (TaskPlanOptions_Map, TaskId_2).Options =>
@@ -289,7 +295,7 @@ private
                              Travel_In_CostMatrix (VehicleId,
                                                    Option_1,
                                                    Option_2,
-                                                   Matrix))))))));
+                                                   Cost_Matrix))))))));
 
    function All_EligibleEntities_In_EntityList
      (Request             : UniqueAutomationRequest;

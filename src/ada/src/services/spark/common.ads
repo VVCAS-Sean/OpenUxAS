@@ -65,7 +65,7 @@ package Common with SPARK_Mode is
       Tail : Character);
    --  Append Tail to Msg if there is enough room in the unbounded string
 
-   package Unbounded_Strings_Subprograms with Annotate => (GNATprove, Always_Return) is
+   package Unbounded_Strings_Subprograms is
 
       function Index
         (Source  : Unbounded_String;
@@ -128,4 +128,6 @@ package Common with SPARK_Mode is
          High   : Natural) return String
       is (Ada.Strings.Unbounded.Slice (Source, Low, High));
    end Unbounded_Strings_Subprograms;
+
+   Parsing_Error : exception;
 end Common;
