@@ -11,17 +11,16 @@ is
    type zones is (Near, Mid, Far);
    
    Maxsize : constant := 1000;
-   subtype SafeFloat is Real64 range -7_000_000.0 .. 7_000_000.0;
+   subtype SafeReal64 is Real64 range -7_000_000.0 .. 7_000_000.0;
 
    --interval defined by a lower bound and an upper bound.
    --intervals are open on the lower bound and closed on the upper bound.
    type interval is record   
-      LowerBound : SafeFloat;
-      UpperBound : SafeFloat;
+      LowerBound : SafeReal64;
+      UpperBound : SafeReal64;
       Classification : zones;
    end record;
-    -- with Dynamic_Predicate => interval.LowerBound < interval.UpperBound;
-   
+-- with Dynamic_Predicate => interval.LowerBound < interval.UpperBound;   
    subtype myvector_index_type is Positive;
    
    package MyVectorOfIntervals is new SPARK.Containers.Formal.Vectors
@@ -35,27 +34,27 @@ is
    --instantiated formal vector container of zones
    subtype ZoneVector is MyVectorOfZones.Vector (Maxsize);
    --Altitude range in meters
-   subtype Altitude_Type_m is Real64 range -10_000.0 .. 10_000.0; 
+   subtype Altitude_Type_m is SafeReal64 range -100_000.0 .. 100_000.0; 
    --minimum distance between lower and upper bound
    subtype Altitude_Buffer_Type_m is Altitude_Type_m range 
      0.0 .. 0.1 * Altitude_Type_m'Last; 
    --heading range in degrees
-   subtype Heading_Type_deg is Real64 range -1_000.0 .. 1_000.0; 
+   subtype Heading_Type_deg is SafeReal64 range -1_000.0 .. 1_000.0; 
    --minimum distance between lower and upper bound
    subtype Heading_Buffer_Type_deg is Heading_Type_deg range 
      0.0 .. 0.1 * Heading_Type_deg'Last; 
    --Ground speed range in meters per second
-   subtype GroundSpeed_Type_mps is Real64 range -1_000.0 .. 1_000.0; 
+   subtype GroundSpeed_Type_mps is SafeReal64 range -1_000.0 .. 1_000.0; 
    --minimum distance between lower and upper bound
    subtype GroundSpeed_Buffer_Type_mps is GroundSpeed_Type_mps range 
      0.0 .. 0.1 * GroundSpeed_Type_mps'Last; 
    --Vertical spped range in meters per second
-   subtype VerticalSpeed_Type_mps is Real64 range -1_000.0 .. 1_000.0; 
+   subtype VerticalSpeed_Type_mps is SafeReal64 range -1_000.0 .. 1_000.0; 
    --minimum distance between lower and upper bound
    subtype VerticalSpeed_Buffer_Type_mps is VerticalSpeed_Type_mps range 
      0.0 .. 0.1 * VerticalSpeed_Type_mps'Last; 
-   subtype latitude_type_deg is Real64 range -90.0 .. 90.0;
-   subtype longitude_type_deg is Real64 range -180.0 .. 180.0;
+   subtype latitude_type_deg is SafeReal64 range -90.0 .. 90.0;
+   subtype longitude_type_deg is SafeReal64 range -180.0 .. 180.0;
    
    type state_parameters is record
       altitude_m : Altitude_Type_m;
@@ -80,13 +79,13 @@ is
    type Vehicle_IDs is array (1 .. 10) of VehicleID_type;
    
    --time to violation of well clear in seconds;
-   subtype ttlowc_sec is Real64 range 0.0 .. Real64'Last;
+   subtype ttlowc_sec is SafeReal64 range 0.0 .. SafeReal64'Last;
    
    --time threshold for automatic response to be enacted
-   subtype action_time_sec is Real64 range 0.0 .. 120.0;
+   subtype action_time_sec is SafeReal64 range 0.0 .. 120.0;
    
    --time threshold for elevating prioroty of the response;
-   subtype priority_time_sec is Real64 range -1.0 .. action_time_sec'Last;
+   subtype priority_time_sec is SafeReal64 range -1.0 .. action_time_sec'Last;
    
    --array of time to violation
    type ttlow_array is array (1 .. 10) of ttlowc_sec;
@@ -94,7 +93,7 @@ is
    --record of intruder information
    type Intruder_info is record
       Intruder_ID : VehicleID_type;
-      Intruder_time_to_violation_isNan : Boolean:= True;
+      Intruder_time_to_violation_isNan : Boolean := True;
       Intruder_time_to_violation : ttlowc_sec;
    end record;
    
@@ -193,8 +192,7 @@ is
                 MyVectorOfIntervals.Last_Index (X) =>
                 (if I < J then MyVectorOfIntervals.Element (X, I).
                        UpperBound < MyVectorOfIntervals.Element (X, J).
-                       UpperBound))))
-         with Ghost;
+                       UpperBound))));
    
    --predicate indicating if a given test value is located within the chosen  
    --interval defined by an open lower bound and closed upper bound 

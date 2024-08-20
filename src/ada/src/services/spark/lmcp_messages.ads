@@ -1,6 +1,7 @@
 with SPARK.Containers.Functional.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Common;                use Common;
+with definitions;           use definitions;
 
 package LMCP_Messages with SPARK_Mode is
 
@@ -383,51 +384,53 @@ package LMCP_Messages with SPARK_Mode is
       TaskList : TaskAssignment_Sequence;
    end record;
 
+   --  subtype SafeReal64 is Real64 range -7_000_000.00 .. 7_000_000.00;
+
    type DAIDALUSConfiguration is new Message_Root with record
       --Entity ID that generated this message
       EntityID : UInt32 := 0;
       --Time horizon of all DAIDALUS functions
-      LookAheadTime : Real64 := 0.0;
+      LookAheadTime : ttlowc_sec := 0.0;
       --Relative maximum horizontal direction maneuver to the left of current
       --ownship direction
-      LeftTrack : Real64 := 0.0;
+      LeftTrack : Heading_Type_deg := 0.0;
       --Relative maximum horizontal direction maneuver to the right of current
       --ownship direction
-      RightTrack : Real64 := 0.0;
+      RightTrack : Heading_Type_deg := 0.0;
       --Absolute maximum horizontal speed manuever
-      MaxGroundSpeed : Real64 := 0.0;
+      MaxGroundSpeed : GroundSpeed_Type_mps := 0.0;
       --Absolute minimum horizontal speed maneuver
-      MinGroundSpeed : Real64 := 0.0;
+      MinGroundSpeed : GroundSpeed_Type_mps := 0.0;
       --Absolute maximum vertical speed maneuver
-      MaxVerticalSpeed : Real64 := 0.0;
+      MaxVerticalSpeed : VerticalSpeed_Type_mps := 0.0;
       --Absolute minimum vertical speed maneuver
-      MinVerticalSpeed : Real64 := 0.0;
+      MinVerticalSpeed : VerticalSpeed_Type_mps := 0.0;
       --Absolute maximum altitude maneuver
-      MaxAltitude : Real64 := 0.0;
+      MaxAltitude : Altitude_Type_m := 0.0;
       --Absolute minimum altitude maneuver
-      MinAltitude : Real64 := 0.0;
+      MinAltitude : Altitude_Type_m := 0.0;
       --Granularity of horizontal direction maneuvers
-      TrackStep : Real64 := 0.0;
+      TrackStep : Heading_Buffer_Type_deg := 0.0;
       --Granularity of horizontal speed maneuvers
-      GroundSpeedStep : Real64 := 0.0;
+      GroundSpeedStep : GroundSpeed_Buffer_Type_mps := 0.0;
       --Granularity of vertical speed maneuvers
-      VerticalSpeedStep : Real64 := 0.0;
+      VerticalSpeedStep : VerticalSpeed_Buffer_Type_mps := 0.0;
       --Granularity of altitude maneuvers
-      AltitudeStep : Real64 := 0.0;
+      AltitudeStep : Altitude_Buffer_Type_m := 0.0;
       --Horizontal acceleration used in the computation of horizontal speed
       --maneuvers
-      HorizontalAcceleration : Real64 := 0.0;
+      HorizontalAcceleration : SafeReal64 := 0.0;
       --Vertical acceleration used in the computation of vertical speed
       --maneuvers
-      VerticalAcceleration : Real64 := 0.0;
+      VerticalAcceleration : SafeReal64 := 0.0;
       --Turn rate used in the computation of horizontal direction maneuvers
-      TurnRate : Real64 := 0.0;
+      TurnRate : SafeReal64 := 0.0;
       --Bank angle used in the computation of horizontal direction maneuvers
-      BankAngle : Real64 := 0.0;
+      BankAngle : Heading_Type_deg := 0.0;
       --Vertical rate used in the computation of altitude maneuvers
-      VerticalRate : Real64 := 0.0;
+      VerticalRate : VerticalSpeed_Type_mps := 0.0;
       --Time delat to stabilize recovery maneuvers
-      RecoveryStabilityTime : Real64 := 0.0;
+      RecoveryStabilityTime : SafeReal64 := 0.0;
       --Enable computation of horizontal direction recovery maneuvers
       isRecoveryTrackBands : Boolean;
       --Enable computation of horizontal speed recovery maneuvers
@@ -442,45 +445,45 @@ package LMCP_Messages with SPARK_Mode is
       --computing avoidance maneuvers
       CollisionAvoidanceBandsFactor : Boolean;
       --Horizontal NMAC
-      HorizontalNMAC : Real64 := 0.0;
+      HorizontalNMAC : SafeReal64 := 0.0;
       --Minimum horizontal separation used in the computation of recovery
       --maneuvers
-      MinHorizontalRecovery : Real64 := 0.0;
+      MinHorizontalRecovery : SafeReal64 := 0.0;
       --Vertical NMAC
-      VerticalNMAC : Real64 := 0.0;
+      VerticalNMAC : SafeReal64 := 0.0;
       --Minimum vertical separation used in the computation of recovery
       --maneuvers
-      MinVerticalRecovery : Real64 := 0.0;
+      MinVerticalRecovery : SafeReal64 := 0.0;
       --Threshold relative to ownship horizontal direction for the computation
       --of horizontal contours
-      HorizontalContourThreshold : Real64 := 0.0;
+      HorizontalContourThreshold : SafeReal64 := 0.0;
       --Threshold for the horzontal distance component of well-clear volume
-      DTHR : Real64 := 0.0;
+      DTHR : SafeReal64 := 0.0;
       --Threshold for the vertical distance component of well-clear volume
-      ZTHR : Real64 := 0.0;
+      ZTHR : SafeReal64 := 0.0;
       --Threshold for time component of well-clear volume.
-      TTHR : Real64 := 0.0;
+      TTHR : SafeReal64 := 0.0;
       --Number of RTCA alert levels desired for reporting
       RTCAAlertLevels : UInt32 := 0;
       --Alert time for preventative alert
-      AlertTime1 : Real64 := 0.0;
+      AlertTime1 : ttlowc_sec := 0.0;
       --Early alert time for the prevenative alert
-      EarlyAlertTime1 : Real64 := 0.0;
+      EarlyAlertTime1 : ttlowc_sec := 0.0;
       --Alert time for the corrective alert
-      AlertTime2 : Real64 := 0.0;
+      AlertTime2 : ttlowc_sec := 0.0;
       --Early alert time for the corrective alert
-      EarlyAlertTime2 : Real64 := 0.0;
+      EarlyAlertTime2 : ttlowc_sec := 0.0;
       --Alert time for the warning alert
-      AlertTime3 : Real64 := 0.0;
+      AlertTime3 : ttlowc_sec := 0.0;
       --Early alert time for the warning alert
-      EarlyAlertTime3 : Real64 := 0.0;
+      EarlyAlertTime3 : ttlowc_sec := 0.0;
       --Horizontal detection type
       HorizontalDetectionType : Unbounded_String;
    end record;
 
    type BandsRegionEnum is (NEAR, MID, FAR);
 
-   type Real64_Array is array (1 .. 2) of Real64;
+   type Real64_Array is array (1 .. 2) of SafeReal64;
 
    package Generic_Real64_Sequences is new SPARK.Containers.Functional.Vectors
      (Index_Type                     => Positive,
@@ -532,7 +535,7 @@ package LMCP_Messages with SPARK_Mode is
 
    package Real64_sequences is new Spark.Containers.Functional.Vectors
      (Index_Type                     => Positive,
-      Element_Type                   => Real64);
+      Element_Type                   => SafeReal64);
 
    type Real64_Seq is new Real64_sequences.Sequence;
 
@@ -546,14 +549,14 @@ package LMCP_Messages with SPARK_Mode is
       EntityList : Int64_Seq;
       TimeToViolationList : Real64_Seq;
       AlertLevelList : Real64_Seq;
-      EntityID : UInt32;
-      CurrentHeading : Real64;
-      CurrentGroundSpeed : Real64;
-      CurrentVerticalSpeed : Real64;
-      CurrentAltitude : Real64;
-      CurrentLatitude : Real64;
-      CurrentLongitude : Real64;
-      CurrentTime : Real64;
+      EntityID : ID_Type;
+      CurrentHeading : Heading_Type_deg;
+      CurrentGroundSpeed : GroundSpeed_Type_mps;
+      CurrentVerticalSpeed : VerticalSpeed_Type_mps;
+      CurrentAltitude : Altitude_Type_m;
+      CurrentLatitude : latitude_type_deg;
+      CurrentLongitude : longitude_type_deg;
+      CurrentTime : ttlowc_sec;
       WCVGroundHeadingIntervals : GroundHeadingInterval;
       WCVGroundHeadingRegions : BandsRegion_seq;
       WCVGroundSpeedIntervals : GroundSpeedInterval;

@@ -337,6 +337,10 @@ package body UxAS.Comms.LMCP_Net_Client.Service.Daidalus_Response_Interfacing is
             This.State.NextWaypoint := Common.Int64 
               (EntityStateMessage.CurrentWaypoint);
          end if;
+         -- TODO: Convert from LMCP messages to automatic response data 
+         -- structures ---------------------------------------------------------
+         -- TODO: Ensure preconditions for automatic response are satisfied-----
+         -- TODO: call automatic response --------------------------------------
       
       end if;
 

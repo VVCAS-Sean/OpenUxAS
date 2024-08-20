@@ -49,9 +49,9 @@ package Daidalus_Response with SPARK_Mode is
    -- use Pos64_Vectors.Formal_Model;
  
    type Daidalus_Response_Configuration_Data is record
-      VehicleID : Int64 := -1;
-      ActionTimeThreshold : Real64 := 25.0;
-      PriorityTimeThreshold : Real64 := -15.0;
+      VehicleID : definitions.ID_Type := -1;
+      ActionTimeThreshold : definitions.ttlowc_sec := 25.0;
+      PriorityTimeThreshold : definitions.priority_time_sec := -15.0;
       
       -- __TODO__
       -- Define fields for this record. This record is intended to hold data
@@ -160,5 +160,7 @@ private
       HeadingZones : definitions.ZoneVector;
       GroundspeedZones : definitions.ZoneVector;      
    end record;         
+   
+   Inconsistent_Message : exception;
 
 end Daidalus_Response;

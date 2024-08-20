@@ -14,6 +14,7 @@ with UxAS.Messages.lmcptask.TaskAutomationResponse; use UxAS.Messages.lmcptask.T
 with UxAS.Messages.lmcptask.TaskOptionCost;         use UxAS.Messages.lmcptask.TaskOptionCost;
 with UxAS.Messages.Route.RouteResponse;             use UxAS.Messages.Route.RouteResponse;
 with larcfm.DAIDALUS.Enumerations;
+with definitions;
 
 package body LMCP_Message_Conversions is
 
@@ -1618,14 +1619,20 @@ package body LMCP_Message_Conversions is
          Result.AlertLevelList := LMCP_Messages.Add (Result.AlertLevelList,
                                        Real64 (AlertLevel));
       end loop;
-      Result.EntityID := UInt32 (Msg.all.getEntityId);
-      Result.CurrentHeading := Real64 (Msg.all.getCurrentHeading);
-      Result.CurrentGroundSpeed := Real64 (Msg.all.getCurrentGoundSpeed);
-      Result.CurrentVerticalSpeed := Real64 (Msg.all.getCurrentVerticalSpeed);
-      Result.CurrentAltitude := Real64 (Msg.all.getCurrentAltitude);
-      Result.CurrentLatitude := Real64 (Msg.all.getCurrentLatitude);
-      Result.CurrentLongitude := Real64 (Msg.all.getCurrentLongitude);
-      Result.CurrentTime := Real64 (Msg.all.getCurrentTime);
+      Result.EntityID := definitions.ID_Type (Msg.all.getEntityId);
+      Result.CurrentHeading := definitions.Heading_Type_deg
+        (Msg.all.getCurrentHeading);
+      Result.CurrentGroundSpeed := definitions.GroundSpeed_Type_mps
+        (Msg.all.getCurrentGoundSpeed);
+      Result.CurrentVerticalSpeed := definitions.VerticalSpeed_Type_mps
+        (Msg.all.getCurrentVerticalSpeed);
+      Result.CurrentAltitude := definitions.Altitude_Type_m
+        (Msg.all.getCurrentAltitude);
+      Result.CurrentLatitude := definitions.latitude_type_deg
+        (Msg.all.getCurrentLatitude);
+      Result.CurrentLongitude := definitions.longitude_type_deg
+        (Msg.all.getCurrentLongitude);
+      Result.CurrentTime := definitions.ttlowc_sec (Msg.all.getCurrentTime);
       for GroundHeadingInterval_Vector of Msg.all.getWCVGroundHeadingIntervals.
       all loop
          Temp := As_GroundHeadingInterval_Message

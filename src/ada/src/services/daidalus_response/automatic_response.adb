@@ -422,9 +422,16 @@ package body automatic_response with SPARK_Mode => On is
                                                      Last_Index
                                                        (wp_val.AssociatedTaskList));
                                     for atl of wp_val.AssociatedTaskList loop
+                                       pragma Assert (Last
+                                                      (lmcp_associated_task_list)'Loop_Entry
+                                                        = 0);
                                        lmcp_associated_task_list := Add
                                          (lmcp_associated_task_list, Int64
                                             (atl));
+                                       pragma Loop_Invariant (Last
+                                                              (lmcp_associated_task_list)
+                                                              <= MyVectorOfIntegers.Last_Index
+                                                                (wp_val.AssociatedTaskList));
                                     end loop;
                                     vehicle_action_temp.AssociatedTaskList :=
                                       lmcp_associated_task_list;

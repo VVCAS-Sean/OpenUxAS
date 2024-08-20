@@ -15,37 +15,50 @@ package body Daidalus_Response with SPARK_Mode is
    -- Helper functions ---------------------------------------------------------
    procedure CreateAltitudeBands (LMCP_Altitudes : AltitudeInterval; 
                                   LMCP_AltitudeZone : BandsRegion_seq;
-                                  DAIDALUS_Altitude_Bands : out 
+                                  DAIDALUS_Altitude_Bands : aliased out 
                                     definitions.OrderedIntervalVector) with 
+       Exceptional_Cases =>
+         (Inconsistent_Message => MyVectorOfIntervals.Is_Empty
+            (DAIDALUS_Altitude_Bands) or else
+          not definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands)),
        Post => definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands);
    
    procedure CreateAltitudeBands (LMCP_Altitudes : AltitudeInterval;
                                   LMCP_AltitudeZone : BandsRegion_seq;
-                                  DAIDALUS_Altitude_Bands : out 
+                                  DAIDALUS_Altitude_Bands : aliased out 
                                  definitions.OrderedIntervalVector) is
       result : definitions.OrderedIntervalVector;
    begin
-      pragma Assume (Generic_Real64_Sequences.Iter_First 
-                     (LMCP_Altitudes.Altitude) = 
-                       BandsRegion_sequences.Iter_First 
-                         (LMCP_AltitudeZone) 
-                     and then Generic_Real64_Sequences.Last 
+      -- Assumption used to bypass setting a precondition given that the 
+      -- is true from the message without handling a check to establish the 
+      -- property upon reception of the corresponding message ------------------
+      pragma Assume (Generic_Real64_Sequences.Last 
                        (LMCP_Altitudes.Altitude) = 
                          BandsRegion_sequences.Last 
                          (LMCP_AltitudeZone));
-      if Generic_Real64_Sequences.Iter_First (LMCP_Altitudes.Altitude) = 
-            BandsRegion_sequences.Iter_First (LMCP_AltitudeZone) and then 
-          Generic_Real64_Sequences.Last (LMCP_Altitudes.Altitude) =
-            BandsRegion_sequences.Last (LMCP_AltitudeZone)
+      -- Assumption that the number of intervals is less than an allowable 
+      -- maximum. --------------------------------------------------------------
+      pragma Assume (BandsRegion_sequences.Last (LMCP_AltitudeZone) <= 
+                       definitions.Maxsize);
+      if Generic_Real64_Sequences.Last (LMCP_Altitudes.Altitude) =
+        BandsRegion_sequences.Last (LMCP_AltitudeZone)
+      --  if Generic_Real64_Sequences.Range_Equal (LMCP_Altitudes.Altitude,
+      --                                           LMCP_AltitudeZone,
+      --                                           Generic_Real64_Sequences.First,
+      --                                           Generic_Real64_Sequences.Last (LMCP_AltitudeZone))
       then
-         for Index in BandsRegion_sequences.Iter_First 
-           (LMCP_AltitudeZone) .. 
-             BandsRegion_sequences.Last (LMCP_AltitudeZone) loop
+         for Index in BandsRegion_sequences.First  .. 
+           BandsRegion_sequences.Last (LMCP_AltitudeZone) loop
+            pragma Assert (Index in Generic_Real64_Sequences.First .. 
+                             Generic_Real64_Sequences.Last 
+                               (LMCP_Altitudes.Altitude));
+            pragma Loop_Invariant (Integer (MyVectorOfIntervals.Length (result))
+                                   = Index - BandsRegion_sequences.First);
             declare
                temp_interval : definitions.interval;
             begin
                temp_interval.LowerBound := Generic_Real64_Sequences.Get 
-                 (LMCP_Altitudes.Altitude, Index)(1);
+                    (LMCP_Altitudes.Altitude, Index)(1);
                temp_interval.UpperBound := Generic_Real64_Sequences.Get 
                  (LMCP_Altitudes.Altitude, Index)(2);
                case BandsRegion_sequences.Get (LMCP_AltitudeZone, Index) is
@@ -58,12 +71,18 @@ package body Daidalus_Response with SPARK_Mode is
                end case;
                MyVectorOfIntervals.Append (result, temp_interval);
             end;
-            DAIDALUS_Altitude_Bands := result;
-            pragma Assume (Are_Legitimate_Bands (DAIDALUS_Altitude_Bands));
          end loop;
+         DAIDALUS_Altitude_Bands := result;
+         --  pragma Assume (definitions.Are_Legitimate_Bands
+         --                 (DAIDALUS_Altitude_Bands));
+         if not definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands) then
+            raise Inconsistent_Message;
+         end if;
       else
-         null;
+         DAIDALUS_Altitude_Bands := MyVectorOfIntervals.Empty_Vector;
+         raise Inconsistent_Message;
       end if;      
+      pragma Assert (definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands));
              
    end CreateAltitudeBands;
 
@@ -154,6 +173,7 @@ package body Daidalus_Response with SPARK_Mode is
       m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
       WCV_Intervals : LMCP_Messages.WellClearViolationIntervals) is
       WCVdata : WCV_data;
+      AltitudeBandsSurrogate : aliased definitions.OrderedIntervalVector;
    begin
       if Common.Int64 (WCV_Intervals.EntityID) = m_DAIDALUSResponseServiceConfig.
         VehicleID
@@ -167,19 +187,29 @@ package body Daidalus_Response with SPARK_Mode is
            CurrentVerticalSpeed;
          WCVdata.CurrentState.latitude_deg := WCV_Intervals.CurrentLatitude;
          WCVdata.CurrentState.longitude_deg := WCV_Intervals.CurrentLongitude;
-           
+         CreateAltitudeBands
+           (LMCP_Altitudes          => WCV_Intervals.WCVAltitudeIntervals,
+            LMCP_AltitudeZone       => WCV_Intervals.WCVAltitudeRegions,
+            DAIDALUS_Altitude_Bands => AltitudeBandsSurrogate); 
+         WCVdata.AltitudeBands := AltitudeBandsSurrogate;
+         
          --TODO finish else ladder for throwing an exception-----------------
          if not (m_DAIDALUSResponseServiceState.Heading_Min_deg <=
                    WCVdata.CurrentState.heading_deg and then 
                  WCVdata.CurrentState.heading_deg <= 
                    m_DAIDALUSResponseServiceState.Heading_Max_deg) 
          then
-            raise Program_Error;
+            null; --raise Program_Error;
          else
             null;
          end if;
+         -- TODO: Handle exceptions raised by helper functions and raise Program
+         -- error to stop execution --------------------------------------------
         
       end if;
+   exception
+      when Inconsistent_Message =>
+         null; --raise Program_Error;
       
    end Process_WellclearViolation_Message;
    
