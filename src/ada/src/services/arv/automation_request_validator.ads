@@ -1,16 +1,17 @@
 with SPARK.Containers.Formal.Doubly_Linked_Lists;
 with SPARK.Containers.Formal.Hashed_Maps;
 with SPARK.Containers.Functional.Maps;
-with SPARK.Containers.Types;                     use SPARK.Containers.Types;
-with Ada.Strings.Unbounded;                      use Ada.Strings.Unbounded;
-with Automation_Request_Validator_Communication; use Automation_Request_Validator_Communication;
-with Common;                                     use Common;
-with LMCP_Messages;                              use LMCP_Messages;
+with SPARK.Containers.Types;                 use SPARK.Containers.Types;
+with SPARK.Big_Integers;                     use SPARK.Big_Integers;
+with Ada.Strings.Unbounded;                  use Ada.Strings.Unbounded;
+with Automation_Request_Validator_Mailboxes; use Automation_Request_Validator_Mailboxes;
+with Common;                                 use Common;
+with LMCP_Messages;                          use LMCP_Messages;
 
---  Package containing the fonctionality of the service. It uses its communication
+--  Package containing the functionality of the service. It uses its communication
 --  counter-part to send and receive messages.
 
-package Automation_Request_Validator with SPARK_Mode is
+package Automation_Request_Validator with SPARK_Mode, Always_Terminates is
    pragma Unevaluated_Use_Of_Old (Allow);
 
    --  Configuration data is separated from the service state as it is not

@@ -26,6 +26,8 @@ class GnatproveDriver(DiffTestDriver):
                 f_prj.write('      for Specification ("Ctrl_C_Handler") use "ctrl_c_handler.ads";\n')
                 f_prj.write('      for Implementation ("Ctrl_C_Handler") use "ctrl_c_handler__dummy.adb";\n')
                 f_prj.write('   end Naming;\n')
+                f_prj.write('   for Excluded_Source_Files use')
+                f_prj.write('      ("ctrl_c_handler__gcov.adb");')
                 f_prj.write('  for Source_Dirs\n')
                 f_prj.write('     use ("'+self.test_env["test_dir"]+'/../../../../src/ada/src/**");\n')
                 f_prj.write('   package Compiler is\n')
@@ -36,6 +38,16 @@ class GnatproveDriver(DiffTestDriver):
                 f_prj.write('      for Proof_Dir use "../../..'+self.test_env["test_dir"]+'/../../../../src/ada/proof";\n')
                 f_prj.write('   end Prove;\n')
                 f_prj.write('end Test;\n')
+
+            with open(self.working_dir("sparklib.gpr"), "w") as f_prj:
+                f_prj.write('project SPARKlib extends "sparklib_external" is\n')
+                f_prj.write('   for Object_Dir use "sparklib_obj";\n')
+                f_prj.write("   for Source_Dirs use SPARKlib_External'Source_Dirs;\n")
+                f_prj.write(
+                    "   for Excluded_Source_Files use "
+                    + "SPARKlib_External'Excluded_Source_Files;\n"
+                )
+                f_prj.write("end SPARKlib;\n")
 
             if self.env.options.no_replay:
                 proof_switches = []

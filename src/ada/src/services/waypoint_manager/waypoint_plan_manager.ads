@@ -1,12 +1,15 @@
+with SPARK.Big_Integers;                         use SPARK.Big_Integers;
 with SPARK.Containers.Formal.Hashed_Maps;
 with SPARK.Containers.Formal.Vectors;
 
-with Ada.Containers;                             use all type Ada.Containers.Count_Type;
-with Waypoint_Plan_Manager_Communication;        use Waypoint_Plan_Manager_Communication;
-with Common;                                     use Common;
-with LMCP_Messages;                              use LMCP_Messages;
+with Ada.Containers;                         use all type Ada.Containers.Count_Type;
+with Waypoint_Plan_Manager_Mailboxes;        use Waypoint_Plan_Manager_Mailboxes;
+with Common;                                 use Common;
+with LMCP_Messages;                          use LMCP_Messages;
 
 package Waypoint_Plan_Manager with SPARK_Mode is
+
+   use Common.Count_Type_To_Big_Integer_Conversions;
 
    Max : constant Ada.Containers.Count_Type := 2000;
 
@@ -360,9 +363,7 @@ package Waypoint_Plan_Manager with SPARK_Mode is
      (State : in out Waypoint_Plan_Manager_State;
       MC : MissionCommand)
      with
-       Pre =>
-         Length (MC.WaypointList) <= Max
-         and then MC.FirstWaypoint > 0,
+       Pre => MC.FirstWaypoint > 0,
        Post =>
          State.MC = MC
          and then Waypoints_Are_Subset (State.Id_To_Waypoint, State.MC.WaypointList)

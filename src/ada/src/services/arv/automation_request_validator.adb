@@ -1,8 +1,11 @@
+with SPARK.Big_Integers;         use SPARK.Big_Integers;
 with Ada.Containers;             use Ada.Containers;
 with AVTAS.LMCP.Types;
 with UxAS.Comms.LMCP_Net_Client; use UxAS.Comms.LMCP_Net_Client;
 
 package body Automation_Request_Validator with SPARK_Mode is
+
+   use Common.Count_Type_To_Big_Integer_Conversions;
 
    -----------------------
    -- Local Subprograms --
@@ -55,8 +58,6 @@ package body Automation_Request_Validator with SPARK_Mode is
                        Available_Line_of_Interest_Ids,
                        Available_Point_of_Interest_Ids,
                        TaskIds));
-
-   procedure Get_Unique_Request_Id (Val : out Int64);
 
    procedure Send_Next_Request
      (Mailbox          : in out Automation_Request_Validator_Mailbox;
@@ -247,7 +248,7 @@ package body Automation_Request_Validator with SPARK_Mode is
                             (not Contains (S, I) and then Contains (States, I))));
                   Id := Int64_Sets.Choose (S);
                   if Contains (States, Id) then
-                     pragma Assume (Length (EntityList) < Count_Type'Last, "we have less than Count_Type'Last vehicles");
+                     pragma Assume (Length (EntityList) < To_Big_Integer (Count_Type'Last), "we have less than Count_Type'Last vehicles");
                      EntityList := Add (EntityList, Id);
                      IsFoundAMatch := True;
                   end if;
@@ -442,11 +443,12 @@ package body Automation_Request_Validator with SPARK_Mode is
       isNewPendingRequest : Boolean := False;
    begin
       while areAllTasksReady and then Length (State.Requests_Waiting_For_Tasks) > 0 loop
+         pragma Loop_Variant (Decreases => Length (State.Requests_Waiting_For_Tasks));
+
          declare
             Req : constant UniqueAutomationRequest := First_Element (State.Requests_Waiting_For_Tasks);
          begin
-            areAllTasksReady :=
-              (for all TaskId of Req.TaskList => Contains (Config.Available_Initialized_Tasks, TaskId));
+            areAllTasksReady := (for all TaskId of Req.TaskList => Contains (Config.Available_Initialized_Tasks, TaskId));
             if areAllTasksReady then
                isNewPendingRequest := True;
 
@@ -460,17 +462,6 @@ package body Automation_Request_Validator with SPARK_Mode is
          Send_Next_Request (Mailbox, State.Pending_Requests);
       end if;
    end Check_Tasks_Initialized;
-
-   ---------------------------
-   -- Get_Unique_Request_Id --
-   ---------------------------
-
-   procedure Get_Unique_Request_Id (Val : out Int64) is
-      Id : AVTAS.LMCP.Types.Int64;
-   begin
-      Get_Unique_Entity_Send_Message_Id (Id);
-      Val := Int64 (Id);
-   end Get_Unique_Request_Id;
 
    -------------------------------
    -- Handle_Automation_Request --
@@ -488,7 +479,7 @@ package body Automation_Request_Validator with SPARK_Mode is
       isReady                   : Boolean;
    begin
 
-      Get_Unique_Request_Id (ReqId);
+      Get_Next_Unique_Sending_Message_Id (Mailbox, ReqId);
       pragma Assume (not Has_Key (State.Sandbox, ReqId), "returned Id is actually unique");
 
       Unique_Automation_Request.RequestID := ReqId;
