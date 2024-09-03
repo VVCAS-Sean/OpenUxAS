@@ -8,11 +8,11 @@ package body FlatEarth is
 
    procedure Initialize
      (feo :  out FlatEarthObject;
-      latitude_initial_rad : SafeFloat;
-      longitude_initial_rad : SafeFloat)
+      latitude_initial_rad : SafeReal64;
+      longitude_initial_rad : SafeReal64)
    is
-      DenominatorMeridional : SafeFloat;
-      DenominatorTransverse : SafeFloat;
+      DenominatorMeridional : SafeReal64;
+      DenominatorTransverse : SafeReal64;
    begin
       if not feo.isInitialized
       then
@@ -43,11 +43,11 @@ package body FlatEarth is
 
    procedure ConvertLatitudeLongitude_rad_ToNorthEast_ft
      (feo : in out FlatEarthObject;
-      latitude_rad :     SafeFloat; longitude_rad : SafeFloat;
-      north_ft     : out SafeFloat; east_ft : out SafeFloat)
+      latitude_rad :     SafeReal64; longitude_rad : SafeReal64;
+      north_ft     : out SafeReal64; east_ft : out SafeReal64)
    is
-      north_m : SafeFloat;
-      east_m : SafeFloat;
+      north_m : SafeReal64;
+      east_m : SafeReal64;
    begin
       if not feo.isInitialized then
          Initialize (feo, latitude_rad, longitude_rad);
@@ -66,8 +66,8 @@ package body FlatEarth is
 
    procedure ConvertLatitudeLongitude_rad_ToNorthEast_m
      (feo : in out FlatEarthObject;
-      latitude_rad :     SafeFloat; longitude_rad : SafeFloat;
-      north_m      : out SafeFloat; east_m : out SafeFloat)
+      latitude_rad :     SafeReal64; longitude_rad : SafeReal64;
+      north_m      : out SafeReal64; east_m : out SafeReal64)
    is
    begin
       if not feo.isInitialized then
@@ -85,11 +85,11 @@ package body FlatEarth is
 
    procedure ConvertLatitudeLongitude_deg_ToNorthEast_m
      (feo : in out FlatEarthObject;
-      latitude_deg :     SafeFloat; longitude_deg : SafeFloat;
-      north_m      : out SafeFloat; east_m : out SafeFloat)
+      latitude_deg :     SafeReal64; longitude_deg : SafeReal64;
+      north_m      : out SafeReal64; east_m : out SafeReal64)
    is
-      latitude_rad : SafeFloat := latitude_deg * convertDegreesToRadians;
-      longitude_rad : SafeFloat := longitude_deg * convertDegreesToRadians;
+      latitude_rad : SafeReal64 := latitude_deg * convertDegreesToRadians;
+      longitude_rad : SafeReal64 := longitude_deg * convertDegreesToRadians;
    begin
       if not feo.isInitialized then
          Initialize (feo, latitude_rad, longitude_rad);
@@ -106,13 +106,13 @@ package body FlatEarth is
 
    procedure ConvertLatitudeLongitude_deg_ToNorthEast_ft
      (feo : in out FlatEarthObject;
-      latitude_deg :     SafeFloat; longitude_deg : SafeFloat;
-      north_ft     : out SafeFloat; east_ft : out SafeFloat)
+      latitude_deg :     SafeReal64; longitude_deg : SafeReal64;
+      north_ft     : out SafeReal64; east_ft : out SafeReal64)
    is
-      latitude_rad : SafeFloat := latitude_deg * convertDegreesToRadians;
-      longitude_rad : SafeFloat := longitude_deg * convertDegreesToRadians;
-      north_m : SafeFloat;
-      east_m : SafeFloat;
+      latitude_rad : SafeReal64 := latitude_deg * convertDegreesToRadians;
+      longitude_rad : SafeReal64 := longitude_deg * convertDegreesToRadians;
+      north_m : SafeReal64;
+      east_m : SafeReal64;
    begin
       if not feo.isInitialized then
          Initialize (feo, latitude_rad, longitude_rad);
@@ -132,9 +132,9 @@ package body FlatEarth is
 
    procedure ConvertNorthEast_m_ToLatitudeLongitude_rad
      (feo : FlatEarthObject;
-      north_m       : SafeFloat; east_m : SafeFloat;
-      latitude_rad : out SafeFloat;
-      longitude_rad : out SafeFloat)
+      north_m       : SafeReal64; east_m : SafeReal64;
+      latitude_rad : out SafeReal64;
+      longitude_rad : out SafeReal64)
    is
    begin
       pragma Assert (feo.RadiusMeridional_m > 0.0);
@@ -152,9 +152,9 @@ package body FlatEarth is
 
    procedure ConvertNorthEast_m_ToLatitudeLongitude_deg
      (feo : FlatEarthObject;
-      north_m       : SafeFloat; east_m : SafeFloat;
-      latitude_deg : out SafeFloat;
-      longitude_deg : out SafeFloat)
+      north_m       : SafeReal64; east_m : SafeReal64;
+      latitude_deg : out SafeReal64;
+      longitude_deg : out SafeReal64)
    is
    begin
       pragma Assert (feo.RadiusMeridional_m > 0.0);
@@ -175,12 +175,12 @@ package body FlatEarth is
 
    procedure ConvertNorthEast_ft_ToLatitudeLongitude_rad
      (feo : FlatEarthObject;
-      north_ft :     SafeFloat; east_ft : SafeFloat;
-      latitude_rad : out SafeFloat;
-      longitude_rad : out SafeFloat)
+      north_ft :     SafeReal64; east_ft : SafeReal64;
+      latitude_rad : out SafeReal64;
+      longitude_rad : out SafeReal64)
    is
-      north_m : SafeFloat := north_ft * convertFeetToMeters;
-      east_m : SafeFloat := east_ft * convertFeetToMeters;
+      north_m : SafeReal64 := north_ft * convertFeetToMeters;
+      east_m : SafeReal64 := east_ft * convertFeetToMeters;
    begin
       pragma Assert (feo.RadiusMeridional_m > 0.0);
       latitude_rad := (if feo.RadiusMeridional_m <= 0.0 then 0.0 else ((north_m
@@ -197,14 +197,14 @@ package body FlatEarth is
 
    procedure ConvertNorthEast_ft_ToLatitudeLongitude_deg
      (feo : FlatEarthObject;
-      north_ft :     SafeFloat; east_ft : SafeFloat;
-      latitude_deg : out SafeFloat;
-      longitude_deg : out SafeFloat)
+      north_ft :     SafeReal64; east_ft : SafeReal64;
+      latitude_deg : out SafeReal64;
+      longitude_deg : out SafeReal64)
    is
-      north_m : SafeFloat := north_ft * convertFeetToMeters;
-      east_m : SafeFloat := east_ft * convertFeetToMeters;
-      latitude_rad : SafeFloat;
-      longitude_rad : SafeFloat;
+      north_m : SafeReal64 := north_ft * convertFeetToMeters;
+      east_m : SafeReal64 := east_ft * convertFeetToMeters;
+      latitude_rad : SafeReal64;
+      longitude_rad : SafeReal64;
    begin
       pragma Assert (feo.RadiusMeridional_m > 0.0);
       latitude_rad := (if feo.RadiusMeridional_m <= 0.0 then 0.0 else ((north_m
@@ -224,15 +224,15 @@ package body FlatEarth is
 
    function GetLinearDistance_m_Lat1Long1_deg_To_Lat2Long2_deg
      (feo : in out FlatEarthObject;
-      latitude1_deg : SafeFloat; longitude1_deg : SafeFloat;
-      latitude2_deg : SafeFloat; longitude2_deg : SafeFloat) return
-     SafeFloat
+      latitude1_deg : SafeReal64; longitude1_deg : SafeReal64;
+      latitude2_deg : SafeReal64; longitude2_deg : SafeReal64) return
+     SafeReal64
    is
-      north1_m : SafeFloat := 0.0;
-      east1_m : SafeFloat := 0.0;
-      north2_m : SafeFloat := 0.0;
-      east2_m : SafeFloat := 0.0;
-      ReturnValue : SafeFloat;
+      north1_m : SafeReal64 := 0.0;
+      east1_m : SafeReal64 := 0.0;
+      north2_m : SafeReal64 := 0.0;
+      east2_m : SafeReal64 := 0.0;
+      ReturnValue : SafeReal64;
    begin
       ConvertLatitudeLongitude_deg_ToNorthEast_m (feo,
                                                  latitude1_deg, longitude1_deg,
@@ -251,15 +251,15 @@ package body FlatEarth is
 
    function GetLinearDistance_m_Lat1Long1_rad_To_Lat2Long2_rad
      (feo : in out FlatEarthObject;
-      latitude1_rad : SafeFloat; longitude1_rad : SafeFloat;
-      latitude2_rad : SafeFloat; longitude2_rad : SafeFloat) return
-     SafeFloat
+      latitude1_rad : SafeReal64; longitude1_rad : SafeReal64;
+      latitude2_rad : SafeReal64; longitude2_rad : SafeReal64) return
+     SafeReal64
    is
-      north1_m : SafeFloat := 0.0;
-      east1_m : SafeFloat := 0.0;
-      north2_m : SafeFloat := 0.0;
-      east2_m : SafeFloat := 0.0;
-      ReturnValue : SafeFloat;
+      north1_m : SafeReal64 := 0.0;
+      east1_m : SafeReal64 := 0.0;
+      north2_m : SafeReal64 := 0.0;
+      east2_m : SafeReal64 := 0.0;
+      ReturnValue : SafeReal64;
    begin
       ConvertLatitudeLongitude_rad_ToNorthEast_m (feo,
                                                  latitude1_rad, longitude1_rad,

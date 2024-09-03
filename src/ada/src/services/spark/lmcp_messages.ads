@@ -545,9 +545,21 @@ package LMCP_Messages with SPARK_Mode is
 
    subtype BandsRegion_seq is BandsRegion_sequences.Sequence;
 
+   package IDType_sequences is new Spark.Containers.Functional.Vectors
+     (Index_Type => Positive,
+      Element_Type => definitions.ID_Type);
+
+   subtype IDType_seq is IDType_sequences.Sequence;
+
+   package ttlowc_sequences is new Spark.Containers.Functional.Vectors
+     (Index_Type                     => Positive,
+      Element_Type                   => definitions.ttlowc_sec);
+
+   subtype ttlowc_seq is ttlowc_sequences.Sequence;
+
    type WellClearViolationIntervals is new Message_Root with record
-      EntityList : Int64_Seq;
-      TimeToViolationList : Real64_Seq;
+      EntityList : IDType_seq;
+      TimeToViolationList : ttlowc_seq;
       AlertLevelList : Real64_Seq;
       EntityID : ID_Type;
       CurrentHeading : Heading_Type_deg;

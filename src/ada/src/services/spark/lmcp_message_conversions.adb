@@ -1609,11 +1609,12 @@ package body LMCP_Message_Conversions is
       use Common;
    begin
       for Entity of Msg.all.getEntityList.all loop
-         Result.EntityList := Add (Result.EntityList, Int64 (Entity));
+         Result.EntityList := LMCP_Messages.IDType_sequences.Add
+           (Result.EntityList, definitions.ID_Type (Entity));
       end loop;
       for ViolationTime of Msg.all.getTimeToViolationList.all loop
-         Result.TimeToViolationList := LMCP_Messages.Add (Result.TimeToViolationList,
-                                            Real64 (ViolationTime));
+         Result.TimeToViolationList := LMCP_Messages.ttlowc_sequences.Add
+           (Result.TimeToViolationList, definitions.ttlowc_sec (ViolationTime));
       end loop;
       for AlertLevel of Msg.all.getAlertLevelList.all loop
          Result.AlertLevelList := LMCP_Messages.Add (Result.AlertLevelList,

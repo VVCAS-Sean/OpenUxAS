@@ -162,5 +162,6 @@ private
    end record;         
    
    Inconsistent_Message : exception;
+   Violated_precondition : exception;
 
 end Daidalus_Response;

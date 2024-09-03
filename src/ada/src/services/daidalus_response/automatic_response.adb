@@ -119,22 +119,18 @@ package body automatic_response with SPARK_Mode => On is
         MyVectorOfIntruderInfo.Last_Index (Intruders) loop
          pragma Loop_Invariant (Integer (MyVectorOfVehicleIDs.Length
                                (Conflict_Resolution_List)) < I);
-         if (not MyVectorOfIntruderInfo.Element (Intruders, I).
-                Intruder_time_to_violation_isNan) and then
-                 (MyVectorOfIntruderInfo.Element (Intruders, I).
+         if MyVectorOfIntruderInfo.Element (Intruders, I).
                         Intruder_time_to_violation <=
-                          m_Action_Time_Thresold_s)
+                          m_Action_Time_Thresold_s
          then
 
             MyVectorOfVehicleIDs.Append (Conflict_Resolution_List,
                                         MyVectorOfIntruderInfo.Element
                                           (Intruders, I).Intruder_ID);
          end if;
-         if (not MyVectorOfIntruderInfo.Element (Intruders, I).
-                Intruder_time_to_violation_isNan) and then
-                 (MyVectorOfIntruderInfo.Element (Intruders, I).
+         if MyVectorOfIntruderInfo.Element (Intruders, I).
                         Intruder_time_to_violation <=
-                          m_Priority_Time_Threshold_s)
+                          m_Priority_Time_Threshold_s
          then
             PriorityStatus := pHigh;
          end if;

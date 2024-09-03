@@ -93,7 +93,6 @@ is
    --record of intruder information
    type Intruder_info is record
       Intruder_ID : VehicleID_type;
-      Intruder_time_to_violation_isNan : Boolean := True;
       Intruder_time_to_violation : ttlowc_sec;
    end record;
    
