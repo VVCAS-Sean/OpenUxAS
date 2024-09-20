@@ -16,8 +16,7 @@ package Altitude_Resolution with SPARK_Mode => On is
       Lower_limit >= 0.0 and then Upper_limit <= 
       (Altitude_Type_m'Last - Altitude_Buffer_Type_m'Last) and then
       Lower_limit >= (Altitude_Type_m'First + Altitude_Buffer_Type_m'Last) 
-      and then Upper_limit - Lower_limit >= 2.0 * Interval_Constraint)
-       with Ghost; 
+      and then Upper_limit - Lower_limit >= 2.0 * Interval_Constraint); 
    
    --represents relational constraints between memebers in an interval band, 
    --assuming the container is not empty additional contraints for range 
@@ -44,8 +43,7 @@ package Altitude_Resolution with SPARK_Mode => On is
                  2.0 * Interval_constraint) and then 
         (MyVectorOfIntervals.Element (X, I).LowerBound <= 
            MyVectorOfIntervals.Element (X, I).UpperBound -
-                  2.0 * Interval_constraint)))) with
-         Ghost;
+                  2.0 * Interval_constraint))));
    
    --predicate indicating if the current altitude is contained within one of 
    --the DAIDALUS_Altitude bands indicating projected loss of well clear
@@ -55,8 +53,7 @@ package Altitude_Resolution with SPARK_Mode => On is
      (for some I in MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) 
           .. MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) =>
            InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, I), 
-        Current_State.altitude_m)) 
-     with Ghost;
+        Current_State.altitude_m));
 
    --predicate indicating if the constraints on the confict and recover bands
    --are such that the subprogram to find an altitude resolution can be called 
@@ -82,9 +79,7 @@ package Altitude_Resolution with SPARK_Mode => On is
                            Lower_limit         => Altitude_Min_m,
                            Interval_constraint => Altitude_Interval_Buffer) 
       and then (MyVectorOfIntervals.Is_Empty (DAIDALUS_Altitude_Bands) or else 
-      Current_Altitude_Exists_in_Bands (Current_State, DAIDALUS_Altitude_Bands))) 
-     with 
-       Ghost;
+      Current_Altitude_Exists_in_Bands (Current_State, DAIDALUS_Altitude_Bands)));
         
    procedure Found_WCV_Altitude_Resolution 
      (DAIDALUS_Altitude_Bands : OrderedIntervalVector; 

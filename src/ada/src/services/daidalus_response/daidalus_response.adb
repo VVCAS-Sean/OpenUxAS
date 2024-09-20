@@ -6,7 +6,11 @@ with Ada.Text_IO;                use Ada.Text_IO;
 with Common;                     use Common;
 with definitions;      
 with SPARK.Containers.Functional.Vectors;
-
+with set_divert_state; 
+with Heading_Resolution; 
+with Altitude_Resolution; 
+with speed_resolution; 
+with CheckSafeToReturn; 
 -- __TODO__
 -- Include any other necessary packages.
 
@@ -410,7 +414,139 @@ package body Daidalus_Response with SPARK_Mode is
       end if;
       
    end CreateIntruderInfo;
-                                
+   
+   procedure ArePreconditionsSatisfied 
+     (DAIDALUS_Altitude_Bands : definitions.OrderedIntervalVector;
+      DAIDALUS_Heading_Bands : definitions.OrderedIntervalVector;
+      DAIDALUS_GroundSpeed_Bands : definitions.OrderedIntervalVector;
+      Recovery_Altitude_Bands : definitions.OrderedIntervalVector;
+      Recovery_Heading_Bands : definitions.OrderedIntervalVector;
+      Recovery_GroundSpeed_Bands : definitions.OrderedIntervalVector;
+      DAIDALUS_Altitude_Zones : definitions.ZoneVector;
+      DAIDALUS_Heading_Zones : definitions.ZoneVector;
+      DAIDALUS_GroundSpeed_Zones : definitions.ZoneVector;
+      Current_State : definitions.state_parameters;
+      State_ReadyToAct : Boolean;
+      State_Status : definitions.Status_Type;
+      Config_PriorityTimeThreshold_sec : definitions.priority_time_sec;
+      Config_ActionTimeThreshold_sec : definitions.action_time_sec;
+      State_HeadingMin_deg : definitions.Heading_Type_deg;
+      State_HeadingMax_deg : definitions.Heading_Type_deg;
+      State_HeadingInterval_deg : definitions.Heading_Buffer_Type_deg;
+      State_AltitudeMin_m : definitions.Altitude_Type_m;
+      State_AltitudeMax_m : definitions.Altitude_Type_m;
+      State_AltitudeInterval_m : definitions.Altitude_Buffer_Type_m;
+      State_GroundSpeedMin_mps : definitions.GroundSpeed_Type_mps;
+      State_GroundSpeedMax_mps : definitions.GroundSpeed_Type_mps;
+      State_GroundSpeedInterval_mps : definitions.GroundSpeed_Buffer_Type_mps;
+      IsSatisfied : aliased out Boolean) with 
+     Exceptional_Cases => 
+       (Violated_precondition => IsSatisfied = False), 
+       Post => 
+         IsSatisfied and then State_Status /= InConflict and then
+       State_ReadyToAct and then 
+       Config_PriorityTimeThreshold_sec < Config_ActionTimeThreshold_sec and then
+       definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands) and then
+       definitions.Are_Legitimate_Bands (DAIDALUS_Heading_Bands) and then
+       definitions.Are_Legitimate_Bands (DAIDALUS_GroundSpeed_Bands) and then
+       definitions.Are_Legitimate_Bands (Recovery_Altitude_Bands) and then
+       definitions.Are_Legitimate_Bands (Recovery_Heading_Bands) and then
+       definitions.Are_Legitimate_Bands (Recovery_GroundSpeed_Bands) and then
+       Heading_Resolution.Heading_range_restraint 
+         (Current_State, State_HeadingMin_deg, State_HeadingMax_deg) and then
+     Heading_Resolution.correct_call_sequence (Current_State,
+                                                      DAIDALUS_Heading_Bands,
+                                                      Recovery_Heading_Bands,
+                                                      State_HeadingMax_deg,
+                                                      State_HeadingMin_deg,
+                                                      State_HeadingInterval_deg)
+     and then Altitude_Resolution.correct_call_sequence (Current_State,
+                                                        DAIDALUS_Altitude_Bands,
+                                                        Recovery_Altitude_Bands,
+                                                        State_AltitudeMax_m,
+                                                        State_AltitudeMin_m,
+                                                        State_AltitudeInterval_m)
+     and then speed_resolution.correct_call_sequence (Current_State,
+                                                     DAIDALUS_GroundSpeed_Bands,
+                                                     Recovery_GroundSpeed_Bands,
+                                                     State_GroundSpeedMax_mps,
+                                                     State_GroundSpeedMin_mps,
+                                                     State_GroundSpeedInterval_mps)
+     and then CheckSafeToReturn.SameIndices (DAIDALUS_Altitude_Bands,
+                                            DAIDALUS_Altitude_Zones)
+     and then CheckSafeToReturn.SameIndices (DAIDALUS_Heading_Bands,
+                                            DAIDALUS_Heading_Zones)
+     and then CheckSafeToReturn.SameIndices (DAIDALUS_GroundSpeed_Bands,
+                                            DAIDALUS_GroundSpeed_Zones);
+
+   procedure ArePreconditionsSatisfied 
+     (DAIDALUS_Altitude_Bands : definitions.OrderedIntervalVector;
+      DAIDALUS_Heading_Bands : definitions.OrderedIntervalVector;
+      DAIDALUS_GroundSpeed_Bands : definitions.OrderedIntervalVector;
+      Recovery_Altitude_Bands : definitions.OrderedIntervalVector;
+      Recovery_Heading_Bands : definitions.OrderedIntervalVector;
+      Recovery_GroundSpeed_Bands : definitions.OrderedIntervalVector;
+      DAIDALUS_Altitude_Zones : definitions.ZoneVector;
+      DAIDALUS_Heading_Zones : definitions.ZoneVector;
+      DAIDALUS_GroundSpeed_Zones : definitions.ZoneVector;
+      Current_State : definitions.state_parameters;
+      State_ReadyToAct : Boolean;
+      State_Status : definitions.Status_Type;
+      Config_PriorityTimeThreshold_sec : definitions.priority_time_sec;
+      Config_ActionTimeThreshold_sec : definitions.action_time_sec;
+      State_HeadingMin_deg : definitions.Heading_Type_deg;
+      State_HeadingMax_deg : definitions.Heading_Type_deg;
+      State_HeadingInterval_deg : definitions.Heading_Buffer_Type_deg;
+      State_AltitudeMin_m : definitions.Altitude_Type_m;
+      State_AltitudeMax_m : definitions.Altitude_Type_m;
+      State_AltitudeInterval_m : definitions.Altitude_Buffer_Type_m;
+      State_GroundSpeedMin_mps : definitions.GroundSpeed_Type_mps;
+      State_GroundSpeedMax_mps : definitions.GroundSpeed_Type_mps;
+      State_GroundSpeedInterval_mps : definitions.GroundSpeed_Buffer_Type_mps;
+      IsSatisfied : aliased out Boolean) is
+   begin
+      if State_ReadyToAct and then 
+       Config_PriorityTimeThreshold_sec < Config_ActionTimeThreshold_sec and then
+       definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands) and then
+       definitions.Are_Legitimate_Bands (DAIDALUS_Heading_Bands) and then
+       definitions.Are_Legitimate_Bands (DAIDALUS_GroundSpeed_Bands) and then
+       definitions.Are_Legitimate_Bands (Recovery_Altitude_Bands) and then
+       definitions.Are_Legitimate_Bands (Recovery_Heading_Bands) and then
+       definitions.Are_Legitimate_Bands (Recovery_GroundSpeed_Bands) and then
+        Heading_Resolution.Heading_range_restraint 
+          (Current_State, State_HeadingMin_deg, State_HeadingMax_deg) and then
+     Heading_Resolution.correct_call_sequence (Current_State,
+                                                      DAIDALUS_Heading_Bands,
+                                                      Recovery_Heading_Bands,
+                                                      State_HeadingMax_deg,
+                                                      State_HeadingMin_deg,
+                                                      State_HeadingInterval_deg)
+     and then Altitude_Resolution.correct_call_sequence (Current_State,
+                                                        DAIDALUS_Altitude_Bands,
+                                                        Recovery_Altitude_Bands,
+                                                        State_AltitudeMax_m,
+                                                        State_AltitudeMin_m,
+                                                        State_AltitudeInterval_m)
+     and then speed_resolution.correct_call_sequence (Current_State,
+                                                     DAIDALUS_GroundSpeed_Bands,
+                                                     Recovery_GroundSpeed_Bands,
+                                                     State_GroundSpeedMax_mps,
+                                                     State_GroundSpeedMin_mps,
+                                                     State_GroundSpeedInterval_mps)
+     and then CheckSafeToReturn.SameIndices (DAIDALUS_Altitude_Bands,
+                                            DAIDALUS_Altitude_Zones)
+     and then CheckSafeToReturn.SameIndices (DAIDALUS_Heading_Bands,
+                                            DAIDALUS_Heading_Zones)
+     and then CheckSafeToReturn.SameIndices (DAIDALUS_GroundSpeed_Bands,
+                                             DAIDALUS_GroundSpeed_Zones)
+      then 
+         IsSatisfied := True;
+      else
+         IsSatisfied := False;
+         raise Violated_precondition;
+      end if;
+   end ArePreconditionsSatisfied;
+   
    -- __TODO__
    -- Include any local types or use clauses you would like to have.
    --
@@ -499,6 +635,7 @@ package body Daidalus_Response with SPARK_Mode is
       WCV_Intervals : LMCP_Messages.WellClearViolationIntervals) is
       WCVdata : WCV_data;
       BandsSurrogate : aliased definitions.OrderedIntervalVector;
+      IntrudersSurrogate : aliased definitions.Intruder_info_Vector;
    begin
       if Common.Int64 (WCV_Intervals.EntityID) = m_DAIDALUSResponseServiceConfig.
         VehicleID
@@ -523,15 +660,22 @@ package body Daidalus_Response with SPARK_Mode is
            (LMCP_Headings          => WCV_Intervals.WCVGroundHeadingIntervals,
             LMCP_HeadingZone       => WCV_Intervals.WCVGroundHeadingRegions,
             DAIDALUS_Heading_Bands => BandsSurrogate);
+         WCVdata.HeadingBands := BandsSurrogate;
          WCVdata.HeadingZones := CreateZones 
            (WCV_Intervals.WCVGroundHeadingRegions);
          CreateGroundSpeedBands
            (LMCP_GroundSpeed           => WCV_Intervals.WCVGroundSpeedIntervals,
             LMCP_GroundSpeedZone       => WCV_Intervals.WCVGroundSpeedRegions,
             DAIDALUS_GroundSpeed_Bands => BandsSurrogate);
+         WCVdata.GroundspeedBands := BandsSurrogate;
          WCVdata.GroundspeedZones := CreateZones 
            (WCV_Intervals.WCVGroundSpeedRegions);
-         
+         CreateIntruderInfo
+           (LMCP_Intruders => WCV_Intervals.EntityList,
+            LMCP_ttlowcs   => WCV_Intervals.TimeToViolationList,
+            Intruders      => IntrudersSurrogate);
+         WCVdata.IntrudersInfo := IntrudersSurrogate;
+
          --TODO finish else ladder for throwing an exception-----------------
          if not (m_DAIDALUSResponseServiceState.Heading_Min_deg <=
                    WCVdata.CurrentState.heading_deg and then 

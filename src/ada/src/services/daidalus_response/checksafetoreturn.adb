@@ -203,8 +203,8 @@ package body CheckSafeToReturn with SPARK_Mode => On is
          SyntheticCheckState.longitude_deg, WaypointNorth, WaypointEast);
       dummyFEO := myFlatEarthObject;
       pragma Assert (dummyFEO = myFlatEarthObject);
-      pragma Assume (Float (WaypointEast - CurrentStateEast) in Float'Range);
-      pragma Assume (Float (WaypointNorth - CurrentStateNorth) in Float'Range);
+      pragma Assume (Real64 (WaypointEast - CurrentStateEast) in Real64'Range);
+      pragma Assume (Real64 (WaypointNorth - CurrentStateNorth) in Real64'Range);
       pragma Assume (not (Float (WaypointEast - CurrentStateEast) = 0.0) and
                        not (Float (WaypointNorth - CurrentStateNorth) = 0.0));
       pragma Assume (Arctan (Float (WaypointNorth - CurrentStateNorth), Float
@@ -213,13 +213,13 @@ package body CheckSafeToReturn with SPARK_Mode => On is
                     (WaypointEast - CurrentStateEast)) <= 3.14149 / 2.0);
       pragma Assume (Heading_Type_deg (Arctan (Float (WaypointNorth -
                        CurrentStateNorth), Float (WaypointEast -
-                           CurrentStateEast))) >= SafeFloat'(-3.14159 / 2.0)
+                           CurrentStateEast))) >= SafeReal64 (-3.14159 / 2.0)
                      and then
                      Heading_Type_deg (Arctan (Float (WaypointNorth -
                          CurrentStateNorth), Float (WaypointEast -
-                        CurrentStateEast))) <= SafeFloat (3.14159 / 2.0));
+                        CurrentStateEast))) <= SafeReal64 (3.14159 / 2.0));
       SyntheticCheckState.heading_deg := Angle_Wrap
-        (Heading_Type_deg (SafeFloat (Arctan (Float (WaypointNorth -
+        (Heading_Type_deg (SafeReal64 (Arctan (Float (WaypointNorth -
            CurrentStateNorth), Float (WaypointEast - CurrentStateEast)))
                                             * convertRadiansToDegrees));
 

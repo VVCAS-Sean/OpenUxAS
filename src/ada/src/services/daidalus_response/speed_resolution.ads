@@ -15,8 +15,7 @@ package speed_resolution with SPARK_Mode => On is
             GroundSpeed_Buffer_Type_mps'Last) and then
       Lower_limit >= (GroundSpeed_Type_mps'First + 
             GroundSpeed_Buffer_Type_mps'Last) and then 
-      Upper_limit - Lower_limit >= 2.0 * Interval_Constraint)
-       with Ghost;
+      Upper_limit - Lower_limit >= 2.0 * Interval_Constraint);
    
    --represents relational constraints between memeber in an interval band, 
    --assuming the container is not empty additional contraints for range 
@@ -44,8 +43,7 @@ package speed_resolution with SPARK_Mode => On is
                   MyVectorOfIntervals.Element (X, I).LowerBound +
                 2.0 * Interval_constraint) and then 
              (MyVectorOfIntervals.Element (X, I).LowerBound <= MyVectorOfIntervals.
-                  Element (X, I).UpperBound - 2.0 * Interval_constraint)))) with
-       Ghost;
+                  Element (X, I).UpperBound - 2.0 * Interval_constraint))));
    
    --predicate indicating if the current altitude is contained within one of 
    --the DAIDALUS_GroundSpeed bands indicating projected loss of well clear
@@ -55,8 +53,7 @@ package speed_resolution with SPARK_Mode => On is
      (for some I in MyVectorOfIntervals.First_Index (DAIDALUS_GroundSpeed_Bands) 
       .. MyVectorOfIntervals.Last_Index (DAIDALUS_GroundSpeed_Bands) 
       => InRange (MyVectorOfIntervals.Element 
-        (DAIDALUS_GroundSpeed_Bands, I), Current_State.groundSpeed_mps)) with 
-     Ghost; 
+        (DAIDALUS_GroundSpeed_Bands, I), Current_State.groundSpeed_mps)); 
    
    --predicate indicating if the constraints on the confict and recover bands 
    --are such that the subprogram to find an altitude resolution can be called 
@@ -85,7 +82,7 @@ package speed_resolution with SPARK_Mode => On is
        and then
          (MyVectorOfIntervals.Is_Empty (DAIDALUS_GroundSpeed_Bands) or else 
           Current_GroundSpeed_Exists_in_Bands (Current_State,
-            DAIDALUS_GroundSpeed_Bands))) with Ghost;
+            DAIDALUS_GroundSpeed_Bands)));
       
    procedure Found_WCV_GroundSpeed_Resolution
      (DAIDALUS_GroundSpeed_Bands : OrderedIntervalVector; 

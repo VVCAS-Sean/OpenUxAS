@@ -17,8 +17,7 @@ is
       and then 
       Lower_limit >= (Heading_Type_deg'First + Heading_Buffer_Type_deg'Last) 
       and then
-        Upper_limit - Lower_limit >= 2.0 * Interval_Constraint)
-       with Ghost;
+        Upper_limit - Lower_limit >= 2.0 * Interval_Constraint);
    
    --represents relational constraints between memebers in an interval band, 
    --assuming intervals are not empty. Additional constraints for range
@@ -44,7 +43,7 @@ is
              2.0 * Interval_constraint) and then 
         (MyVectorOfIntervals.Element (X, I).LowerBound <= 
              MyVectorOfIntervals.Element (X, I).UpperBound -
-             2.0 * Interval_constraint)))) with Ghost;
+             2.0 * Interval_constraint))));
    
    --predicate indicating if the current heading exists amongst interval bands 
    --leading to an impending loss of well clear
@@ -56,8 +55,7 @@ is
                            Last_Index (DAIDALUS_Heading_Bands) =>
                             InRange (MyVectorOfIntervals.Element
                             (DAIDALUS_Heading_Bands, I), Current_State.
-                             heading_deg)) 
-     with Ghost;
+                             heading_deg));
    
    --predicate indicating whether the constraints on conflict and recovery 
    --intervals are sufficiently enforced to prevent runtime errors
@@ -86,8 +84,7 @@ is
      (MyVectorOfIntervals.Is_Empty (DAIDALUS_Heading_Bands) or else
            Current_Heading_Exists_in_Bands
              (Current_State          => Current_State,
-              DAIDALUS_Heading_Bands => DAIDALUS_Heading_Bands)))
-     with Ghost;
+              DAIDALUS_Heading_Bands => DAIDALUS_Heading_Bands)));
    
    --function to return the angle wrapped version of a heading input in degrees.
    function Angle_Wrap (angle : Heading_Type_deg) return Heading_Type_deg
@@ -101,7 +98,7 @@ is
                                     Heading_Max_deg : Heading_Type_deg) 
                                     return Boolean is
        (Heading_Min_deg <= Current_State.heading_deg and then Current_State.
-          heading_deg <= Heading_Max_deg) with Ghost;
+          heading_deg <= Heading_Max_deg);
    
    --subprogram that attempts to find a resolution to an impending loss of well 
    --clear by setting the divert heading using information from DAIDALUS 

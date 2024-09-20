@@ -155,7 +155,7 @@ private
       RAltitudeBands : definitions.OrderedIntervalVector;
       RHeadingBands : definitions.OrderedIntervalVector;
       RGroundspeedBands : definitions.OrderedIntervalVector;
-      IntrudersInfo : definitions.Intruder_info;
+      IntrudersInfo : definitions.Intruder_info_Vector;
       AltitudeZones : definitions.ZoneVector;
       HeadingZones : definitions.ZoneVector;
       GroundspeedZones : definitions.ZoneVector;      

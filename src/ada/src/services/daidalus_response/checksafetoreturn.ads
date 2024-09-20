@@ -7,8 +7,7 @@ package CheckSafeToReturn with SPARK_Mode => on is
 
    function SameIndices (A : OrderedIntervalVector; B : ZoneVector) return
    Boolean is
-     (MyVectorOfIntervals.Last_Index (A) = MyVectorOfZones.Last_Index (B)) with
-       Ghost;
+     (MyVectorOfIntervals.Last_Index (A) = MyVectorOfZones.Last_Index (B));
 
    function AltitudeSafe
      (DAIDALUS_Altitude_Bands : OrderedIntervalVector;
