@@ -506,39 +506,40 @@ package body Daidalus_Response with SPARK_Mode is
       IsSatisfied : aliased out Boolean) is
    begin
       if State_ReadyToAct and then 
-       Config_PriorityTimeThreshold_sec < Config_ActionTimeThreshold_sec and then
-       definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands) and then
-       definitions.Are_Legitimate_Bands (DAIDALUS_Heading_Bands) and then
-       definitions.Are_Legitimate_Bands (DAIDALUS_GroundSpeed_Bands) and then
-       definitions.Are_Legitimate_Bands (Recovery_Altitude_Bands) and then
-       definitions.Are_Legitimate_Bands (Recovery_Heading_Bands) and then
-       definitions.Are_Legitimate_Bands (Recovery_GroundSpeed_Bands) and then
+        State_Status /= definitions.InConflict and then
+        Config_PriorityTimeThreshold_sec < Config_ActionTimeThreshold_sec and then
+        definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands) and then
+        definitions.Are_Legitimate_Bands (DAIDALUS_Heading_Bands) and then
+        definitions.Are_Legitimate_Bands (DAIDALUS_GroundSpeed_Bands) and then
+        definitions.Are_Legitimate_Bands (Recovery_Altitude_Bands) and then
+        definitions.Are_Legitimate_Bands (Recovery_Heading_Bands) and then
+        definitions.Are_Legitimate_Bands (Recovery_GroundSpeed_Bands) and then
         Heading_Resolution.Heading_range_restraint 
           (Current_State, State_HeadingMin_deg, State_HeadingMax_deg) and then
-     Heading_Resolution.correct_call_sequence (Current_State,
-                                                      DAIDALUS_Heading_Bands,
-                                                      Recovery_Heading_Bands,
-                                                      State_HeadingMax_deg,
-                                                      State_HeadingMin_deg,
-                                                      State_HeadingInterval_deg)
-     and then Altitude_Resolution.correct_call_sequence (Current_State,
-                                                        DAIDALUS_Altitude_Bands,
-                                                        Recovery_Altitude_Bands,
-                                                        State_AltitudeMax_m,
-                                                        State_AltitudeMin_m,
-                                                        State_AltitudeInterval_m)
-     and then speed_resolution.correct_call_sequence (Current_State,
-                                                     DAIDALUS_GroundSpeed_Bands,
-                                                     Recovery_GroundSpeed_Bands,
-                                                     State_GroundSpeedMax_mps,
-                                                     State_GroundSpeedMin_mps,
-                                                     State_GroundSpeedInterval_mps)
-     and then CheckSafeToReturn.SameIndices (DAIDALUS_Altitude_Bands,
-                                            DAIDALUS_Altitude_Zones)
-     and then CheckSafeToReturn.SameIndices (DAIDALUS_Heading_Bands,
-                                            DAIDALUS_Heading_Zones)
-     and then CheckSafeToReturn.SameIndices (DAIDALUS_GroundSpeed_Bands,
-                                             DAIDALUS_GroundSpeed_Zones)
+        Heading_Resolution.correct_call_sequence (Current_State,
+                                                  DAIDALUS_Heading_Bands,
+                                                  Recovery_Heading_Bands,
+                                                  State_HeadingMax_deg,
+                                                  State_HeadingMin_deg,
+                                                  State_HeadingInterval_deg)
+        and then Altitude_Resolution.correct_call_sequence (Current_State,
+                                                            DAIDALUS_Altitude_Bands,
+                                                            Recovery_Altitude_Bands,
+                                                            State_AltitudeMax_m,
+                                                            State_AltitudeMin_m,
+                                                            State_AltitudeInterval_m)
+        and then speed_resolution.correct_call_sequence (Current_State,
+                                                         DAIDALUS_GroundSpeed_Bands,
+                                                         Recovery_GroundSpeed_Bands,
+                                                         State_GroundSpeedMax_mps,
+                                                         State_GroundSpeedMin_mps,
+                                                         State_GroundSpeedInterval_mps)
+        and then CheckSafeToReturn.SameIndices (DAIDALUS_Altitude_Bands,
+                                                DAIDALUS_Altitude_Zones)
+        and then CheckSafeToReturn.SameIndices (DAIDALUS_Heading_Bands,
+                                                DAIDALUS_Heading_Zones)
+        and then CheckSafeToReturn.SameIndices (DAIDALUS_GroundSpeed_Bands,
+                                                DAIDALUS_GroundSpeed_Zones)
       then 
          IsSatisfied := True;
       else
