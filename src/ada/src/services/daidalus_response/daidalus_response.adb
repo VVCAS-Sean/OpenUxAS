@@ -740,14 +740,14 @@ package body Daidalus_Response with SPARK_Mode is
                DAIDALUS_GroundSpeed_Bands       => WCVdata.GroundspeedBands,
                Recovery_Altitude_Bands          => WCVdata.RAltitudeBands,
                Recovery_Heading_Bands           => WCVdata.RHeadingBands,
-               Recovery_Groundspeed_Bands       => WCVdata.RGroundspeedBands,
+               Recovery_GroundSpeed_Bands       => WCVdata.RGroundspeedBands,
                m_Vehicle_ID                     => 
                  m_DAIDALUSResponseServiceConfig.VehicleID,
                Intruders                        => WCVdata.IntrudersInfo,
-               DADIDALUS_Altitude_Zones         => WCVdata.AltitudeZones,
+               DAIDALUS_Altitude_Zones         => WCVdata.AltitudeZones,
                DAIDALUS_Heading_Zones           => WCVdata.HeadingZones,
                DAIDALUS_GroundSpeed_Zones       => WCVdata.GroundspeedZones,
-               m_Isready_To_Act                 => 
+               m_isReady_to_Act                 => 
                  m_DAIDALUSResponseServiceState.ReadyToAct,
                m_Action_Time_Thresold_s         => 
                  m_DAIDALUSResponseServiceConfig.ActionTimeThreshold,
