@@ -6,6 +6,7 @@ with Ada.Text_IO;                use Ada.Text_IO;
 with Common;                     use Common;
 with definitions;      
 with SPARK.Containers.Functional.Vectors;
+with automatic_response;
 with set_divert_state; 
 with Heading_Resolution; 
 with Altitude_Resolution; 
@@ -633,10 +634,17 @@ package body Daidalus_Response with SPARK_Mode is
    procedure Process_WellclearViolation_Message 
      (m_DAIDALUSResponseServiceState : in out Daidalus_Response_State;
       m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
+      m_DAIDALUSResponseServiceMailbox : in out Daidalus_Response_Mailbox;
       WCV_Intervals : LMCP_Messages.WellClearViolationIntervals) is
       WCVdata : WCV_data;
       BandsSurrogate : aliased definitions.OrderedIntervalVector;
       IntrudersSurrogate : aliased definitions.Intruder_info_Vector;
+      PreconditionsMetSurrogate : aliased Boolean;
+      DivertStateSurrogate : definitions.state_parameters;
+      RoWghostSurrogate : definitions.ID_Type;
+      ConflictResolutionListghostSurrogate : definitions.VehicleIDsVector;
+      SendNewMissionCommandghostSurrogate : Boolean;
+      SendDivertActionCommandghostSurrogate : Boolean;
    begin
       if Common.Int64 (WCV_Intervals.EntityID) = m_DAIDALUSResponseServiceConfig.
         VehicleID
@@ -678,14 +686,107 @@ package body Daidalus_Response with SPARK_Mode is
          WCVdata.IntrudersInfo := IntrudersSurrogate;
 
          --TODO finish else ladder for throwing an exception-----------------
-         if not (m_DAIDALUSResponseServiceState.Heading_Min_deg <=
-                   WCVdata.CurrentState.heading_deg and then 
-                 WCVdata.CurrentState.heading_deg <= 
-                   m_DAIDALUSResponseServiceState.Heading_Max_deg) 
+         ArePreconditionsSatisfied
+              (DAIDALUS_Altitude_Bands          => WCVdata.AltitudeBands,
+               DAIDALUS_Heading_Bands           => WCVdata.HeadingBands,
+               DAIDALUS_GroundSpeed_Bands       => WCVdata.GroundspeedBands,
+               Recovery_Altitude_Bands          => WCVdata.RAltitudeBands,
+               Recovery_Heading_Bands           => WCVdata.RHeadingBands,
+               Recovery_GroundSpeed_Bands       => WCVdata.RGroundspeedBands,
+               DAIDALUS_Altitude_Zones          => WCVdata.AltitudeZones,
+               DAIDALUS_Heading_Zones           => WCVdata.HeadingZones,
+               DAIDALUS_GroundSpeed_Zones       => WCVdata.GroundspeedZones,
+               Current_State                    => WCVdata.CurrentState,
+               State_ReadyToAct                 => 
+                 m_DAIDALUSResponseServiceState.ReadyToAct,
+               State_Status                     => 
+                 m_DAIDALUSResponseServiceState.Status,
+               Config_PriorityTimeThreshold_sec => 
+                 m_DAIDALUSResponseServiceConfig.PriorityTimeThreshold,
+               Config_ActionTimeThreshold_sec   => 
+                 m_DAIDALUSResponseServiceConfig.ActionTimeThreshold,
+               State_HeadingMin_deg             => 
+                 m_DAIDALUSResponseServiceState.Heading_Min_deg, 
+               State_HeadingMax_deg             => 
+                 m_DAIDALUSResponseServiceState.Heading_Max_deg,
+               State_HeadingInterval_deg        => 
+                 m_DAIDALUSResponseServiceState.Heading_Interval_Buffer_deg,
+               State_AltitudeMin_m              => 
+                 m_DAIDALUSResponseServiceState.Altitude_Min_m,
+               State_AltitudeMax_m              => 
+               m_DAIDALUSResponseServiceState.Altitude_Max_m,
+               State_AltitudeInterval_m         => 
+               m_DAIDALUSResponseServiceState.Altitude_Interval_Buffer_m,
+               State_GroundSpeedMin_mps         => 
+               m_DAIDALUSResponseServiceState.GroundSpeed_Min_mps,
+               State_GroundSpeedMax_mps         => 
+               m_DAIDALUSResponseServiceState.GroundSpeed_Max_mps,
+               State_GroundSpeedInterval_mps    => 
+               m_DAIDALUSResponseServiceState.GroundSpeed_Interval_Buffer_mps,
+               IsSatisfied                      => PreconditionsMetSurrogate);
+         m_DAIDALUSResponseServiceState.PreconditionsMet := 
+           PreconditionsMetSurrogate;
+         if not m_DAIDALUSResponseServiceState.PreconditionsMet 
          then
             null; --raise Program_Error;
          else
-            null;
+            automatic_response.Process_DAIDALUS_Bands
+              (Mailbox                          => 
+                 m_DAIDALUSResponseServiceMailbox,
+               Current_State                    => WCVdata.CurrentState,
+               Divert_State                     => DivertStateSurrogate,
+               DAIDALUS_Altitude_Bands          => WCVdata.AltitudeBands,
+               DAIDALUS_Heading_Bands           => WCVdata.HeadingBands,
+               DAIDALUS_GroundSpeed_Bands       => WCVdata.GroundspeedBands,
+               Recovery_Altitude_Bands          => WCVdata.RAltitudeBands,
+               Recovery_Heading_Bands           => WCVdata.RHeadingBands,
+               Recovery_Groundspeed_Bands       => WCVdata.RGroundspeedBands,
+               m_Vehicle_ID                     => 
+                 m_DAIDALUSResponseServiceConfig.VehicleID,
+               Intruders                        => WCVdata.IntrudersInfo,
+               DADIDALUS_Altitude_Zones         => WCVdata.AltitudeZones,
+               DAIDALUS_Heading_Zones           => WCVdata.HeadingZones,
+               DAIDALUS_GroundSpeed_Zones       => WCVdata.GroundspeedZones,
+               m_Isready_To_Act                 => 
+                 m_DAIDALUSResponseServiceState.ReadyToAct,
+               m_Action_Time_Thresold_s         => 
+                 m_DAIDALUSResponseServiceConfig.ActionTimeThreshold,
+               m_Priority_Time_Threshold_s      => 
+                 m_DAIDALUSResponseServiceConfig.PriorityTimeThreshold,
+               m_Status                         => 
+                 m_DAIDALUSResponseServiceState.Status,
+               m_NextWaypoint                   => 
+                 m_DAIDALUSResponseServiceState.NextWaypoint,
+               Altitude_Max_m                   => 
+                 m_DAIDALUSResponseServiceState.Altitude_Max_m,
+               Altitude_Min_m                   => 
+                 m_DAIDALUSResponseServiceState.Altitude_Min_m,
+               Altitude_Interval_Buffer_m       => 
+                 m_DAIDALUSResponseServiceState.Altitude_Interval_Buffer_m,
+               Heading_Max_deg                  => 
+                 m_DAIDALUSResponseServiceState.Heading_Max_deg,
+               Heading_Min_deg                  => 
+                 m_DAIDALUSResponseServiceState.Heading_Min_deg,
+               Heading_Interval_Buffer_deg      => 
+                 m_DAIDALUSResponseServiceState.Heading_Interval_Buffer_deg,
+               GroundSpeed_Max_mps              => 
+                 m_DAIDALUSResponseServiceState.GroundSpeed_Max_mps,
+               GroundSpeed_Min_mps              => 
+                 m_DAIDALUSResponseServiceState.GroundSpeed_Min_mps,
+               GroundSpeed_Interval_Buffer_mps  => 
+                 m_DAIDALUSResponseServiceState.GroundSpeed_Interval_Buffer_mps,
+               Is_Tracking_Next_Waypoint        => 
+                 m_DAIDALUSResponseServiceState.IsTrackingNextWaypoint,
+               m_MissionCommand                 => 
+                 m_DAIDALUSResponseServiceState.MissionCommand,
+               RoW_ghost                        => RoWghostSurrogate,
+               ConflictResolutionList_ghost     => 
+                 ConflictResolutionListghostSurrogate,
+               SendNewMissionCommand_ghost      => 
+                 SendNewMissionCommandghostSurrogate,
+               Send_Divert_Action_Command_ghost => 
+                 SendDivertActionCommandghostSurrogate);
+
          end if;
          -- TODO: Handle exceptions raised by helper functions and raise Program
          -- error to stop execution --------------------------------------------

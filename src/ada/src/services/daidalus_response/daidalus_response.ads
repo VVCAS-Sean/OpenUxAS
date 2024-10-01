@@ -82,6 +82,7 @@ package Daidalus_Response with SPARK_Mode is
       GroundSpeed_Max_mps : GroundSpeed_Type_mps := 360.111;
       GroundSpeed_Min_mps : GroundSpeed_Type_mps := 5.1444;
       GroundSpeed_Interval_Buffer_mps : GroundSpeed_Buffer_Type_mps := 10.0;
+      PreconditionsMet : Boolean;
    end record;
    
       -- __TODO__
@@ -134,6 +135,7 @@ package Daidalus_Response with SPARK_Mode is
    procedure Process_WellclearViolation_Message 
      (m_DAIDALUSResponseServiceState : in out Daidalus_Response_State;
       m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
+      m_DAIDALUSResponseServiceMailbox : in out Daidalus_Response_Mailbox;
       WCV_Intervals : LMCP_Messages.WellClearViolationIntervals);
    
    procedure Process_DAIDALUSConfiguration_Message 
