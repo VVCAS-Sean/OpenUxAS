@@ -34,20 +34,21 @@ package body Daidalus_Response with SPARK_Mode is
                                   DAIDALUS_Altitude_Bands : aliased out 
                                  definitions.OrderedIntervalVector) is
       result : definitions.OrderedIntervalVector;
+      EmptyVector : definitions.OrderedIntervalVector;
    begin
       -- Assumption used to bypass setting a precondition given that the 
       -- is true from the message without handling a check to establish the 
       -- property upon reception of the corresponding message ------------------
-      pragma Assume (Generic_Real64_Sequences.Last 
-                       (LMCP_Altitudes.Altitude) = 
-                         BandsRegion_sequences.Last 
-                         (LMCP_AltitudeZone));
+      --  pragma Assume (Generic_Real64_Sequences.Last
+      --                   (LMCP_Altitudes.Altitude) =
+      --                     BandsRegion_sequences.Last
+      --                     (LMCP_AltitudeZone));
       -- Assumption that the number of intervals is less than an allowable 
       -- maximum. --------------------------------------------------------------
-      pragma Assume (BandsRegion_sequences.Last (LMCP_AltitudeZone) <= 
+      pragma Assume (BandsRegion_sequences.Last (LMCP_AltitudeZone) <=
                        Integer (MyVectorOfIntervals.Capacity (result)));
       if Generic_Real64_Sequences.Last (LMCP_Altitudes.Altitude) =
-        BandsRegion_sequences.Last (LMCP_AltitudeZone)
+            BandsRegion_sequences.Last (LMCP_AltitudeZone)
       then
          for Index in BandsRegion_sequences.First  .. 
            BandsRegion_sequences.Last (LMCP_AltitudeZone) loop
@@ -79,7 +80,8 @@ package body Daidalus_Response with SPARK_Mode is
             raise Violated_precondition;
          end if;
       else
-         DAIDALUS_Altitude_Bands := MyVectorOfIntervals.Empty_Vector;
+         --  DAIDALUS_Altitude_Bands := MyVectorOfIntervals.Empty_Vector;
+         DAIDALUS_Altitude_Bands := EmptyVector;
          raise Inconsistent_Message;
       end if;      
       pragma Assert (definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands));
@@ -128,14 +130,15 @@ package body Daidalus_Response with SPARK_Mode is
                                   DAIDALUS_Heading_Bands : aliased out 
                                  definitions.OrderedIntervalVector) is
       result : definitions.OrderedIntervalVector;
+      EmptyVector : definitions.OrderedIntervalVector;
    begin
       -- Assumption used to bypass setting a precondition given that the 
       -- is true from the message without handling a check to establish the 
       -- property upon reception of the corresponding message ------------------
-      pragma Assume (Generic_Real64_Sequences.Last 
-                       (LMCP_Headings.GroundHeadings) = 
-                         BandsRegion_sequences.Last 
-                         (LMCP_HeadingZone));
+      --  pragma Assume (Generic_Real64_Sequences.Last
+      --                   (LMCP_Headings.GroundHeadings) =
+      --                     BandsRegion_sequences.Last
+      --                     (LMCP_HeadingZone));
       -- Assumption that the number of intervals is less than an allowable 
       -- maximum. --------------------------------------------------------------
       pragma Assume (BandsRegion_sequences.Last (LMCP_HeadingZone) <= 
@@ -173,7 +176,8 @@ package body Daidalus_Response with SPARK_Mode is
             raise Violated_precondition;
          end if;
       else
-         DAIDALUS_Heading_Bands := MyVectorOfIntervals.Empty_Vector;
+         --  DAIDALUS_Heading_Bands := MyVectorOfIntervals.Empty_Vector;
+         DAIDALUS_Heading_Bands := EmptyVector;
          raise Inconsistent_Message;
       end if;      
       pragma Assert (definitions.Are_Legitimate_Bands (DAIDALUS_Heading_Bands));
@@ -196,6 +200,7 @@ package body Daidalus_Response with SPARK_Mode is
                                   DAIDALUS_GroundSpeed_Bands : aliased out 
                                  definitions.OrderedIntervalVector) is
       result : definitions.OrderedIntervalVector;
+      EmptyVector : definitions.OrderedIntervalVector;
    begin
       -- Assumption used to bypass setting a precondition given that the 
       -- is true from the message without handling a check to establish the 
@@ -241,7 +246,8 @@ package body Daidalus_Response with SPARK_Mode is
             raise Violated_precondition;
          end if;
       else
-         DAIDALUS_GroundSpeed_Bands := MyVectorOfIntervals.Empty_Vector;
+         --  DAIDALUS_GroundSpeed_Bands := MyVectorOfIntervals.Empty_Vector;
+         DAIDALUS_GroundSpeed_Bands := EmptyVector;
          raise Inconsistent_Message;
       end if;      
       pragma Assert (definitions.Are_Legitimate_Bands 
@@ -386,6 +392,8 @@ package body Daidalus_Response with SPARK_Mode is
                                  Intruders : aliased out Intruder_info_Vector) 
    is
       result : Intruder_info_Vector;
+      EmptyVector : Intruder_info_Vector;
+      --  test1 : MyVectorOfIntruderInfo.Vector := MyVectorOfIntruderInfo.Empty_Vector;
    begin
       if IDType_sequences.Last (LMCP_Intruders) = ttlowc_sequences.Last 
         (LMCP_ttlowcs)
@@ -410,7 +418,8 @@ package body Daidalus_Response with SPARK_Mode is
          end loop;
          Intruders := result;
       else
-         Intruders := MyVectorOfIntruderInfo.Empty_Vector;
+         --  Intruders := MyVectorOfIntruderInfo.Empty_Vector;
+         Intruders := EmptyVector;
          raise Inconsistent_Message;
       end if;
       
@@ -819,6 +828,10 @@ package body Daidalus_Response with SPARK_Mode is
            MaxAltitude;
          m_DAIDALUSResponseServiceState.Altitude_Interval_Buffer_m := 
            ConfigurationMessage.AltitudeStep / 2.0;
+         m_DAIDALUSResponseServiceState.Heading_Min_deg := ConfigurationMessage.
+           LeftTrack;
+         m_DAIDALUSResponseServiceState.Heading_Max_deg := ConfigurationMessage.
+           RightTrack;
          m_DAIDALUSResponseServiceState.Heading_Interval_Buffer_deg := 
            ConfigurationMessage.TrackStep / 2.0;
          m_DAIDALUSResponseServiceState.GroundSpeed_Interval_Buffer_mps := 
@@ -837,6 +850,8 @@ package body Daidalus_Response with SPARK_Mode is
       m_DAIDALUSResponseServiceConfig : Daidalus_Response_Configuration_Data;
       MissionCommandMessage : LMCP_Messages.MissionCommand) is
       SettingState : definitions.MissionCommand;
+      use all type Int64_Seq; 
+      use all type VA_Seq;
    begin
       if MissionCommandMessage.VehicleId = m_DAIDALUSResponseServiceConfig.
         VehicleID
@@ -854,18 +869,45 @@ package body Daidalus_Response with SPARK_Mode is
             temp_val : definitions.VehicleActionList;
          begin
          
-            for val of MissionCommandMessage.VehicleActionList loop
-               declare
-                  temp_atl : definitions.Associated_Tasks_List;
-                  vehicleaction : definitions.VehicleAction;
-               begin
-                  for atl of val.AssociatedTaskList loop
-                     MyVectorOfIntegers.Append (temp_atl, Common.Int64 (atl));
-                  end loop;
-                  vehicleaction.AssociatedTaskList := temp_atl;
-                  MyVectorOfVehicleActions.Append (temp_val, vehicleaction);
-               end;
-            end loop;
+            --  pragma Assume (Integer (MyVectorOfVehicleActions.Capacity
+            --                 (temp_val)) <= Last
+            --                 (MissionCommandMessage.VehicleActionList));
+            if Last (MissionCommandMessage.VehicleActionList) <= Integer 
+                    (MyVectorOfVehicleActions.Capacity (temp_val))
+            then
+               for val of MissionCommandMessage.VehicleActionList loop
+                  pragma Loop_Invariant (MyVectorOfVehicleActions.Length 
+                                         (temp_val) < MyVectorOfVehicleActions.
+                                           Capacity (temp_val));
+                  declare
+                     temp_atl : definitions.Associated_Tasks_List;
+                     vehicleaction : definitions.VehicleAction;
+                  begin
+                     --Due to transcription from sequence to vector an assumption
+                     --is used to convey the relationship between the capacity of 
+                     --vector and the number of items transcribed------------------
+                     if Last (val.AssociatedTaskList) <= Integer
+                             (MyVectorOfIntegers.Capacity (temp_atl))
+                     then
+                        pragma Assert (MyVectorOfIntegers.Length (temp_atl) = 0);
+                        for atl of val.AssociatedTaskList loop
+                           pragma Loop_Invariant (MyVectorOfIntegers.Length
+                                                      (temp_atl) <
+                           MyVectorOfIntegers.Capacity (temp_atl));
+                           MyVectorOfIntegers.Append (temp_atl, Common.Int64 (atl));
+                        end loop;
+                        vehicleaction.AssociatedTaskList := temp_atl;
+                        MyVectorOfVehicleActions.Append (temp_val, vehicleaction);
+                     else
+                        raise Inconsistent_Message;
+                     end if;
+                     
+                  end;
+               end loop;
+            else
+               raise Inconsistent_Message;
+            end if;
+                    
             SettingState.vehicle_action_list := temp_val;
          end;
          SettingState.first_waypoint := Common.Int64 (MissionCommandMessage.FirstWaypoint);
@@ -934,6 +976,9 @@ package body Daidalus_Response with SPARK_Mode is
          end;
          m_DAIDALUSResponseServiceState.MissionCommand := SettingState;
       end if;
+   exception
+      when Inconsistent_Message =>
+         Put_Line ("Problem with data in MissionCommand message.  Unable to return to Mission.");
       
    end Process_MissionCommand_Message;
 

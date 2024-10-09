@@ -50,8 +50,8 @@ package Daidalus_Response with SPARK_Mode is
  
    type Daidalus_Response_Configuration_Data is record
       VehicleID : definitions.ID_Type := -1;
-      ActionTimeThreshold : definitions.ttlowc_sec := 25.0;
-      PriorityTimeThreshold : definitions.priority_time_sec := -15.0;
+      ActionTimeThreshold : definitions.action_time_sec := 25.0;
+      PriorityTimeThreshold : definitions.priority_time_sec := -1.0;
       
       -- __TODO__
       -- Define fields for this record. This record is intended to hold data
@@ -75,10 +75,10 @@ package Daidalus_Response with SPARK_Mode is
       IsTrackingNextWaypoint : Boolean := True;
       Altitude_Max_m : Altitude_Type_m := 10_000.0;
       Altitude_Min_m : Altitude_Type_m := 100.0;
-      Altitude_Interval_Buffer_m : Altitude_Type_m := 20.0;
+      Altitude_Interval_Buffer_m : Altitude_Buffer_Type_m := 20.0;
       Heading_Max_deg : Heading_Type_deg := 360.0;
       Heading_Min_deg : Heading_Type_deg := 0.0;
-      Heading_Interval_Buffer_deg : Heading_Type_deg := 5.0;
+      Heading_Interval_Buffer_deg : Heading_Buffer_Type_deg := 5.0;
       GroundSpeed_Max_mps : GroundSpeed_Type_mps := 360.111;
       GroundSpeed_Min_mps : GroundSpeed_Type_mps := 5.1444;
       GroundSpeed_Interval_Buffer_mps : GroundSpeed_Buffer_Type_mps := 10.0;
@@ -165,5 +165,6 @@ private
    
    Inconsistent_Message : exception;
    Violated_precondition : exception;
+   Improper_Configuration : exception;
 
 end Daidalus_Response;

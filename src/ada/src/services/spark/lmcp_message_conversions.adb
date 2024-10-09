@@ -1407,28 +1407,28 @@ package body LMCP_Message_Conversions is
    is
       Result : LMCP_Messages.DAIDALUSConfiguration;
    begin
-      Result.EntityID := Common.UInt32 (Msg.getEntityId);
-      Result.LookAheadTime := Common.Real64 (Msg.getLookAheadTime);
-      Result.LeftTrack := Common.Real64 (Msg.getLeftTrack);
-      Result.RightTrack := Common.Real64 (Msg.getRightTrack);
-      Result.MaxGroundSpeed := Common.Real64 (Msg.getMaxGroundSpeed);
-      Result.MinGroundSpeed := Common.Real64 (Msg.getMinGroundSpeed);
-      Result.MaxVerticalSpeed := Common.Real64 (Msg.getMaxVerticalSpeed);
-      Result.MinVerticalSpeed := Common.Real64 (Msg.getMinVerticalSpeed);
-      Result.MaxAltitude := Common.Real64 (Msg.getMaxAltitude);
-      Result.MinAltitude := Common.Real64 (Msg.getMinAltitude);
-      Result.TrackStep := Common.Real64 (Msg.getTrackStep);
-      Result.GroundSpeedStep := Common.Real64 (Msg.getGroundSpeedStep);
-      Result.VerticalSpeedStep := Common.Real64 (Msg.getVerticalSpeedStep);
-      Result.AltitudeStep := Common.Real64 (Msg.getAltitudeStep);
-      Result.HorizontalAcceleration := Common.Real64
+      Result.EntityID := definitions.VehicleID_type (Msg.getEntityId);
+      Result.LookAheadTime := definitions.ttlowc_sec (Msg.getLookAheadTime);
+      Result.LeftTrack := definitions.Heading_Type_deg (Msg.getLeftTrack);
+      Result.RightTrack := definitions.Heading_Type_deg (Msg.getRightTrack);
+      Result.MaxGroundSpeed := definitions.GroundSpeed_Type_mps (Msg.getMaxGroundSpeed);
+      Result.MinGroundSpeed := definitions.GroundSpeed_Type_mps (Msg.getMinGroundSpeed);
+      Result.MaxVerticalSpeed := definitions.VerticalSpeed_Type_mps (Msg.getMaxVerticalSpeed);
+      Result.MinVerticalSpeed := definitions.VerticalSpeed_Type_mps (Msg.getMinVerticalSpeed);
+      Result.MaxAltitude := definitions.Altitude_Type_m (Msg.getMaxAltitude);
+      Result.MinAltitude := definitions.Altitude_Type_m (Msg.getMinAltitude);
+      Result.TrackStep := definitions.Heading_Buffer_Type_deg (Msg.getTrackStep);
+      Result.GroundSpeedStep := definitions.GroundSpeed_Buffer_Type_mps (Msg.getGroundSpeedStep);
+      Result.VerticalSpeedStep := definitions.VerticalSpeed_Buffer_Type_mps (Msg.getVerticalSpeedStep);
+      Result.AltitudeStep := definitions.Altitude_Buffer_Type_m (Msg.getAltitudeStep);
+      Result.HorizontalAcceleration := definitions.SafeReal64
         (Msg.getHorizontalAcceleration);
-      Result.VerticalAcceleration := Common.Real64
+      Result.VerticalAcceleration := definitions.SafeReal64
         (Msg.getVerticalAcceleration);
-      Result.TurnRate := Common.Real64 (Msg.getTurnRate);
-      Result.BankAngle := Common.Real64 (Msg.getBankAngle);
-      Result.VerticalRate := Common.Real64 (Msg.getVerticalRate);
-      Result.RecoveryStabilityTime := Common.Real64
+      Result.TurnRate := definitions.SafeReal64 (Msg.getTurnRate);
+      Result.BankAngle := definitions.Heading_Type_deg (Msg.getBankAngle);
+      Result.VerticalRate := definitions.VerticalSpeed_Type_mps (Msg.getVerticalRate);
+      Result.RecoveryStabilityTime := definitions.SafeReal64
         (Msg.getRecoveryStabilityTime);
       Result.isRecoveryTrackBands := Msg.getisRecoveryTrackBands;
       Result.isRecoveryGroundSpeedBands := Msg.getisRecoveryGroundSpeedBands;
@@ -1438,23 +1438,23 @@ package body LMCP_Message_Conversions is
       Result.isCollisionAvoidanceBands := Msg.getisCollisionAvoidanceBands;
       Result.CollisionAvoidanceBandsFactor :=
         Msg.getCollisionAvoidanceBandsFactor;
-      Result.HorizontalNMAC := Common.Real64 (Msg.getHorizontalNMAC);
-      Result.MinHorizontalRecovery := Common.Real64
+      Result.HorizontalNMAC := definitions.SafeReal64 (Msg.getHorizontalNMAC);
+      Result.MinHorizontalRecovery := definitions.SafeReal64
         (Msg.getMinHorizontalRecovery);
-      Result.VerticalNMAC := Common.Real64 (Msg.getVerticalNMAC);
-      Result.MinVerticalRecovery := Common.Real64 (Msg.getMinVerticalRecovery);
-      Result.HorizontalContourThreshold := Common.Real64
+      Result.VerticalNMAC := definitions.SafeReal64 (Msg.getVerticalNMAC);
+      Result.MinVerticalRecovery := definitions.SafeReal64 (Msg.getMinVerticalRecovery);
+      Result.HorizontalContourThreshold := definitions.SafeReal64
         (Msg.getHorizontalContourThreshold);
-      Result.DTHR := Common.Real64 (Msg.getDTHR);
-      Result.ZTHR := Common.Real64 (Msg.getZTHR);
-      Result.TTHR := Common.Real64 (Msg.getTTHR);
+      Result.DTHR := definitions.SafeReal64 (Msg.getDTHR);
+      Result.ZTHR := definitions.SafeReal64 (Msg.getZTHR);
+      Result.TTHR := definitions.SafeReal64 (Msg.getTTHR);
       Result.RTCAAlertLevels := Common.UInt32 (Msg.getRTCAAlertLevels);
-      Result.AlertTime1 := Common.Real64 (Msg.getAlertTime1);
-      Result.EarlyAlertTime1 := Common.Real64 (Msg.getEarlyAlertTime1);
-      Result.AlertTime2 := Common.Real64 (Msg.getAlertTime2);
-      Result.EarlyAlertTime2 := Common.Real64 (Msg.getEarlyAlertTime2);
-      Result.AlertTime3 := Common.Real64 (Msg.getAlertTime3);
-      Result.EarlyAlertTime3 := Common.Real64 (Msg.getEarlyAlertTime3);
+      Result.AlertTime1 := definitions.ttlowc_sec (Msg.getAlertTime1);
+      Result.EarlyAlertTime1 := definitions.ttlowc_sec (Msg.getEarlyAlertTime1);
+      Result.AlertTime2 := definitions.ttlowc_sec (Msg.getAlertTime2);
+      Result.EarlyAlertTime2 := definitions.ttlowc_sec (Msg.getEarlyAlertTime2);
+      Result.AlertTime3 := definitions.ttlowc_sec (Msg.getAlertTime3);
+      Result.EarlyAlertTime3 := definitions.ttlowc_sec (Msg.getEarlyAlertTime3);
       Result.HorizontalDetectionType := Msg.getHorizontalDetectionType;
 
       return Result;
@@ -1617,7 +1617,7 @@ package body LMCP_Message_Conversions is
            (Result.TimeToViolationList, definitions.ttlowc_sec (ViolationTime));
       end loop;
       for AlertLevel of Msg.all.getAlertLevelList.all loop
-         Result.AlertLevelList := LMCP_Messages.Add (Result.AlertLevelList,
+         Result.AlertLevelList := LMCP_Messages.Real64_sequences.Add (Result.AlertLevelList,
                                        Real64 (AlertLevel));
       end loop;
       Result.EntityID := definitions.ID_Type (Msg.all.getEntityId);

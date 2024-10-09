@@ -33,6 +33,7 @@ package Common with SPARK_Mode is
      (Index_Type   => Positive,
       Element_Type => Int64);
    type Int64_Seq is new Int64_Sequences.Sequence;
+   --  subtype Int64_Seq is Int64_Sequences.Sequence;
 
    package Int64_Sets is new SPARK.Containers.Functional.Sets (Int64);
    type Int64_Set is new Int64_Sets.Set;

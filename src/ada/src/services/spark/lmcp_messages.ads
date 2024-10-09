@@ -388,7 +388,7 @@ package LMCP_Messages with SPARK_Mode is
 
    type DAIDALUSConfiguration is new Message_Root with record
       --Entity ID that generated this message
-      EntityID : UInt32 := 0;
+      EntityID : VehicleID_type := 0;
       --Time horizon of all DAIDALUS functions
       LookAheadTime : ttlowc_sec := 0.0;
       --Relative maximum horizontal direction maneuver to the left of current
@@ -537,7 +537,7 @@ package LMCP_Messages with SPARK_Mode is
      (Index_Type                     => Positive,
       Element_Type                   => SafeReal64);
 
-   type Real64_Seq is new Real64_sequences.Sequence;
+   subtype Real64_Seq is Real64_sequences.Sequence;
 
    package BandsRegion_sequences is new Spark.Containers.Functional.Vectors
      (Index_Type => Positive,
@@ -547,7 +547,7 @@ package LMCP_Messages with SPARK_Mode is
 
    package IDType_sequences is new Spark.Containers.Functional.Vectors
      (Index_Type => Positive,
-      Element_Type => definitions.ID_Type);
+      Element_Type => definitions.VehicleID_type);
 
    subtype IDType_seq is IDType_sequences.Sequence;
 
@@ -561,7 +561,7 @@ package LMCP_Messages with SPARK_Mode is
       EntityList : IDType_seq;
       TimeToViolationList : ttlowc_seq;
       AlertLevelList : Real64_Seq;
-      EntityID : ID_Type;
+      EntityID : VehicleID_type;
       CurrentHeading : Heading_Type_deg;
       CurrentGroundSpeed : GroundSpeed_Type_mps;
       CurrentVerticalSpeed : VerticalSpeed_Type_mps;
