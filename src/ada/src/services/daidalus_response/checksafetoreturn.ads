@@ -9,17 +9,21 @@ package CheckSafeToReturn with SPARK_Mode => on is
    Boolean is
      (MyVectorOfIntervals.Last_Index (A) = MyVectorOfZones.Last_Index (B));
 
+   function SameIndices (A : OrderedIntervalVector32; B : ZoneVector) return
+     Boolean is
+       (MyVectorOfIntervals32.Last_Index (A) = MyVectorOfZones.Last_Index (B));
+
    function AltitudeSafe
-     (DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       DAIDALUS_Altitude_Classification_Bands : ZoneVector;
       State : state_parameters) return Boolean is
-     ((for all I in MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) ..
-         MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) => not InRange
-       (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, I),
-          State.altitude_m)) or else (for some J in MyVectorOfIntervals.
-             First_Index (DAIDALUS_Altitude_Bands) .. MyVectorOfIntervals.
+     ((for all I in MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands) ..
+         MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) => not InRange
+       (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands, I),
+          State.altitude_m)) or else (for some J in MyVectorOfIntervals32.
+             First_Index (DAIDALUS_Altitude_Bands) .. MyVectorOfIntervals32.
            Last_Index (DAIDALUS_Altitude_Bands) =>
-            InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, J),
+            InRange (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands, J),
            State.altitude_m) and then not (MyVectorOfZones.
              Element (DAIDALUS_Altitude_Classification_Bands, J) = Near)))
      with
@@ -55,7 +59,7 @@ package CheckSafeToReturn with SPARK_Mode => on is
        Pre => SameIndices (X_Bands, X_Classification_Bands), Ghost;
 
    procedure SafeToReturn
-     (DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       DAIDALUS_Heading_Bands : OrderedIntervalVector;
       DAIDALUS_GroundSpeed_Bands : OrderedIntervalVector;
       DAIDALUS_Altitude_Classification_Bands : ZoneVector;

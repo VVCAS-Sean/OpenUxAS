@@ -151,10 +151,10 @@ package Daidalus_Response with SPARK_Mode is
 private
    type WCV_data is record
       CurrentState : definitions.state_parameters;
-      AltitudeBands : definitions.OrderedIntervalVector;
+      AltitudeBands : definitions.OrderedIntervalVector32;
       HeadingBands : definitions.OrderedIntervalVector;
       GroundspeedBands : definitions.OrderedIntervalVector;
-      RAltitudeBands : definitions.OrderedIntervalVector;
+      RAltitudeBands : definitions.OrderedIntervalVector32;
       RHeadingBands : definitions.OrderedIntervalVector;
       RGroundspeedBands : definitions.OrderedIntervalVector;
       IntrudersInfo : definitions.Intruder_info_Vector;

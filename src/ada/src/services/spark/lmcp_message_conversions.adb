@@ -1517,14 +1517,14 @@ package body LMCP_Message_Conversions is
 
    function As_AltitudeInterval_Message
      (Msg : not null AltitudeInterval_Acc) return
-     LMCP_Messages.Real64_Array
+     LMCP_Messages.Real32_Array
    is
       Result : LMCP_Messages.Real64_Array;
       AltInterval : constant larcfm.DAIDALUS.AltitudeInterval.Real64_2D :=
         Msg.all.getAltitude.all;
       use LMCP_Messages; use Common;
    begin
-      Result := (Real64 (AltInterval'First), Real64 (AltInterval'Last));
+      Result := (Real32 (AltInterval'First), Real32 (AltInterval'Last));
       return Result;
    end As_AltitudeInterval_Message;
 
@@ -1585,14 +1585,14 @@ package body LMCP_Message_Conversions is
 
    function As_AltitudeRecoveryInterval_Message
      (Msg : not null AltitudeRecoveryInterval_Acc) return
-     LMCP_Messages.Real64_Array
+     LMCP_Messages.Real32_Array
    is
       Result : LMCP_Messages.Real64_Array;
       ARInterval : constant larcfm.DAIDALUS.AltitudeRecoveryInterval.Real64_2D
         := Msg.all.getRecoveryAltitude.all;
       use LMCP_Messages; use Common;
    begin
-      Result := (Real64 (ARInterval'First), Real64 (ARInterval'Last));
+      Result := (Real32 (ARInterval'First), Real32 (ARInterval'Last));
       return Result;
    end As_AltitudeRecoveryInterval_Message;
 
@@ -1710,7 +1710,7 @@ package body LMCP_Message_Conversions is
       end loop;
       for AltitudeInterval_Vector of Msg.all.getWCVAlitudeIntervals.all loop
          Result.WCVAltitudeIntervals.Altitude := LMCP_Messages.
-           Generic_Real64_Sequences.Add
+           Generic_Real32_Sequences.Add
            (Result.WCVAltitudeIntervals.Altitude,
             As_AltitudeInterval_Message (AltitudeInterval_Vector));
       end loop;
@@ -1757,7 +1757,7 @@ package body LMCP_Message_Conversions is
       for RecoveryAltitudeInterval_Vector of Msg.all.
         getRecoveryAltitudeIntervals.all loop
          Result.RecoveryAltitudeIntervals.RecoveryAltitude := LMCP_Messages.
-           Generic_Real64_Sequences.Add
+           Generic_Real32_Sequences.Add
            (Result.RecoveryAltitudeIntervals.RecoveryAltitude,
             As_AltitudeRecoveryInterval_Message
               (RecoveryAltitudeInterval_Vector));

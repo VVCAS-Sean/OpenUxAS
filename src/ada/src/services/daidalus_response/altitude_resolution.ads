@@ -21,38 +21,38 @@ package Altitude_Resolution with SPARK_Mode => On is
    --represents relational constraints between memebers in an interval band, 
    --assuming the container is not empty additional contraints for range 
    --protection
-   function vector_constraints (X : OrderedIntervalVector;
+   function vector_constraints (X : OrderedIntervalVector32;
                                Upper_limit : Altitude_Type_m; 
                                Lower_limit : Altitude_Type_m; 
                                Interval_constraint : Altitude_Buffer_Type_m) 
                                return Boolean is 
-     (if not MyVectorOfIntervals.Is_Empty (X) then 
-       ((for all I in MyVectorOfIntervals.First_Index (X) .. 
-         MyVectorOfIntervals.Last_Index (X) =>
-        (MyVectorOfIntervals.Element (X, I).LowerBound >= Lower_limit) and then 
-        (MyVectorOfIntervals.Element (X, I).UpperBound <= Upper_limit) and then
-        (MyVectorOfIntervals.Element (X, I).UpperBound + 
+     (if not MyVectorOfIntervals32.Is_Empty (X) then 
+       ((for all I in MyVectorOfIntervals32.First_Index (X) .. 
+         MyVectorOfIntervals32.Last_Index (X) =>
+        (MyVectorOfIntervals32.Element (X, I).LowerBound >= Lower_limit) and then 
+        (MyVectorOfIntervals32.Element (X, I).UpperBound <= Upper_limit) and then
+        (MyVectorOfIntervals32.Element (X, I).UpperBound + 
                  Altitude_Buffer_Type_m'Last <= Altitude_Type_m'Last) and then 
-        (MyVectorOfIntervals.Element (X, I).LowerBound - 
+        (MyVectorOfIntervals32.Element (X, I).LowerBound - 
                 Altitude_Buffer_Type_m'Last >= Altitude_Type_m'First) and then
-        (MyVectorOfIntervals.Element (X, I).UpperBound - 
-           MyVectorOfIntervals.Element (X, I).LowerBound
+        (MyVectorOfIntervals32.Element (X, I).UpperBound - 
+           MyVectorOfIntervals32.Element (X, I).LowerBound
                   >= 2.0 * Interval_constraint) and then
-        (MyVectorOfIntervals.Element (X, I).UpperBound >= 
-           MyVectorOfIntervals.Element (X, I).LowerBound +
+        (MyVectorOfIntervals32.Element (X, I).UpperBound >= 
+           MyVectorOfIntervals32.Element (X, I).LowerBound +
                  2.0 * Interval_constraint) and then 
-        (MyVectorOfIntervals.Element (X, I).LowerBound <= 
-           MyVectorOfIntervals.Element (X, I).UpperBound -
+        (MyVectorOfIntervals32.Element (X, I).LowerBound <= 
+           MyVectorOfIntervals32.Element (X, I).UpperBound -
                   2.0 * Interval_constraint))));
    
    --predicate indicating if the current altitude is contained within one of 
    --the DAIDALUS_Altitude bands indicating projected loss of well clear
    function Current_Altitude_Exists_in_Bands
      (Current_State : state_parameters; 
-      DAIDALUS_Altitude_Bands : OrderedIntervalVector) return Boolean is 
-     (for some I in MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) 
-          .. MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) =>
-           InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, I), 
+      DAIDALUS_Altitude_Bands : OrderedIntervalVector32) return Boolean is 
+     (for some I in MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands) 
+          .. MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) =>
+           InRange (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands, I), 
         Current_State.altitude_m));
 
    --predicate indicating if the constraints on the confict and recover bands
@@ -60,8 +60,8 @@ package Altitude_Resolution with SPARK_Mode => On is
    --without producing a runtime error.
    function correct_call_sequence
      (Current_State : state_parameters; 
-      DAIDALUS_Altitude_Bands : OrderedIntervalVector; 
-      Recovery_Altitude_bands : OrderedIntervalVector; 
+      DAIDALUS_Altitude_Bands : OrderedIntervalVector32; 
+      Recovery_Altitude_bands : OrderedIntervalVector32; 
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m; 
       Altitude_Interval_Buffer : Altitude_Buffer_Type_m) return Boolean is
@@ -78,12 +78,12 @@ package Altitude_Resolution with SPARK_Mode => On is
                            Upper_limit         => Altitude_Max_m,
                            Lower_limit         => Altitude_Min_m,
                            Interval_constraint => Altitude_Interval_Buffer) 
-      and then (MyVectorOfIntervals.Is_Empty (DAIDALUS_Altitude_Bands) or else 
+      and then (MyVectorOfIntervals32.Is_Empty (DAIDALUS_Altitude_Bands) or else 
       Current_Altitude_Exists_in_Bands (Current_State, DAIDALUS_Altitude_Bands)));
         
    procedure Found_WCV_Altitude_Resolution 
-     (DAIDALUS_Altitude_Bands : OrderedIntervalVector; 
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : OrderedIntervalVector32; 
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Current_State : state_parameters; 
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;

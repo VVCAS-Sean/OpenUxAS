@@ -21,9 +21,9 @@ package body Daidalus_Response with SPARK_Mode is
    procedure CreateAltitudeBands (LMCP_Altitudes : AltitudeInterval; 
                                   LMCP_AltitudeZone : BandsRegion_seq;
                                   DAIDALUS_Altitude_Bands : aliased out 
-                                    definitions.OrderedIntervalVector) with 
+                                    definitions.OrderedIntervalVector32) with 
        Exceptional_Cases =>
-         (Inconsistent_Message => MyVectorOfIntervals.Is_Empty
+         (Inconsistent_Message => MyVectorOfIntervals32.Is_Empty
             (DAIDALUS_Altitude_Bands),
           Violated_precondition => 
                not definitions.Are_Legitimate_Bands (DAIDALUS_Altitude_Bands)),
@@ -32,37 +32,37 @@ package body Daidalus_Response with SPARK_Mode is
    procedure CreateAltitudeBands (LMCP_Altitudes : AltitudeInterval;
                                   LMCP_AltitudeZone : BandsRegion_seq;
                                   DAIDALUS_Altitude_Bands : aliased out 
-                                 definitions.OrderedIntervalVector) is
-      result : definitions.OrderedIntervalVector;
-      EmptyVector : definitions.OrderedIntervalVector;
+                                 definitions.OrderedIntervalVector32) is
+      result : definitions.OrderedIntervalVector32;
+      EmptyVector : definitions.OrderedIntervalVector32;
    begin
       -- Assumption used to bypass setting a precondition given that the 
       -- is true from the message without handling a check to establish the 
       -- property upon reception of the corresponding message ------------------
-      --  pragma Assume (Generic_Real64_Sequences.Last
+      --  pragma Assume (Generic_Real32_Sequences.Last
       --                   (LMCP_Altitudes.Altitude) =
       --                     BandsRegion_sequences.Last
       --                     (LMCP_AltitudeZone));
       -- Assumption that the number of intervals is less than an allowable 
       -- maximum. --------------------------------------------------------------
       pragma Assume (BandsRegion_sequences.Last (LMCP_AltitudeZone) <=
-                       Integer (MyVectorOfIntervals.Capacity (result)));
-      if Generic_Real64_Sequences.Last (LMCP_Altitudes.Altitude) =
+                       Integer (MyVectorOfIntervals32.Capacity (result)));
+      if Generic_Real32_Sequences.Last (LMCP_Altitudes.Altitude) =
             BandsRegion_sequences.Last (LMCP_AltitudeZone)
       then
          for Index in BandsRegion_sequences.First  .. 
            BandsRegion_sequences.Last (LMCP_AltitudeZone) loop
-            pragma Assert (Index in Generic_Real64_Sequences.First .. 
-                             Generic_Real64_Sequences.Last 
+            pragma Assert (Index in Generic_Real32_Sequences.First .. 
+                             Generic_Real32_Sequences.Last 
                                (LMCP_Altitudes.Altitude));
-            pragma Loop_Invariant (Integer (MyVectorOfIntervals.Length (result))
+            pragma Loop_Invariant (Integer (MyVectorOfIntervals32.Length (result))
                                    = Index - BandsRegion_sequences.First);
             declare
-               temp_interval : definitions.interval;
+               temp_interval : definitions.interval32;
             begin
-               temp_interval.LowerBound := Generic_Real64_Sequences.Get 
+               temp_interval.LowerBound := Generic_Real32_Sequences.Get 
                     (LMCP_Altitudes.Altitude, Index)(1);
-               temp_interval.UpperBound := Generic_Real64_Sequences.Get 
+               temp_interval.UpperBound := Generic_Real32_Sequences.Get 
                  (LMCP_Altitudes.Altitude, Index)(2);
                case BandsRegion_sequences.Get (LMCP_AltitudeZone, Index) is
                   when LMCP_Messages.MID => temp_interval.Classification := 
@@ -72,7 +72,7 @@ package body Daidalus_Response with SPARK_Mode is
                   when LMCP_Messages.FAR => temp_interval.Classification :=
                        definitions.Far;
                end case;
-               MyVectorOfIntervals.Append (result, temp_interval);
+               MyVectorOfIntervals32.Append (result, temp_interval);
             end;
          end loop;
          DAIDALUS_Altitude_Bands := result;
@@ -80,7 +80,7 @@ package body Daidalus_Response with SPARK_Mode is
             raise Violated_precondition;
          end if;
       else
-         --  DAIDALUS_Altitude_Bands := MyVectorOfIntervals.Empty_Vector;
+         --  DAIDALUS_Altitude_Bands := MyVectorOfIntervals32.Empty_Vector;
          DAIDALUS_Altitude_Bands := EmptyVector;
          raise Inconsistent_Message;
       end if;      
@@ -257,7 +257,7 @@ package body Daidalus_Response with SPARK_Mode is
    
    procedure CreateRecoveryAltitudeBands 
      (LMCP_RecoveryAltitudeBands : AltitudeInterval;
-      Recovery_Altitude_Bands : aliased out OrderedIntervalVector) with 
+      Recovery_Altitude_Bands : aliased out OrderedIntervalVector32) with 
      Exceptional_Cases => 
        (Violated_precondition => 
           not definitions.Are_Legitimate_Bands (Recovery_Altitude_Bands)),
@@ -265,29 +265,29 @@ package body Daidalus_Response with SPARK_Mode is
    
    procedure CreateRecoveryAltitudeBands 
      (LMCP_RecoveryAltitudeBands : AltitudeInterval;
-      Recovery_Altitude_Bands : aliased out OrderedIntervalVector) is
-      result : OrderedIntervalVector;
+      Recovery_Altitude_Bands : aliased out OrderedIntervalVector32) is
+      result : OrderedIntervalVector32;
    begin
       -- Assumption that the number of intervals is less than an allowable 
       -- maximum. --------------------------------------------------------------
       pragma Assume 
-        (Generic_Real64_Sequences.Last 
+        (Generic_Real32_Sequences.Last 
          (LMCP_RecoveryAltitudeBands.Altitude) <=
-            Integer (MyVectorOfIntervals.Capacity (result)));
-      for Index in Generic_Real64_Sequences.First .. 
-        Generic_Real64_Sequences.Last (LMCP_RecoveryAltitudeBands.Altitude) loop
-         pragma Loop_Invariant (Integer (MyVectorOfIntervals.Length (result)) < 
+            Integer (MyVectorOfIntervals32.Capacity (result)));
+      for Index in Generic_Real32_Sequences.First .. 
+        Generic_Real32_Sequences.Last (LMCP_RecoveryAltitudeBands.Altitude) loop
+         pragma Loop_Invariant (Integer (MyVectorOfIntervals32.Length (result)) < 
                                   Index);
          declare
-            temp : interval;
+            temp : interval32;
          begin
-            temp.LowerBound := Generic_Real64_Sequences.Get 
+            temp.LowerBound := Generic_Real32_Sequences.Get 
               (LMCP_RecoveryAltitudeBands.Altitude, Index)(1);
-            temp.UpperBound := Generic_Real64_Sequences.Get 
+            temp.UpperBound := Generic_Real32_Sequences.Get 
               (LMCP_RecoveryAltitudeBands.Altitude, Index)(2);
             --Zone classification for Recovery bands not utilized.--------------
             temp.Classification := definitions.Near;
-            MyVectorOfIntervals.Append (result, temp);
+            MyVectorOfIntervals32.Append (result, temp);
          end;
       end loop;
       Recovery_Altitude_Bands := result;
@@ -426,10 +426,10 @@ package body Daidalus_Response with SPARK_Mode is
    end CreateIntruderInfo;
    
    procedure ArePreconditionsSatisfied 
-     (DAIDALUS_Altitude_Bands : definitions.OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : definitions.OrderedIntervalVector32;
       DAIDALUS_Heading_Bands : definitions.OrderedIntervalVector;
       DAIDALUS_GroundSpeed_Bands : definitions.OrderedIntervalVector;
-      Recovery_Altitude_Bands : definitions.OrderedIntervalVector;
+      Recovery_Altitude_Bands : definitions.OrderedIntervalVector32;
       Recovery_Heading_Bands : definitions.OrderedIntervalVector;
       Recovery_GroundSpeed_Bands : definitions.OrderedIntervalVector;
       DAIDALUS_Altitude_Zones : definitions.ZoneVector;
@@ -490,10 +490,10 @@ package body Daidalus_Response with SPARK_Mode is
                                             DAIDALUS_GroundSpeed_Zones);
 
    procedure ArePreconditionsSatisfied 
-     (DAIDALUS_Altitude_Bands : definitions.OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : definitions.OrderedIntervalVector32;
       DAIDALUS_Heading_Bands : definitions.OrderedIntervalVector;
       DAIDALUS_GroundSpeed_Bands : definitions.OrderedIntervalVector;
-      Recovery_Altitude_Bands : definitions.OrderedIntervalVector;
+      Recovery_Altitude_Bands : definitions.OrderedIntervalVector32;
       Recovery_Heading_Bands : definitions.OrderedIntervalVector;
       Recovery_GroundSpeed_Bands : definitions.OrderedIntervalVector;
       DAIDALUS_Altitude_Zones : definitions.ZoneVector;
@@ -647,6 +647,7 @@ package body Daidalus_Response with SPARK_Mode is
       WCV_Intervals : LMCP_Messages.WellClearViolationIntervals) is
       WCVdata : WCV_data;
       BandsSurrogate : aliased definitions.OrderedIntervalVector;
+      BandsSurrogate32 : aliased definitions.OrderedIntervalVector32;
       IntrudersSurrogate : aliased definitions.Intruder_info_Vector;
       PreconditionsMetSurrogate : aliased Boolean;
       DivertStateSurrogate : definitions.state_parameters;
@@ -670,8 +671,8 @@ package body Daidalus_Response with SPARK_Mode is
          CreateAltitudeBands
            (LMCP_Altitudes          => WCV_Intervals.WCVAltitudeIntervals,
             LMCP_AltitudeZone       => WCV_Intervals.WCVAltitudeRegions,
-            DAIDALUS_Altitude_Bands => BandsSurrogate); 
-         WCVdata.AltitudeBands := BandsSurrogate;
+            DAIDALUS_Altitude_Bands => BandsSurrogate32); 
+         WCVdata.AltitudeBands := BandsSurrogate32;
          WCVdata.AltitudeZones := CreateZones 
            (WCV_Intervals.WCVAltitudeRegions);
          CreateHeadingBands 
@@ -869,17 +870,17 @@ package body Daidalus_Response with SPARK_Mode is
             temp_val : definitions.VehicleActionList;
          begin
          
-            --  pragma Assume (Integer (MyVectorOfVehicleActions.Capacity
-            --                 (temp_val)) <= Last
-            --                 (MissionCommandMessage.VehicleActionList));
             if Last (MissionCommandMessage.VehicleActionList) <= Integer 
                     (MyVectorOfVehicleActions.Capacity (temp_val))
             then
-               for val of MissionCommandMessage.VehicleActionList loop
-                  pragma Loop_Invariant (MyVectorOfVehicleActions.Length 
-                                         (temp_val) < MyVectorOfVehicleActions.
-                                           Capacity (temp_val));
+               --  for val of MissionCommandMessage.VehicleActionList loop
+               for Index1 in Positive'First .. Last 
+                 (MissionCommandMessage.VehicleActionList) loop
+                  pragma Loop_Invariant (Integer (MyVectorOfVehicleActions.
+                                           Length (temp_val)) = (Index1 - 1));
                   declare
+                     val : LMCP_Messages.VehicleAction := Get 
+                       (MissionCommandMessage.VehicleActionList, Index1);
                      temp_atl : definitions.Associated_Tasks_List;
                      vehicleaction : definitions.VehicleAction;
                   begin
@@ -890,11 +891,16 @@ package body Daidalus_Response with SPARK_Mode is
                              (MyVectorOfIntegers.Capacity (temp_atl))
                      then
                         pragma Assert (MyVectorOfIntegers.Length (temp_atl) = 0);
-                        for atl of val.AssociatedTaskList loop
-                           pragma Loop_Invariant (MyVectorOfIntegers.Length
-                                                      (temp_atl) <
-                           MyVectorOfIntegers.Capacity (temp_atl));
-                           MyVectorOfIntegers.Append (temp_atl, Common.Int64 (atl));
+                        --  for atl of val.AssociatedTaskList loop
+                        --     Increment_Ghost_Index (Index);
+                        for Index2 in Positive'First .. Last (val.AssociatedTaskList) loop
+                           pragma Loop_Invariant (Integer (MyVectorOfIntegers.
+                                                    Length (temp_atl)) = 
+                                                  (Index2 - 1));
+                           --  MyVectorOfIntegers.Append (temp_atl, Common.Int64 (atl));
+                           MyVectorOfIntegers.Append (temp_atl, Get 
+                                                      (val.AssociatedTaskList, 
+                                                         Index2));
                         end loop;
                         vehicleaction.AssociatedTaskList := temp_atl;
                         MyVectorOfVehicleActions.Append (temp_val, vehicleaction);
@@ -922,16 +928,30 @@ package body Daidalus_Response with SPARK_Mode is
                     (waypointlist.Number);
                   temp_waypoint.next_waypoint := Common.Int64 
                     (waypointlist.NextWaypoint);
-                  temp_waypoint.speed := definitions.GroundSpeed_Type_mps 
-                    (waypointlist.Speed);
+                  if waypointlist.Speed in Common.Real32 
+                    (GroundSpeed_Type_mps'First) .. Common.Real32 
+                    (GroundSpeed_Type_mps'Last) 
+                  then
+                     temp_waypoint.speed := definitions.GroundSpeed_Type_mps 
+                       (waypointlist.Speed);
+                  else
+                     raise Improper_Configuration;
+                  end if;
                   case waypointlist.SpeedType is
                   when Airspeed => temp_waypoint.speed_type := 
                        definitions.Airspeed;
                   when Groundspeed => temp_waypoint.speed_type :=
                        definitions.Groundspeed;
                   end case;
-                  temp_waypoint.climb_rate := definitions.VerticalSpeed_Type_mps 
-                    (waypointlist.ClimbRate);
+                  if waypointlist.ClimbRate in Common.Real32 
+                    (VerticalSpeed_Type_mps'First) .. Common.Real32 
+                    (VerticalSpeed_Type_mps'Last) 
+                  then
+                     temp_waypoint.climb_rate := definitions.VerticalSpeed_Type_mps 
+                       (waypointlist.ClimbRate);
+                  else 
+                     raise Improper_Configuration;
+                  end if;
                   case waypointlist.TurnType is 
                   when TurnShort => temp_waypoint.turn_type := 
                        definitions.TurnShort;
@@ -941,20 +961,51 @@ package body Daidalus_Response with SPARK_Mode is
                   declare
                      val : definitions.VehicleActionList;
                   begin
-                     for lmcp_val of waypointlist.VehicleActionList loop
-                        declare
-                           val_atl : definitions.Associated_Tasks_List;
-                           vehicleaction : definitions.VehicleAction;
-                        begin
-                           for atl of lmcp_val.AssociatedTaskList loop
-                              MyVectorOfIntegers.Append (val_atl, Common.Int64 
-                                                         (atl));
-                           end loop;
-                           vehicleaction.AssociatedTaskList := val_atl;
-                           MyVectorOfVehicleActions.Append (val, vehicleaction);
-                        end;
-                     end loop;
-                     temp_waypoint.vehicle_action_list := val;
+                     --  for lmcp_val of waypointlist.VehicleActionList loop
+                     if Last (waypointlist.VehicleActionList) <= Integer 
+                       (MyVectorOfVehicleActions.Capacity (val))
+                     then
+                           
+                        for Index1 in Positive'First .. Last 
+                          (waypointlist.VehicleActionList) loop
+                           pragma Loop_Invariant (Integer 
+                                                  (MyVectorOfVehicleActions.
+                                                       Length (val)) = 
+                                                    Index1 - 1);
+                           declare
+                              lmcp_val : LMCP_Messages.VehicleAction := Get 
+                                (waypointlist.VehicleActionList, Index1);
+                              val_atl : definitions.Associated_Tasks_List;
+                              vehicleaction : definitions.VehicleAction;
+                           begin
+                              if Last (lmcp_val.AssociatedTaskList) <= Integer 
+                                (MyVectorOfIntegers.Capacity (val_atl)) 
+                              then
+                                 for Index2 in Positive'First .. Last 
+                                   (lmcp_val.AssociatedTaskList) loop
+                                    pragma Loop_Invariant (Integer 
+                                                           (MyVectorOfIntegers.
+                                                                Length (val_atl)) 
+                                                           = Index2 - 1);
+                                    MyVectorOfIntegers.Append (val_atl, Get 
+                                                               (lmcp_val.
+                                                                    AssociatedTaskList
+                                                                  , Index2));
+                                 end loop;
+                                 vehicleaction.AssociatedTaskList := val_atl;
+                                 MyVectorOfVehicleActions.Append 
+                                   (val, vehicleaction);
+                              else
+                                 raise Inconsistent_Message;
+                              end if;
+                                 
+                           end;
+                           
+                        end loop;
+                        temp_waypoint.vehicle_action_list := val;
+                     else
+                        raise Inconsistent_Message;
+                     end if;
                   end;
                   temp_waypoint.contingency_waypoint_A := Common.Int64 
                     (waypointlist.ContingencyWaypointA);
@@ -963,12 +1014,53 @@ package body Daidalus_Response with SPARK_Mode is
                   declare
                      wp_atl : definitions.Associated_Tasks_List;
                   begin
-                     for atl of waypointlist.AssociatedTasks loop
-                        MyVectorOfIntegers.Append (wp_atl, Common.Int64 
-                                                   (atl));
-                     end loop;
-                     temp_waypoint.associated_tasks := wp_atl;
+                     if Last (waypointlist.AssociatedTasks) <= Integer 
+                       (MyVectorOfIntegers.Capacity (wp_atl))
+                     then
+                           
+                        --  for atl of waypointlist.AssociatedTasks loop
+                        for Index in Positive'First .. Last 
+                          (waypointlist.AssociatedTasks) loop
+                           pragma Loop_Invariant (Integer (MyVectorOfIntegers.
+                                                    Length (wp_atl)) = Index 
+                                                  - 1);
+                           MyVectorOfIntegers.Append (wp_atl, Get 
+                                                      (waypointlist.AssociatedTasks, Index));
+                        end loop;
+                        temp_waypoint.associated_tasks := wp_atl;
+                     else
+                        raise Inconsistent_Message;
+                     end if;
+                        
                   end;
+                  if waypointlist.Longitude in Heading_Type_deg'First ..  
+                    Heading_Type_deg'Last
+                  then
+                     temp_waypoint.longitude_deg := definitions.Heading_Type_deg 
+                       (waypointlist.Longitude);
+                  else 
+                     raise Improper_Configuration;
+                  end if;
+                  if waypointlist.Latitude in Heading_Type_deg'First ..  
+                    Heading_Type_deg'Last
+                  then
+                     temp_waypoint.latitude_deg := definitions.Heading_Type_deg 
+                       (waypointlist.Latitude);
+                  else
+                     raise Improper_Configuration;
+                  end if;
+                  if waypointlist.Altitude in Altitude_Type_m'First .. 
+                    Altitude_Type_m'Last
+                  then
+                     temp_waypoint.altitude_m := definitions.Altitude_Type_m 
+                       (waypointlist.Altitude);
+                  else
+                     raise Improper_Configuration;
+                  end if;
+                  case waypointlist.AltitudeType is
+                     when MSL => temp_waypoint.altitude_type := definitions.MSL;
+                     when AGL => temp_waypoint.altitude_type := definitions.AGL;
+                  end case;
                   MyVectorOfWaypoints.Append (temp_waypoint_list, temp_waypoint);
                end;
             end loop;
@@ -979,6 +1071,8 @@ package body Daidalus_Response with SPARK_Mode is
    exception
       when Inconsistent_Message =>
          Put_Line ("Problem with data in MissionCommand message.  Unable to return to Mission.");
+      when Improper_Configuration =>
+         Put_Line ("MissionCommand message does not conform to current configuration parameters. Unalbe to return to Mission.");
       
    end Process_MissionCommand_Message;
 

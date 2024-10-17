@@ -2,10 +2,10 @@ package body set_divert_state with
 SPARK_Mode => On is
 
    procedure SetDivertState
-     (DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       DAIDALUS_Heading_Bands : OrderedIntervalVector;
       DAIDALUS_GroundSpeed_Bands : OrderedIntervalVector;
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Recovery_Heading_Bands : OrderedIntervalVector;
       Recovery_GroundSpeed_Bands : OrderedIntervalVector;
       Current_State : state_parameters;
@@ -140,13 +140,13 @@ SPARK_Mode => On is
          end if;
 
          pragma Assert (if not found_acceptable_action_flag and then not
-                       MyVectorOfIntervals.Is_Empty (DAIDALUS_Altitude_Bands)
+                       MyVectorOfIntervals32.Is_Empty (DAIDALUS_Altitude_Bands)
                        then Divert_Fallback (found_acceptable_action_flag,
                          DAIDALUS_GroundSpeed_Bands, DAIDALUS_Altitude_Bands,
                          Divert_State, GroundSpeed_Min_mps, Altitude_Max_m,
                          Priority));
          pragma Assert (if not found_acceptable_action_flag and then
-                         MyVectorOfIntervals.Is_Empty (DAIDALUS_Altitude_Bands)
+                         MyVectorOfIntervals32.Is_Empty (DAIDALUS_Altitude_Bands)
                        then Divert_No_Recourse (found_acceptable_action_flag,
                          DAIDALUS_GroundSpeed_Bands, DAIDALUS_Altitude_Bands,
                          Divert_State, Current_State, Priority));

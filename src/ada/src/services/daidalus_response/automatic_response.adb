@@ -55,10 +55,10 @@ package body automatic_response with SPARK_Mode => On is
      (Mailbox                         : in out Daidalus_Response_Mailbox;
       Current_State                   :     state_parameters;
       Divert_State                    :    out state_parameters;
-      DAIDALUS_Altitude_Bands         :     OrderedIntervalVector;
+      DAIDALUS_Altitude_Bands         :     OrderedIntervalVector32;
       DAIDALUS_Heading_Bands          :     OrderedIntervalVector;
       DAIDALUS_GroundSpeed_Bands      :     OrderedIntervalVector;
-      Recovery_Altitude_Bands         :     OrderedIntervalVector;
+      Recovery_Altitude_Bands         :     OrderedIntervalVector32;
       Recovery_Heading_Bands          :     OrderedIntervalVector;
       Recovery_GroundSpeed_Bands      :     OrderedIntervalVector;
       m_Vehicle_ID                    :     VehicleID_type;
@@ -156,7 +156,7 @@ package body automatic_response with SPARK_Mode => On is
          --, heading, or groundspeed bands has an interval that contains the
          --ownship with a time to violation less than the threshold by nature of
          --DAIDALUS detection and awareness
-         pragma Assume (not (MyVectorOfIntervals.Is_Empty
+         pragma Assume (not (MyVectorOfIntervals32.Is_Empty
                        (DAIDALUS_Altitude_Bands) and MyVectorOfIntervals.
                          Is_Empty (DAIDALUS_Heading_Bands) and
                          MyVectorOfIntervals.Is_Empty

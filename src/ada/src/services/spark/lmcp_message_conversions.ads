@@ -93,7 +93,7 @@ package LMCP_Message_Conversions is
 
    function As_AltitudeInterval_Message
      (Msg : not null AltitudeInterval_Acc) return
-     LMCP_Messages.Real64_Array;
+     LMCP_Messages.Real32_Array;
 
    function As_GroundHeadingRecoveryInterval_Message
      (Msg : not null GroundHeadingRecoveryInterval_Acc) return
@@ -109,6 +109,6 @@ package LMCP_Message_Conversions is
 
    function As_AltitudeRecoveryInterval_Message
      (Msg : not null AltitudeRecoveryInterval_Acc) return
-     LMCP_Messages.Real64_Array;
+     LMCP_Messages.Real32_Array;
 
 end LMCP_Message_Conversions;

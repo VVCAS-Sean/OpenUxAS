@@ -3,7 +3,7 @@ with Common; use Common;
 package body CheckSafeToReturn with SPARK_Mode => On is
 
    function isSafeToReturn_Altitude
-     (DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       DAIDALUS_Altitude_Classification_Bands : ZoneVector;
       VirtualReturnState : state_parameters) return Boolean
      with
@@ -19,14 +19,14 @@ package body CheckSafeToReturn with SPARK_Mode => On is
                   VirtualReturnState));
 
    function isSafeToReturn_Altitude
-     (DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       DAIDALUS_Altitude_Classification_Bands : ZoneVector;
       VirtualReturnState : state_parameters) return Boolean
    is
    begin
-      for I in MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) ..
-        MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) loop
-         if InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, I),
+      for I in MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands) ..
+        MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) loop
+         if InRange (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands, I),
                      VirtualReturnState.altitude_m)
          then
             if MyVectorOfZones.Element (DAIDALUS_Altitude_Classification_Bands,
@@ -41,9 +41,9 @@ package body CheckSafeToReturn with SPARK_Mode => On is
                exit;
             end if;
          end if;
-         pragma Loop_Invariant (for all J in MyVectorOfIntervals.First_Index
+         pragma Loop_Invariant (for all J in MyVectorOfIntervals32.First_Index
                                (DAIDALUS_Altitude_Bands) .. I =>
-                                  not InRange (MyVectorOfIntervals.Element
+                                  not InRange (MyVectorOfIntervals32.Element
                                  (DAIDALUS_Altitude_Bands, J),
                                  VirtualReturnState.altitude_m));
 
@@ -56,22 +56,22 @@ package body CheckSafeToReturn with SPARK_Mode => On is
 
    function isSafeToReturn_GroundSpeed
      (DAIDALUS_GroundSpeed_Bands : OrderedIntervalVector;
-      DAIDALUS_GroundSpeed_Classifiaction_Bands : ZoneVector;
+      DAIDALUS_GroundSpeed_Classification_Bands : ZoneVector;
       VirtualReturnState : state_parameters) return Boolean with
      Pre => Are_Legitimate_Bands (DAIDALUS_GroundSpeed_Bands) and then
      SameIndices (DAIDALUS_GroundSpeed_Bands,
-                  DAIDALUS_GroundSpeed_Classifiaction_Bands),
+                  DAIDALUS_GroundSpeed_Classification_Bands),
      Post => (if isSafeToReturn_GroundSpeed'Result then GroundSpeedSafe
               (DAIDALUS_GroundSpeed_Bands,
-                 DAIDALUS_GroundSpeed_Classifiaction_Bands,
+                 DAIDALUS_GroundSpeed_Classification_Bands,
                  VirtualReturnState) else not GroundSpeedSafe
                 (DAIDALUS_GroundSpeed_Bands,
-                 DAIDALUS_GroundSpeed_Classifiaction_Bands,
+                 DAIDALUS_GroundSpeed_Classification_Bands,
                  VirtualReturnState));
 
    function isSafeToReturn_GroundSpeed
      (DAIDALUS_GroundSpeed_Bands : OrderedIntervalVector;
-      DAIDALUS_GroundSpeed_Classifiaction_Bands : ZoneVector;
+      DAIDALUS_GroundSpeed_Classification_Bands : ZoneVector;
       VirtualReturnState : state_parameters) return Boolean  is
    begin
       for I in MyVectorOfIntervals.First_Index (DAIDALUS_GroundSpeed_Bands) ..
@@ -81,10 +81,10 @@ package body CheckSafeToReturn with SPARK_Mode => On is
                        groundSpeed_mps)
          then
             if MyVectorOfZones.Element
-              (DAIDALUS_GroundSpeed_Classifiaction_Bands, I) = Near
+              (DAIDALUS_GroundSpeed_Classification_Bands, I) = Near
             then
                pragma Assert (not GroundSpeedSafe (DAIDALUS_GroundSpeed_Bands,
-                              DAIDALUS_GroundSpeed_Classifiaction_Bands,
+                              DAIDALUS_GroundSpeed_Classification_Bands,
                               VirtualReturnState));
                return False;
             else
@@ -98,7 +98,7 @@ package body CheckSafeToReturn with SPARK_Mode => On is
                                    VirtualReturnState.groundSpeed_mps));
       end loop;
       pragma Assert (GroundSpeedSafe (DAIDALUS_GroundSpeed_Bands,
-                    DAIDALUS_GroundSpeed_Classifiaction_Bands,
+                    DAIDALUS_GroundSpeed_Classification_Bands,
                     VirtualReturnState));
       return True;
    end isSafeToReturn_GroundSpeed;
@@ -149,7 +149,7 @@ package body CheckSafeToReturn with SPARK_Mode => On is
    ------------------
 
    procedure SafeToReturn
-     (DAIDALUS_Altitude_Bands                   :     OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands                   :     OrderedIntervalVector32;
       DAIDALUS_Heading_Bands                    :     OrderedIntervalVector;
       DAIDALUS_GroundSpeed_Bands                :     OrderedIntervalVector;
       DAIDALUS_Altitude_Classification_Bands    :     ZoneVector;
@@ -167,7 +167,7 @@ package body CheckSafeToReturn with SPARK_Mode => On is
       WaypointNorth : Real64;
       WaypointEast : Real64;
       dummyFEO : FlatEarthObject;
-      dummyState : state_parameters := (others => 0.0);
+      dummyState : state_parameters := (altitude_m => 0.0, others => 0.0);
    begin
       SyntheticCheckState := dummyState;
       pragma Assume (for some J in MyVectorOfWaypoints.First_Index

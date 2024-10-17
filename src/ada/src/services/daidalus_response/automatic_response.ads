@@ -52,10 +52,10 @@ package automatic_response with SPARK_Mode => On is
      (Mailbox : in out Daidalus_Response_Mailbox;
       Current_State : state_parameters;
       Divert_State : out state_parameters;
-      DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+      DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       DAIDALUS_Heading_Bands : OrderedIntervalVector;
       DAIDALUS_GroundSpeed_Bands : OrderedIntervalVector;
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Recovery_Heading_Bands : OrderedIntervalVector;
       Recovery_GroundSpeed_Bands : OrderedIntervalVector;
       m_Vehicle_ID : VehicleID_type;

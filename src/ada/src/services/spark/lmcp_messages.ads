@@ -485,11 +485,17 @@ package LMCP_Messages with SPARK_Mode is
 
    type Real64_Array is array (1 .. 2) of SafeReal64;
 
+   type Real32_Array is array (1 .. 2) of SafeReal32;
+
    package Generic_Real64_Sequences is new SPARK.Containers.Functional.Vectors
      (Index_Type                     => Positive,
       Element_Type                   => Real64_Array);
 
-   subtype Altitude_Sequence is  Generic_Real64_Sequences.Sequence;
+   package Generic_Real32_Sequences is new SPARK.Containers.Functional.Vectors
+     (Index_Type                     => Positive,
+      Element_Type                   => Real32_Array);
+
+   subtype Altitude_Sequence is  Generic_Real32_Sequences.Sequence;
 
    type AltitudeInterval is new Message_Root with record
       Altitude : Altitude_Sequence;
@@ -533,19 +539,25 @@ package LMCP_Messages with SPARK_Mode is
       RecoveryVerticalSpeed : VerticalSpeed_Sequence;
    end record;
 
-   package Real64_sequences is new Spark.Containers.Functional.Vectors
+   package Real64_sequences is new SPARK.Containers.Functional.Vectors
      (Index_Type                     => Positive,
       Element_Type                   => SafeReal64);
 
    subtype Real64_Seq is Real64_sequences.Sequence;
 
-   package BandsRegion_sequences is new Spark.Containers.Functional.Vectors
+   package Real32_sequences is new SPARK.Containers.Functional.Vectors
+     (Index_Type => Positive,
+      Element_Type => Real32);
+
+   subtype Real32_Seq is Real32_sequences.Sequence;
+
+   package BandsRegion_sequences is new SPARK.Containers.Functional.Vectors
      (Index_Type => Positive,
       Element_Type => BandsRegionEnum);
 
    subtype BandsRegion_seq is BandsRegion_sequences.Sequence;
 
-   package IDType_sequences is new Spark.Containers.Functional.Vectors
+   package IDType_sequences is new SPARK.Containers.Functional.Vectors
      (Index_Type => Positive,
       Element_Type => definitions.VehicleID_type);
 

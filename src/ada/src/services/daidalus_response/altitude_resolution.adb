@@ -6,11 +6,11 @@ with SPARK_Mode => On is
    --predicate indicting whether or not the divert altitude is contained within
    --a single recovery band interval
    function Successful_Placement_in_Recovery_Bands
-     (Recovery_Altitude_Bands : OrderedIntervalVector;
+     (Recovery_Altitude_Bands : OrderedIntervalVector32;
       Divert_state : state_parameters) return Boolean is
-     (for some I in MyVectorOfIntervals.First_Index (Recovery_Altitude_Bands) ..
-       MyVectorOfIntervals.Last_Index (Recovery_Altitude_Bands) =>
-           InRange (MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I),
+     (for some I in MyVectorOfIntervals32.First_Index (Recovery_Altitude_Bands) ..
+       MyVectorOfIntervals32.Last_Index (Recovery_Altitude_Bands) =>
+           InRange (MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I),
         Divert_state.altitude_m));
 
    --Predicate describing the relationship between conflict bands and recovery
@@ -22,18 +22,18 @@ with SPARK_Mode => On is
    --to each other.
    function Conflict_and_Recovery_Complimentary_Nature
      (Divert_State : state_parameters;
-      DAIDALUS_Altitude_Bands : OrderedIntervalVector;
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+      DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Altitude_Min_m : Altitude_Type_m;
       Altitude_Max_m : Altitude_Type_m) return Boolean is
      (if (Divert_State.altitude_m >= Altitude_Min_m) and then
         (Divert_State.altitude_m <= Altitude_Max_m) and then (not
-        MyVectorOfIntervals.Is_Empty (DAIDALUS_Altitude_Bands)) and then
-        (not MyVectorOfIntervals.Is_Empty (Recovery_Altitude_Bands)) and then
+        MyVectorOfIntervals32.Is_Empty (DAIDALUS_Altitude_Bands)) and then
+        (not MyVectorOfIntervals32.Is_Empty (Recovery_Altitude_Bands)) and then
         (for all I in
-          MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) ..
-          MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) =>
-              not InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, I)
+          MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands) ..
+          MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) =>
+              not InRange (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands, I)
            , Divert_State.altitude_m)) then
         (Successful_Placement_in_Recovery_Bands
              (Recovery_Altitude_Bands, Divert_State))) with
@@ -44,32 +44,32 @@ with SPARK_Mode => On is
    --given the current state is in a conflict band there exists a recovery band
    --interval that is completly above or below the current altitude
    function Expected_Recovery_Bands_Nature
-     (Recovery_Altitude_Bands : OrderedIntervalVector;
+     (Recovery_Altitude_Bands : OrderedIntervalVector32;
       Current_state : state_parameters) return Boolean is
-     ((for some I in MyVectorOfIntervals.First_Index (Recovery_Altitude_Bands) ..
-        MyVectorOfIntervals.Last_Index (Recovery_Altitude_Bands) =>
-         MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).LowerBound >
+     ((for some I in MyVectorOfIntervals32.First_Index (Recovery_Altitude_Bands) ..
+        MyVectorOfIntervals32.Last_Index (Recovery_Altitude_Bands) =>
+         MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).LowerBound >
         Current_state.altitude_m and then
-          MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).UpperBound >
+          MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).UpperBound >
         Current_state.altitude_m) or else
-         (for some I in MyVectorOfIntervals.First_Index (Recovery_Altitude_Bands)
-           .. MyVectorOfIntervals.Last_Index (Recovery_Altitude_Bands) =>
-           MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).LowerBound <
+         (for some I in MyVectorOfIntervals32.First_Index (Recovery_Altitude_Bands)
+           .. MyVectorOfIntervals32.Last_Index (Recovery_Altitude_Bands) =>
+           MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).LowerBound <
               Current_state.altitude_m and
-           MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).UpperBound <
+           MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).UpperBound <
                  Current_state.altitude_m)) with
            Ghost;
    procedure Find_Initial_and_Climb
      (Divert_state : in out state_parameters;
       is_Found : in out Boolean;
       initial_band_index : in out myvector_index_type;
-      DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+      DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       Current_state : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
       Altitude_Interval_Buffer_m : Altitude_Buffer_Type_m) with
         Pre => Are_Legitimate_Bands (DAIDALUS_Altitude_Bands) and then
-            not MyVectorOfIntervals.Is_Empty (DAIDALUS_Altitude_Bands) and then
+            not MyVectorOfIntervals32.Is_Empty (DAIDALUS_Altitude_Bands) and then
             scalar_constraints
                (Upper_limit         => Altitude_Max_m,
                 Lower_limit         => Altitude_Min_m,
@@ -83,19 +83,19 @@ with SPARK_Mode => On is
              Current_Altitude_Exists_in_Bands (Current_state,
                                               DAIDALUS_Altitude_Bands) and then
              initial_band_index =
-              MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) and then
+              MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands) and then
            is_Found = False and then Current_state = Divert_state,
      Post => (initial_band_index in
-                MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) ..
-                MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) and then
-             (for all I in MyVectorOfIntervals.First_Index
+                MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands) ..
+                MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) and then
+             (for all I in MyVectorOfIntervals32.First_Index
                                                  (DAIDALUS_Altitude_Bands) ..
-              MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) =>
-              not InRange (MyVectorOfIntervals.Element
+              MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) =>
+              not InRange (MyVectorOfIntervals32.Element
              (DAIDALUS_Altitude_Bands, I), Divert_state.altitude_m)) and then
              (Divert_state.altitude_m > Current_state.altitude_m) and then
              (is_Found = True) and then
-             InRange (MyVectorOfIntervals.Element
+             InRange (MyVectorOfIntervals32.Element
                 (DAIDALUS_Altitude_Bands, initial_band_index),
                 Current_state.altitude_m));
 
@@ -106,26 +106,26 @@ with SPARK_Mode => On is
      (Divert_state : in out state_parameters;
       is_Found : in out Boolean;
       initial_band_index : in out myvector_index_type;
-      DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+      DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       Current_state : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
       Altitude_Interval_Buffer_m : Altitude_Buffer_Type_m) is
    begin
 
-      for I in MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) ..
-        MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) loop
+      for I in MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands) ..
+        MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) loop
 
-         if InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, I),
+         if InRange (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands, I),
                      Divert_state.altitude_m)
          then
-            pragma Assert (MyVectorOfIntervals.Element
+            pragma Assert (MyVectorOfIntervals32.Element
                           (DAIDALUS_Altitude_Bands, I).UpperBound +
                            Altitude_Buffer_Type_m'Last <= Altitude_Type_m'Last);
-            Divert_state.altitude_m := MyVectorOfIntervals.Element
+            Divert_state.altitude_m := MyVectorOfIntervals32.Element
               (DAIDALUS_Altitude_Bands, I).UpperBound +
               Altitude_Interval_Buffer_m;
-            pragma Assert (MyVectorOfIntervals.Element
+            pragma Assert (MyVectorOfIntervals32.Element
                           (DAIDALUS_Altitude_Bands, I).UpperBound <
                             Divert_state.altitude_m);
             if not is_Found then
@@ -134,20 +134,20 @@ with SPARK_Mode => On is
             end if;
          end if;
          pragma Assert (if is_Found then (for all J in
-                        MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands)
-                        .. I - 1 => not InRange (MyVectorOfIntervals.
+                        MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands)
+                        .. I - 1 => not InRange (MyVectorOfIntervals32.
                         Element (DAIDALUS_Altitude_Bands, J),
                         Divert_state.altitude_m)));
 
          pragma Loop_Invariant (not is_Found or else
                                  (initial_band_index <= I and then
                                   initial_band_index in
-                                    MyVectorOfIntervals.First_Index
+                                    MyVectorOfIntervals32.First_Index
                                       (DAIDALUS_Altitude_Bands) ..
-                                    MyVectorOfIntervals.Last_Index
+                                    MyVectorOfIntervals32.Last_Index
                                     (DAIDALUS_Altitude_Bands)));
          pragma Loop_Invariant (not is_Found or else
-                               InRange (MyVectorOfIntervals.Element
+                               InRange (MyVectorOfIntervals32.Element
                                  (DAIDALUS_Altitude_Bands, initial_band_index),
                                  Current_state.altitude_m));
          pragma Loop_Invariant (is_Found or else (Current_state = Divert_state
@@ -156,24 +156,24 @@ with SPARK_Mode => On is
          pragma Loop_Invariant (not is_Found or else Divert_state.altitude_m >
                                  Current_state.altitude_m);
          pragma Loop_Invariant (is_Found or else (for all J in
-                                 MyVectorOfIntervals.First_Index (
+                                 MyVectorOfIntervals32.First_Index (
                                    DAIDALUS_Altitude_Bands) .. I =>
-                                  not InRange (MyVectorOfIntervals.Element
+                                  not InRange (MyVectorOfIntervals32.Element
                                  (DAIDALUS_Altitude_Bands, J),
                                  Divert_state.altitude_m)));
-         pragma Loop_Invariant (not InRange (MyVectorOfIntervals.Element
+         pragma Loop_Invariant (not InRange (MyVectorOfIntervals32.Element
                                (DAIDALUS_Altitude_Bands, I),
                                Divert_state.altitude_m));
-         pragma Loop_Invariant (for all J in MyVectorOfIntervals.
+         pragma Loop_Invariant (for all J in MyVectorOfIntervals32.
                                  First_Index (DAIDALUS_Altitude_Bands) .. I =>
-                                  not InRange (MyVectorOfIntervals.Element
+                                  not InRange (MyVectorOfIntervals32.Element
                                  (DAIDALUS_Altitude_Bands, J),
                                  Divert_state.altitude_m));
       end loop;
-      pragma Assert (for all I in MyVectorOfIntervals.First_Index
-                    (DAIDALUS_Altitude_Bands) .. MyVectorOfIntervals.Last_Index
+      pragma Assert (for all I in MyVectorOfIntervals32.First_Index
+                    (DAIDALUS_Altitude_Bands) .. MyVectorOfIntervals32.Last_Index
                     (DAIDALUS_Altitude_Bands) =>
-                       not InRange (MyVectorOfIntervals.Element
+                       not InRange (MyVectorOfIntervals32.Element
                       (DAIDALUS_Altitude_Bands, I), Divert_state.altitude_m));
       pragma Assert (is_Found);
    end Find_Initial_and_Climb;
@@ -184,13 +184,13 @@ with SPARK_Mode => On is
    procedure Reset_to_Initial_and_Descend
      (Divert_state : in out state_parameters;
       initial_band_index : myvector_index_type;
-      DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+      DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       Current_State : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
       Altitude_Interval_Buffer_m : Altitude_Buffer_Type_m) with
      Pre => (Are_Legitimate_Bands (DAIDALUS_Altitude_Bands) and then
-             not MyVectorOfIntervals.Is_Empty (DAIDALUS_Altitude_Bands) and then
+             not MyVectorOfIntervals32.Is_Empty (DAIDALUS_Altitude_Bands) and then
              scalar_constraints
                 (Upper_limit         => Altitude_Max_m,
                  Lower_limit         => Altitude_Min_m,
@@ -203,42 +203,42 @@ with SPARK_Mode => On is
               Current_Altitude_Exists_in_Bands (Current_State,
                DAIDALUS_Altitude_Bands) and then
               Divert_state = Current_State and then initial_band_index in
-              MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands) ..
-               MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) and then
-              InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands,
+              MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands) ..
+               MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) and then
+              InRange (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands,
                   initial_band_index), Current_State.altitude_m)),
      Post => (Divert_state.altitude_m < Current_State.altitude_m and then
-             (for all I in MyVectorOfIntervals.First_Index
+             (for all I in MyVectorOfIntervals32.First_Index
                  (DAIDALUS_Altitude_Bands) ..
-              MyVectorOfIntervals.Last_Index (DAIDALUS_Altitude_Bands) => not
-              InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, I),
+              MyVectorOfIntervals32.Last_Index (DAIDALUS_Altitude_Bands) => not
+              InRange (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands, I),
                    Divert_state.altitude_m)));
 
    procedure Reset_to_Initial_and_Descend
      (Divert_state : in out state_parameters;
       initial_band_index : myvector_index_type;
-      DAIDALUS_Altitude_Bands : OrderedIntervalVector;
+      DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
       Current_State : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
       Altitude_Interval_Buffer_m : Altitude_Buffer_Type_m) is
    begin
-      for I in reverse MyVectorOfIntervals.First_Index (DAIDALUS_Altitude_Bands)
+      for I in reverse MyVectorOfIntervals32.First_Index (DAIDALUS_Altitude_Bands)
         .. initial_band_index loop
-         if InRange (MyVectorOfIntervals.Element (DAIDALUS_Altitude_Bands, I),
+         if InRange (MyVectorOfIntervals32.Element (DAIDALUS_Altitude_Bands, I),
                     Divert_state.altitude_m)
          then
-            pragma Assert (MyVectorOfIntervals.Element
+            pragma Assert (MyVectorOfIntervals32.Element
                           (DAIDALUS_Altitude_Bands, I).LowerBound >=
                             Altitude_Min_m);
-            Divert_state.altitude_m := MyVectorOfIntervals.Element
+            Divert_state.altitude_m := MyVectorOfIntervals32.Element
               (DAIDALUS_Altitude_Bands, I).LowerBound -
               Altitude_Interval_Buffer_m;
-            pragma Assert (Divert_state.altitude_m < MyVectorOfIntervals.
+            pragma Assert (Divert_state.altitude_m < MyVectorOfIntervals32.
                             Element (DAIDALUS_Altitude_Bands, I).LowerBound);
-            pragma Assert (for all J in I .. MyVectorOfIntervals.Last_Index
+            pragma Assert (for all J in I .. MyVectorOfIntervals32.Last_Index
                           (DAIDALUS_Altitude_Bands) =>
-                             not InRange (MyVectorOfIntervals.Element
+                             not InRange (MyVectorOfIntervals32.Element
                             (DAIDALUS_Altitude_Bands, J),
                             Divert_state.altitude_m));
          end if;
@@ -246,13 +246,13 @@ with SPARK_Mode => On is
          pragma Loop_Invariant (Divert_state.altitude_m <=
                                  Divert_state.altitude_m'Loop_Entry);
          pragma Loop_Invariant (for all J in initial_band_index  ..
-                                 MyVectorOfIntervals.Last_Index
+                                 MyVectorOfIntervals32.Last_Index
                                    (DAIDALUS_Altitude_Bands) =>
-                                  not InRange (MyVectorOfIntervals.Element
+                                  not InRange (MyVectorOfIntervals32.Element
                                  (DAIDALUS_Altitude_Bands, J),
                                  Divert_state.altitude_m));
          pragma Loop_Invariant (for all J in I .. initial_band_index =>
-                                  not InRange (MyVectorOfIntervals.Element
+                                  not InRange (MyVectorOfIntervals32.Element
                                  (DAIDALUS_Altitude_Bands, J),
                                  Divert_state.altitude_m));
       end loop;
@@ -265,7 +265,7 @@ with SPARK_Mode => On is
    --highest
       procedure Recovery_Climb
      (Divert_State : in out state_parameters;
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Current_State : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
@@ -273,7 +273,7 @@ with SPARK_Mode => On is
       is_Recovery_Found_by_Climb : in out Boolean;
       acceptable_action_found : in out Boolean) with
      Pre => (Are_Legitimate_Bands (Recovery_Altitude_Bands) and then
-             not MyVectorOfIntervals.Is_Empty (Recovery_Altitude_Bands)
+             not MyVectorOfIntervals32.Is_Empty (Recovery_Altitude_Bands)
              and then scalar_constraints
                          (Upper_limit         => Altitude_Max_m,
                           Lower_limit         => Altitude_Min_m,
@@ -285,7 +285,7 @@ with SPARK_Mode => On is
                           Interval_constraint => Altitude_Interval_Buffer_m)
              and then is_Recovery_Found_by_Climb = False and then
              Divert_State.altitude_m < Altitude_Min_m and then not
-                 MyVectorOfIntervals.Is_Empty (Recovery_Altitude_Bands)),
+                 MyVectorOfIntervals32.Is_Empty (Recovery_Altitude_Bands)),
      Post => ((is_Recovery_Found_by_Climb and then acceptable_action_found
               and then Successful_Placement_in_Recovery_Bands
                 (Recovery_Altitude_Bands    => Recovery_Altitude_Bands,
@@ -293,16 +293,16 @@ with SPARK_Mode => On is
               or else (not is_Recovery_Found_by_Climb and then
                     Divert_State.altitude_m < Altitude_Min_m and then
                   (for all I in
-                     MyVectorOfIntervals.First_Index (Recovery_Altitude_Bands) ..
-                       MyVectorOfIntervals.Last_Index (Recovery_Altitude_Bands)
+                     MyVectorOfIntervals32.First_Index (Recovery_Altitude_Bands) ..
+                       MyVectorOfIntervals32.Last_Index (Recovery_Altitude_Bands)
                    => not
-                     (MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).
+                     (MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).
                           LowerBound > Current_State.altitude_m and then
-                      MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).
+                      MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).
                         UpperBound > Current_State.altitude_m))));
    procedure Recovery_Climb
      (Divert_State : in out state_parameters;
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Current_State : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
@@ -310,31 +310,31 @@ with SPARK_Mode => On is
       is_Recovery_Found_by_Climb : in out Boolean;
       acceptable_action_found : in out Boolean) is
    begin
-      for I in MyVectorOfIntervals.First_Index (Recovery_Altitude_Bands) ..
-        MyVectorOfIntervals.Last_Index (Recovery_Altitude_Bands) loop
-         if MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).LowerBound >
-          Current_State.altitude_m and then MyVectorOfIntervals.Element
+      for I in MyVectorOfIntervals32.First_Index (Recovery_Altitude_Bands) ..
+        MyVectorOfIntervals32.Last_Index (Recovery_Altitude_Bands) loop
+         if MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).LowerBound >
+          Current_State.altitude_m and then MyVectorOfIntervals32.Element
            (Recovery_Altitude_Bands, I).UpperBound > Current_State.altitude_m
          then
-            pragma Assert (MyVectorOfIntervals.Element
+            pragma Assert (MyVectorOfIntervals32.Element
                           (Recovery_Altitude_Bands, I).UpperBound <=
                             Altitude_Max_m);
-            Divert_State.altitude_m := MyVectorOfIntervals.Element
+            Divert_State.altitude_m := MyVectorOfIntervals32.Element
               (Recovery_Altitude_Bands, I).LowerBound +
               Altitude_Interval_Buffer_m / 2.0;
-            pragma Assert (Divert_State.altitude_m = MyVectorOfIntervals.Element
+            pragma Assert (Divert_State.altitude_m = MyVectorOfIntervals32.Element
                           (Recovery_Altitude_Bands, I).LowerBound +
                             Altitude_Interval_Buffer_m / 2.0);
-            pragma Assert (MyVectorOfIntervals.Element
+            pragma Assert (MyVectorOfIntervals32.Element
                           (Recovery_Altitude_Bands, I).UpperBound -
-                            MyVectorOfIntervals.Element
+                            MyVectorOfIntervals32.Element
                               (Recovery_Altitude_Bands, I).LowerBound >=
                             2.0 * Altitude_Interval_Buffer_m);
-            pragma Assert (Divert_State.altitude_m > MyVectorOfIntervals.Element
+            pragma Assert (Divert_State.altitude_m > MyVectorOfIntervals32.Element
                             (Recovery_Altitude_Bands, I).LowerBound and then
-                           Divert_State.altitude_m < MyVectorOfIntervals.Element
+                           Divert_State.altitude_m < MyVectorOfIntervals32.Element
                              (Recovery_Altitude_Bands, I).UpperBound);
-            pragma Assert (InRange (MyVectorOfIntervals.Element
+            pragma Assert (InRange (MyVectorOfIntervals32.Element
                         (Recovery_Altitude_Bands, I), Divert_State.altitude_m));
             pragma Assert (Successful_Placement_in_Recovery_Bands
                           (Recovery_Altitude_Bands, Divert_State));
@@ -346,12 +346,12 @@ with SPARK_Mode => On is
 
          pragma Loop_Invariant (Divert_State.altitude_m < Altitude_Min_m);
          pragma Loop_Invariant (not is_Recovery_Found_by_Climb);
-         pragma Loop_Invariant (for all J in MyVectorOfIntervals.First_Index
+         pragma Loop_Invariant (for all J in MyVectorOfIntervals32.First_Index
                                (Recovery_Altitude_Bands) .. I =>
-                                  not (MyVectorOfIntervals.Element
+                                  not (MyVectorOfIntervals32.Element
                                  (Recovery_Altitude_Bands, J).LowerBound >
                                    Current_State.altitude_m and then
-                                 MyVectorOfIntervals.Element
+                                 MyVectorOfIntervals32.Element
                                    (Recovery_Altitude_Bands, J).UpperBound >
                                    Current_State.altitude_m));
       end loop;
@@ -361,7 +361,7 @@ with SPARK_Mode => On is
    --current altitude. loops over recovery bands from highest to lowest
    procedure Recovery_Descend
      (Divert_State : in out state_parameters;
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Current_State : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
@@ -370,7 +370,7 @@ with SPARK_Mode => On is
       acceptable_action_found : in out Boolean) with
      Pre => Are_Legitimate_Bands (Recovery_Altitude_Bands) and then
             is_Recovery_Found = False and then not
-            MyVectorOfIntervals.Is_Empty (Recovery_Altitude_Bands) and then
+            MyVectorOfIntervals32.Is_Empty (Recovery_Altitude_Bands) and then
            scalar_constraints (Upper_limit         => Altitude_Max_m,
                               Lower_limit         => Altitude_Min_m,
                               Interval_Constraint => Altitude_Interval_Buffer_m)
@@ -380,16 +380,16 @@ with SPARK_Mode => On is
                           Lower_limit         => Altitude_Min_m,
                           Interval_constraint => Altitude_Interval_Buffer_m)
             and then Divert_State.altitude_m < Altitude_Min_m and then not
-                MyVectorOfIntervals.Is_Empty (Recovery_Altitude_Bands)
+                MyVectorOfIntervals32.Is_Empty (Recovery_Altitude_Bands)
             and then Expected_Recovery_Bands_Nature
                       (Recovery_Altitude_Bands    => Recovery_Altitude_Bands,
                        Current_state              => Current_State)
-            and then (for all I in MyVectorOfIntervals.First_Index
-                     (Recovery_Altitude_Bands) .. MyVectorOfIntervals.Last_Index
+            and then (for all I in MyVectorOfIntervals32.First_Index
+                     (Recovery_Altitude_Bands) .. MyVectorOfIntervals32.Last_Index
                       (Recovery_Altitude_Bands) => not
-                       (MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I)
+                       (MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I)
                          .LowerBound > Current_State.altitude_m and then
-                        MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I)
+                        MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I)
                          .UpperBound > Current_State.altitude_m)),
      Post => (is_Recovery_Found and then acceptable_action_found and then
                 Successful_Placement_in_Recovery_Bands
@@ -398,7 +398,7 @@ with SPARK_Mode => On is
 
    procedure Recovery_Descend
      (Divert_State : in out state_parameters;
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Current_State : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
@@ -407,29 +407,29 @@ with SPARK_Mode => On is
       acceptable_action_found : in out Boolean) is
    begin
 
-      for I in reverse MyVectorOfIntervals.First_Index (Recovery_Altitude_Bands)
-        .. MyVectorOfIntervals.Last_Index (Recovery_Altitude_Bands) loop
-         if MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).LowerBound <
-           Current_State.altitude_m and then MyVectorOfIntervals.Element
+      for I in reverse MyVectorOfIntervals32.First_Index (Recovery_Altitude_Bands)
+        .. MyVectorOfIntervals32.Last_Index (Recovery_Altitude_Bands) loop
+         if MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).LowerBound <
+           Current_State.altitude_m and then MyVectorOfIntervals32.Element
            (Recovery_Altitude_Bands, I).UpperBound < Current_State.altitude_m
          then
-            pragma Assert (MyVectorOfIntervals.Element
+            pragma Assert (MyVectorOfIntervals32.Element
                           (Recovery_Altitude_Bands, I).LowerBound >=
                             Altitude_Min_m);
-            Divert_State.altitude_m := MyVectorOfIntervals.Element
+            Divert_State.altitude_m := MyVectorOfIntervals32.Element
               (Recovery_Altitude_Bands, I).UpperBound -
               Altitude_Interval_Buffer_m / 2.0;
 
-            pragma Assert (MyVectorOfIntervals.Element
+            pragma Assert (MyVectorOfIntervals32.Element
                           (Recovery_Altitude_Bands, I).UpperBound -
-                            MyVectorOfIntervals.Element
+                            MyVectorOfIntervals32.Element
                               (Recovery_Altitude_Bands, I).LowerBound
                             >= 2.0 * Altitude_Interval_Buffer_m);
-            pragma Assert (Divert_State.altitude_m < MyVectorOfIntervals.Element
+            pragma Assert (Divert_State.altitude_m < MyVectorOfIntervals32.Element
                            (Recovery_Altitude_Bands, I).UpperBound and then
-                          Divert_State.altitude_m > MyVectorOfIntervals.Element
+                          Divert_State.altitude_m > MyVectorOfIntervals32.Element
                             (Recovery_Altitude_Bands, I).LowerBound);
-            pragma Assert (InRange (MyVectorOfIntervals.Element
+            pragma Assert (InRange (MyVectorOfIntervals32.Element
                         (Recovery_Altitude_Bands, I), Divert_State.altitude_m));
 
             is_Recovery_Found := True;
@@ -446,22 +446,22 @@ with SPARK_Mode => On is
                                  Divert_State.altitude_m'Loop_Entry);
          pragma Loop_Invariant (not is_Recovery_Found);
          pragma Loop_Invariant (for all J in reverse I ..
-                                 MyVectorOfIntervals.Last_Index
+                                 MyVectorOfIntervals32.Last_Index
                                    (Recovery_Altitude_Bands)  =>
-                                  not (MyVectorOfIntervals.Element
+                                  not (MyVectorOfIntervals32.Element
                                  (Recovery_Altitude_Bands, J).LowerBound <
                                    Current_State.altitude_m and then
-                                 MyVectorOfIntervals.Element
+                                 MyVectorOfIntervals32.Element
                                    (Recovery_Altitude_Bands, J).UpperBound <
                                    Current_State.altitude_m));
 
       end loop;
-      pragma Assert (if (for some I in MyVectorOfIntervals.First_Index
-                    (Recovery_Altitude_Bands) .. MyVectorOfIntervals.Last_Index
+      pragma Assert (if (for some I in MyVectorOfIntervals32.First_Index
+                    (Recovery_Altitude_Bands) .. MyVectorOfIntervals32.Last_Index
                     (Recovery_Altitude_Bands) =>
-                      (MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).
+                      (MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).
                            LowerBound < Current_State.altitude_m and then
-                       MyVectorOfIntervals.Element (Recovery_Altitude_Bands, I).
+                       MyVectorOfIntervals32.Element (Recovery_Altitude_Bands, I).
                            UpperBound < Current_State.altitude_m)) then
                            is_Recovery_Found);
    end Recovery_Descend;
@@ -471,8 +471,8 @@ with SPARK_Mode => On is
    -----------------------------------
 
    procedure Found_WCV_Altitude_Resolution
-     (DAIDALUS_Altitude_Bands : OrderedIntervalVector;
-      Recovery_Altitude_Bands : OrderedIntervalVector;
+     (DAIDALUS_Altitude_Bands : OrderedIntervalVector32;
+      Recovery_Altitude_Bands : OrderedIntervalVector32;
       Current_State : state_parameters;
       Altitude_Max_m : Altitude_Type_m;
       Altitude_Min_m : Altitude_Type_m;
@@ -490,7 +490,7 @@ with SPARK_Mode => On is
       --initialize divert state with the current state
       Divert_State := Current_State;
 
-      if not MyVectorOfIntervals.Is_Empty (DAIDALUS_Altitude_Bands) then
+      if not MyVectorOfIntervals32.Is_Empty (DAIDALUS_Altitude_Bands) then
 
          --find the index to the conflict band that contains the current
          --altitude and move the divert altitude higher if in a conflict band
@@ -530,7 +530,7 @@ with SPARK_Mode => On is
                              Recovery_Altitude_Bands, Altitude_Min_m,
                              Altitude_Max_m));
             local_acceptable_action_flag :=
-              (if MyVectorOfIntervals.Is_Empty (Recovery_Altitude_Bands) then
+              (if MyVectorOfIntervals32.Is_Empty (Recovery_Altitude_Bands) then
                     True else Successful_Placement_in_Recovery_Bands
                                (Recovery_Altitude_Bands, Divert_State));
             pragma Assert (Found_Acceptable_Action (local_acceptable_action_flag
@@ -543,7 +543,7 @@ with SPARK_Mode => On is
          --Use recovery bands to mitigate loss of well clear (LOWC)
          if Divert_State.altitude_m < Altitude_Min_m then
             local_acceptable_action_flag := False;
-            if not MyVectorOfIntervals.Is_Empty (Recovery_Altitude_Bands) then
+            if not MyVectorOfIntervals32.Is_Empty (Recovery_Altitude_Bands) then
                --check for a recovery band with bounds greater than current
                --altitude to set divert altitude
                Recovery_Climb
@@ -561,14 +561,14 @@ with SPARK_Mode => On is
                --information available
                pragma Assume (if not is_Recovery_Found then
                                (for some I in reverse
-                                  MyVectorOfIntervals.First_Index
+                                  MyVectorOfIntervals32.First_Index
                                     (Recovery_Altitude_Bands) ..
-                                    MyVectorOfIntervals.Last_Index
+                                    MyVectorOfIntervals32.Last_Index
                                   (Recovery_Altitude_Bands) =>
-                                    (MyVectorOfIntervals.Element
+                                    (MyVectorOfIntervals32.Element
                                          (Recovery_Altitude_Bands, I).LowerBound
                                      < Current_State.altitude_m and then
-                                     MyVectorOfIntervals.Element
+                                     MyVectorOfIntervals32.Element
                                        (Recovery_Altitude_Bands, I).UpperBound <
                                            Current_State.altitude_m)));
                if not is_Recovery_Found then
@@ -606,7 +606,7 @@ with SPARK_Mode => On is
                           (Divert_State, DAIDALUS_Altitude_Bands,
                              Recovery_Altitude_Bands, Altitude_Min_m,
                              Altitude_Max_m));
-               local_acceptable_action_flag := (if MyVectorOfIntervals.Is_Empty
+               local_acceptable_action_flag := (if MyVectorOfIntervals32.Is_Empty
                                                (Recovery_Altitude_Bands)    then
                                                    True else
                                           Successful_Placement_in_Recovery_Bands
