@@ -212,7 +212,7 @@ package LMCP_Messages with SPARK_Mode is
      (Index_Type   => Positive,
       Element_Type => RoutePlan);
    type RP_Seq is new RP_Sequences.Sequence with
-     Predicate =>
+     Ghost_Predicate =>
        (for all I in 1 .. RP_Sequences.Last (RP_Sequences.Sequence (RP_Seq)) =>
           (for all J in 1 .. RP_Sequences.Last (RP_Sequences.Sequence (RP_Seq)) =>
                I = J or else RP_Sequences.Get (RP_Sequences.Sequence (RP_Seq), I).RouteID /=

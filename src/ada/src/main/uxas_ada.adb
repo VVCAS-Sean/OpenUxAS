@@ -10,25 +10,21 @@ with Ctrl_C_Handler;
 with UxAS.Common.Configuration_Manager;   use UxAS.Common;
 with UxAS.Comms.LMCP_Net_Client.Service;  use UxAS.Comms.LMCP_Net_Client.Service;
 
-with UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validation;
-pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validation);
---  need package in closure for sake of package executable part
+with UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validator_Interfacing;
+pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Automation_Request_Validator_Interfacing);
+--  need package in closure for inclusion in executable
 
-with UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation;
-pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregation);
---  need package in closure for sake of package executable part
+with UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregator_Interfacing;
+pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Route_Aggregator_Interfacing);
+--  need package in closure for inclusion in executable
 
-with UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bounding;
-pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bounding);
---  need package in closure for sake of package executable part
+with UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bound_Interfacing;
+pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Assignment_Tree_Branch_Bound_Interfacing);
+--  need package in closure for inclusion in executable
 
-with UxAS.Comms.LMCP_Net_Client.Service.Example_Spark_Service;
-pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Example_Spark_Service);
---  need package in closure for sake of package executable part
-
-with UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management;
-pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Management);
---  need package in closure for sake of package executable part
+with UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Manager_Interfacing;
+pragma Unreferenced (UxAS.Comms.LMCP_Net_Client.Service.Waypoint_Plan_Manager_Interfacing);
+--  need package in closure for inclusion in executable
 
 with Ada.Strings.Unbounded;  use Ada.Strings.Unbounded;
 with UxAS.Common.String_Constant.Lmcp_Network_Socket_Address;

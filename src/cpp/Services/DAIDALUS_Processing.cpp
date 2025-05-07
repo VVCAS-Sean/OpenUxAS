@@ -1253,10 +1253,10 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
     }
     else if (afrl::cmasi::isAirVehicleState(receivedLmcpMessage->m_object))
     {
-        static bool bFirst = true; // flag for first message received
+        //static bool bFirst = true; // flag for first message received
         
         // Form DAIDLUS_Configuration on reception of the first message
-        if (bFirst)
+        if (m_bFirst)
         {
             std::shared_ptr<larcfm::DAIDALUS::DAIDALUSConfiguration> DetectionConfiguration = std::make_shared<larcfm::DAIDALUS::DAIDALUSConfiguration>();
             DetectionConfiguration->setEntityId(m_VehicleID);
@@ -1322,7 +1322,7 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
             m_isReadyToActConfiguration = true;  //boolean indicating if a threshold time is set from reading a DAIDALUS configuration parameter.
 
             sendSharedLmcpObjectBroadcastMessage(DetectionConfiguration);
-            bFirst = false; //turn off flag for first message
+            m_bFirst = false; //turn off flag for first message
         }
         
         // handle message
@@ -1450,10 +1450,13 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                         {
                             temp_regionType = larcfm::DAIDALUS::BandsRegion::NEAR;
                         }
-                        pTempPtr->getGroundHeadings()[0] = lower_trk_deg;
-                        pTempPtr->getGroundHeadings()[1] = upper_trk_deg;
-                        nogo_ptr->getWCVGroundHeadingIntervals().push_back(pTempPtr.release());
-                        nogo_ptr->getWCVGroundHeadingRegions().push_back(temp_regionType);
+                        if (upper_trk_deg - lower_trk_deg >= m_trk_step_deg)
+                            {
+                                pTempPtr->getGroundHeadings()[0] = lower_trk_deg;
+                                pTempPtr->getGroundHeadings()[1] = upper_trk_deg;
+                                nogo_ptr->getWCVGroundHeadingIntervals().push_back(pTempPtr.release());
+                                nogo_ptr->getWCVGroundHeadingRegions().push_back(temp_regionType);
+                            }
                     }
                     else if (regionType == larcfm::BandsRegion::RECOVERY)
                     {
@@ -1487,10 +1490,13 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                         {
                             temp_regionType = larcfm::DAIDALUS::BandsRegion::NEAR;
                         }
-                        pTempPtr->getGroundSpeeds()[0] = lower_gs_mps;
-                        pTempPtr->getGroundSpeeds()[1] = upper_gs_mps;
-                        nogo_ptr->getWCVGroundSpeedIntervals().push_back(pTempPtr.release());
-                        nogo_ptr->getWCVGroundSpeedRegions().push_back(temp_regionType);
+                        if (upper_gs_mps - lower_gs_mps >= m_gs_step_mps)
+                            {
+                                pTempPtr->getGroundSpeeds()[0] = lower_gs_mps;
+                                pTempPtr->getGroundSpeeds()[1] = upper_gs_mps;
+                                nogo_ptr->getWCVGroundSpeedIntervals().push_back(pTempPtr.release());
+                                nogo_ptr->getWCVGroundSpeedRegions().push_back(temp_regionType);
+                            }
                     }
                     else if (regionType == larcfm::BandsRegion::RECOVERY)
                     {
@@ -1524,10 +1530,13 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                         {
                             temp_regionType = larcfm::DAIDALUS::BandsRegion::NEAR;
                         }
-                        pTempPtr->getVerticalSpeeds()[0] = lower_vs_mps;
-                        pTempPtr->getVerticalSpeeds()[1] = upper_vs_mps;
-                        nogo_ptr->getWCVVerticalSpeedIntervals().push_back(pTempPtr.release());
-                        nogo_ptr->getWCVVerticalSpeedRegions().push_back(temp_regionType);
+                        if (upper_vs_mps - lower_vs_mps >= m_vs_step_mps)
+                            { 
+                                pTempPtr->getVerticalSpeeds()[0] = lower_vs_mps;
+                                pTempPtr->getVerticalSpeeds()[1] = upper_vs_mps;
+                                nogo_ptr->getWCVVerticalSpeedIntervals().push_back(pTempPtr.release());
+                                nogo_ptr->getWCVVerticalSpeedRegions().push_back(temp_regionType);
+                            }
                     }
                     else if (regionType == larcfm::BandsRegion::RECOVERY)
                     {
@@ -1561,10 +1570,13 @@ bool DAIDALUS_Processing::processReceivedLmcpMessage(std::unique_ptr<uxas::commu
                         {
                             temp_regionType = larcfm::DAIDALUS::BandsRegion::NEAR;
                         }
-                        pTempPtr->getAltitude()[0] = lower_alt_m;
-                        pTempPtr->getAltitude()[1] = upper_alt_m;
-                        nogo_ptr->getWCVAlitudeIntervals().push_back(pTempPtr.release());
-                        nogo_ptr->getWCVAltitudeRegions().push_back(temp_regionType);
+                        if (upper_alt_m - lower_alt_m >= m_alt_step_m)
+                            {
+                                pTempPtr->getAltitude()[0] = lower_alt_m;
+                                pTempPtr->getAltitude()[1] = upper_alt_m;
+                                nogo_ptr->getWCVAlitudeIntervals().push_back(pTempPtr.release());
+                                nogo_ptr->getWCVAltitudeRegions().push_back(temp_regionType);
+                            }
                     }
                     else if (regionType == larcfm::BandsRegion::RECOVERY)
                     {

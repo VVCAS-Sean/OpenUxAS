@@ -3,7 +3,7 @@ with Common;                use Common;
 with Ada.Unchecked_Deallocation;
 with SPARK.Big_Integers; use SPARK.Big_Integers;
 
-package Algebra with SPARK_Mode, Annotate => (GNATprove, Always_Return) is
+package Algebra with SPARK_Mode, Always_Terminates is
 
    Max_Children : constant := 50;
 
@@ -18,7 +18,7 @@ package Algebra with SPARK_Mode, Annotate => (GNATprove, Always_Return) is
 
    subtype Children_Number is Integer range 0 .. Max_Children;
    subtype Children_Index is Children_Number range 1 .. Children_Number'Last;
-   type Algebra_Tree_Array is array (Children_Index range <>) of Algebra_Tree;
+   type Algebra_Tree_Array is array (Children_Index range <>) of aliased Algebra_Tree;
    type Children_Array is new Algebra_Tree_Array
    with Predicate => (for all Child of Children_Array => Child /= null);
 
@@ -42,13 +42,15 @@ package Algebra with SPARK_Mode, Annotate => (GNATprove, Always_Return) is
 
    procedure Parse_Formula
      (Formula : Unbounded_String;
-      Algebra : out Algebra_Tree;
-      Error   : in out Boolean;
-      Message : in out Unbounded_String)
+      Algebra : aliased out Algebra_Tree;
+      Message : out Unbounded_String)
    with
+     Relaxed_Initialization => Message,
      Pre  => Length (Formula) > 1,
-     Post => (if not Error then Algebra /= null),
-     Subprogram_Variant => (Decreases => Length (Formula));
+     Post => Algebra /= null,
+     Subprogram_Variant => (Decreases => Length (Formula)),
+     Exceptional_Cases =>
+       (Parsing_Error => Message'Initialized);
 
    procedure Print_Tree
      (Algebra : not null access constant Algebra_Tree_Cell);

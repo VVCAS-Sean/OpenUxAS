@@ -21,8 +21,7 @@ package Bounded_Stack with SPARK_Mode is
      Ghost,
      Import,
      Global => null,
-     Annotate => (GNATprove, Logical_Equal),
-     Annotate => (GNATprove, Always_Return);
+     Annotate => (GNATprove, Logical_Equal);
 
    procedure Push (S : in out Stack; E : Element_Type) with
      Pre  => Size (S) < Count_Type'Last,
@@ -31,7 +30,8 @@ package Bounded_Stack with SPARK_Mode is
          and then
        (for all I in 1 .. Size (S'Old) => Element_Logic_Equal (Get (S, I), Get (S'Old, I)))
          and then
-           Element_Logic_Equal (Get (S, Size (S)), E);
+           Element_Logic_Equal (Get (S, Size (S)), E),
+     Always_Terminates;
 
    procedure Pop (S : in out Stack; E : out Element_Type) with
      Pre  => Size (S) > 0,
@@ -40,7 +40,8 @@ package Bounded_Stack with SPARK_Mode is
          and then
        (for all I in 1 .. Size (S) => Element_Logic_Equal (Get (S, I), Get (S'Old, I)))
          and then
-       Element_Logic_Equal (E, Get (S'Old, Size (S'Old)));
+           Element_Logic_Equal (E, Get (S'Old, Size (S'Old))),
+     Always_Terminates;
 
 private
 

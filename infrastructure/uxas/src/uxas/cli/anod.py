@@ -1,4 +1,5 @@
 """Simple front-end to the task-specific anod scripts contained in lib."""
+
 from e3.main import Main
 
 from argparse import SUPPRESS, ArgumentParser, _HelpAction
