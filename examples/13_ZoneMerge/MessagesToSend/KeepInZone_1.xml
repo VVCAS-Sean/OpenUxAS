@@ -7,7 +7,7 @@
   <AffectedAircraft/>
   <StartTime>0</StartTime>
   <EndTime>0</EndTime>
-  <Padding>0.0</Padding>
+  <Padding>60.0</Padding>
   <Label/>
   <Boundary>
     <Rectangle Series="CMASI">
