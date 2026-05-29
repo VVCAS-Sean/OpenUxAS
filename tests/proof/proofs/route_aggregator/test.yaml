@@ -1,3 +1,4 @@
 filenames: ["route_aggregator.ads"]
 level: 4
 timeout: 120
+memlimit: 4000

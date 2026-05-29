@@ -15,6 +15,7 @@ class GnatproveDriver(DiffTestDriver):
         filenames = self.test_env.get ("filenames")
         gnatprove_level = self.test_env.get ("level")
         gnatprove_timeout = self.test_env.get ("timeout")
+        gnatprove_memlimit= self.test_env.get("memlimit")
 
         if filenames != None:
             if self.env.options.no_replay:
@@ -29,6 +30,8 @@ class GnatproveDriver(DiffTestDriver):
                     proof_switches+= ["--level="+str(gnatprove_level)]
                 if gnatprove_timeout != None:
                     proof_switches+=["--timeout="+str(gnatprove_timeout)]
+                if gnatprove_memlimit != None:
+                    proof_switches +=["--memlimit="+str(gnatprove_memlimit)]
             else:
                 proof_switches=["--replay"]
 
@@ -60,6 +63,14 @@ class GnatproveTestsuite(Testsuite):
             metavar="N",
             default=300,
             help="Modify the timeout of processes running gnatprove (not related to gnatprove's --timeout option)"
+        )
+        self.main.argument_parser.add_argument(
+            "--memlimit",
+            dest="timeout",
+            type=int,
+            metavar="N",
+            default=4000,
+            help="Modify the memory limit of processes running gnatprove (in MB)"
         )
         self.main.argument_parser.add_argument(
             "-g",
